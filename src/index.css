@@ -1,0 +1,224 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 96%;
+    --foreground: 0 0% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 10%;
+
+    --primary: 0 0% 10%;
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 0 0% 10%;
+
+    --muted: 210 20% 96%;
+    --muted-foreground: 215 16% 47%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 0 0% 10%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 0 0% 10%;
+
+    --radius: 0.625rem;
+
+    /* Marketplace custom tokens */
+    --marketplace-orange: 24 95% 53%;
+    --marketplace-orange-light: 30 100% 95%;
+    --marketplace-red: 348 83% 47%;
+    --marketplace-red-light: 348 83% 95%;
+    --marketplace-green: 142 71% 45%;
+    --marketplace-green-light: 142 71% 93%;
+    --marketplace-blue: 217 91% 60%;
+    --marketplace-blue-light: 217 91% 95%;
+    --marketplace-yellow: 45 93% 47%;
+    --marketplace-gray: 220 9% 46%;
+    --marketplace-gray-light: 220 14% 96%;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Admin tokens */
+    --admin-bg: 0 0% 96%;
+    --admin-sidebar: 0 0% 100%;
+    --admin-sidebar-border: 214 32% 91%;
+    --admin-topbar: 0 0% 100%;
+    --admin-card: 0 0% 100%;
+    --admin-card-hover: 210 20% 98%;
+    --admin-text: 0 0% 10%;
+    --admin-text-muted: 215 16% 47%;
+    --admin-accent: 263 70% 50%;
+    --admin-accent-light: 263 70% 95%;
+    --admin-chart-stroke: 348 83% 47%;
+    --admin-chart-fill: 348 83% 90%;
+
+    /* VoidTok tokens */
+    --void-black: 240 10% 4%;
+    --void-deep: 240 10% 6%;
+    --void-card: 240 6% 9%;
+    --void-card-hover: 240 6% 13%;
+    --void-purple: 263 70% 58%;
+    --void-purple-glow: 263 60% 68%;
+    --void-cyan: 199 89% 48%;
+    --void-cyan-glow: 199 80% 62%;
+    --void-navy: 230 30% 14%;
+    --void-navy-border: 230 20% 20%;
+    --void-text: 0 0% 98%;
+    --void-text-muted: 230 10% 50%;
+    --void-success: 152 60% 48%;
+    --void-warning: 38 92% 50%;
+    --void-danger: 0 72% 55%;
+  }
+
+  .dark {
+    --background: 240 10% 4%;
+    --foreground: 210 20% 92%;
+
+    --card: 240 6% 9%;
+    --card-foreground: 210 20% 92%;
+
+    --popover: 240 6% 10%;
+    --popover-foreground: 210 20% 92%;
+
+    --primary: 263 70% 58%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 230 20% 14%;
+    --secondary-foreground: 210 20% 92%;
+
+    --muted: 240 6% 13%;
+    --muted-foreground: 220 10% 50%;
+
+    --accent: 199 89% 48%;
+    --accent-foreground: 0 0% 0%;
+
+    --destructive: 0 72% 55%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 230 15% 16%;
+    --input: 230 15% 16%;
+    --ring: 263 70% 58%;
+
+    /* Marketplace dark overrides */
+    --marketplace-red-light: 348 60% 18%;
+    --marketplace-green-light: 142 50% 15%;
+    --marketplace-blue-light: 217 60% 18%;
+    --marketplace-orange-light: 30 60% 18%;
+    --marketplace-gray-light: 220 14% 16%;
+
+    --admin-bg: 240 10% 4%;
+    --admin-sidebar: 240 6% 7%;
+    --admin-sidebar-border: 230 15% 14%;
+    --admin-topbar: 240 6% 7%;
+    --admin-card: 240 6% 9%;
+    --admin-card-hover: 240 6% 13%;
+    --admin-text: 210 20% 92%;
+    --admin-text-muted: 220 10% 50%;
+    --admin-accent: 263 70% 58%;
+    --admin-accent-light: 263 40% 18%;
+    --admin-chart-stroke: 199 89% 48%;
+    --admin-chart-fill: 199 60% 12%;
+
+    --sidebar-background: 240 6% 7%;
+    --sidebar-foreground: 210 10% 68%;
+    --sidebar-primary: 263 70% 58%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 230 20% 14%;
+    --sidebar-accent-foreground: 210 20% 92%;
+    --sidebar-border: 230 15% 14%;
+    --sidebar-ring: 199 89% 48%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  #lovable-badge { 
+    display: none !important; 
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+  }
+
+  .void-glow-cyan {
+    box-shadow: 0 0 20px hsl(199 89% 48% / 0.15), 0 0 60px hsl(199 89% 48% / 0.05);
+  }
+
+  .void-glow-purple {
+    box-shadow: 0 0 20px hsl(263 70% 58% / 0.15), 0 0 60px hsl(263 70% 58% / 0.05);
+  }
+
+  .void-glow-cyan-sm {
+    box-shadow: 0 0 12px hsl(199 89% 48% / 0.12);
+  }
+
+  .void-glow-purple-sm {
+    box-shadow: 0 0 12px hsl(263 70% 58% / 0.12);
+  }
+
+  .void-gradient-bg {
+    background: 
+      radial-gradient(ellipse 80% 50% at 50% -20%, hsl(263 70% 58% / 0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 100% 100%, hsl(199 89% 48% / 0.03) 0%, transparent 50%),
+      hsl(240 10% 4%);
+  }
+
+  .void-card-border {
+    border: 1px solid hsl(230 15% 16%);
+  }
+
+  .void-card-navy {
+    border-color: hsl(230 20% 18%);
+    background: hsl(240 6% 9%);
+  }
+
+  .void-text-gradient {
+    background: linear-gradient(135deg, hsl(263 60% 68%), hsl(199 89% 48%));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .icon-glow:hover {
+    filter: drop-shadow(0 0 4px hsl(199 89% 48% / 0.4));
+    transition: filter 0.2s ease;
+  }
+
+  .icon-glow-purple:hover {
+    filter: drop-shadow(0 0 4px hsl(263 70% 58% / 0.4));
+    transition: filter 0.2s ease;
+  }
+}

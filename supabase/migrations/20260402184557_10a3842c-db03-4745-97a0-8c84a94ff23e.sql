@@ -1,0 +1,1 @@
+ALTER TABLE public.orders ADD COLUMN utm_params jsonb DEFAULT '{}'::jsonb;

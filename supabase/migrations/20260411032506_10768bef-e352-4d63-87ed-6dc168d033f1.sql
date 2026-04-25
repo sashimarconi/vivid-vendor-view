@@ -1,0 +1,1 @@
+ALTER TABLE public.tracking_pixels ADD COLUMN IF NOT EXISTS name text DEFAULT NULL;
