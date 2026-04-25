@@ -9,6 +9,11 @@ import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { PRODUCT_THEMES, type ProductThemePreset } from "@/data/productThemes";
 import {
+  DEFAULT_PRODUCT_PAGE_BUILDER_CONFIG,
+  PRODUCT_PAGE_PREVIEW_MESSAGE_TYPE,
+  type ProductPageBuilderConfig,
+} from "@/lib/product-page-builder";
+import {
   GripVertical, Eye, EyeOff, Palette, Type, Layout, Sparkles,
   Save, Smartphone, Monitor, Upload, Image, DollarSign, Truck,
   ShieldCheck, Store, Star, FileText, ShoppingBag, ChevronDown, ChevronRight,
@@ -48,52 +53,6 @@ interface ConversionConfig {
   show_units_available: boolean;
   units_available_count: number;
 }
-
-interface ProductBuilderConfig {
-  sections: Section[];
-  appearance: AppearanceConfig;
-  texts: TextsConfig;
-  conversion: ConversionConfig;
-}
-
-const DEFAULT_CONFIG: ProductBuilderConfig = {
-  sections: [
-    { id: "gallery", enabled: true, label: "Galeria de Imagens" },
-    { id: "pricing", enabled: true, label: "Preço e Desconto" },
-    { id: "info", enabled: true, label: "Informações do Produto" },
-    { id: "shipping", enabled: true, label: "Frete" },
-    { id: "trust_badges", enabled: true, label: "Selos de Confiança" },
-    { id: "store_card", enabled: true, label: "Card da Loja" },
-    { id: "reviews", enabled: true, label: "Avaliações" },
-    { id: "description", enabled: true, label: "Descrição" },
-    { id: "related", enabled: true, label: "Produtos Relacionados" },
-  ],
-  appearance: {
-    bg_color: "",
-    header_bg_color: "",
-    header_logo_url: "",
-    header_logo_height: 28,
-    show_cart_icon: true,
-    button_color: "#E63946",
-    button_text_color: "#FFFFFF",
-    button_radius: "lg",
-  },
-  texts: {
-    buy_button_text: "Comprar agora",
-    shipping_label: "Frete grátis",
-    reviews_title: "Avaliações",
-    units_available_text: "13 unidades disponíveis",
-    description_title: "Descrição do produto",
-    related_title: "Mais desta loja",
-  },
-  conversion: {
-    show_discount_badge: true,
-    show_flash_sale: true,
-    show_sold_count: true,
-    show_units_available: true,
-    units_available_count: 13,
-  },
-};
 
 const SECTION_ICONS: Record<string, React.ReactNode> = {
   gallery: <Image className="w-4 h-4" />,
