@@ -253,6 +253,14 @@ const MfaDevicesSection = () => {
                   <Button
                     size="icon"
                     variant="ghost"
+                    onClick={() => handleViewCode(f.id, f.friendly_name)}
+                    title="Ver QR Code / código secreto"
+                  >
+                    <QrCode className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="ghost"
                     onClick={() => handleRemove(f.id, f.friendly_name)}
                     className="text-destructive hover:text-destructive"
                   >
