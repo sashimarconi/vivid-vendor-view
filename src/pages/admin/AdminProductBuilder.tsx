@@ -147,7 +147,7 @@ const AdminProductBuilder = () => {
         .from("product_page_builder_config" as any)
         .select("*")
         .limit(1)
-        .single();
+        .maybeSingle();
       if (error) throw error;
       return data as any;
     },
