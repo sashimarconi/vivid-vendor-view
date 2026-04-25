@@ -685,6 +685,7 @@ const AdminProductBuilder = () => {
                 ref={iframeRef}
                 key={`${previewMode}-${previewProduct.slug}`}
                 src={`/product/${previewProduct.slug}?preview=true`}
+                onLoad={postPreviewConfig}
                 className="w-full h-full border-0"
                 style={{ minHeight: 800 }}
                 title="Product Page Preview"
