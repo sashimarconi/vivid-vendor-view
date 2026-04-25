@@ -191,11 +191,24 @@ const AdminProductBuilder = () => {
   const saveMutation = useMutation({
     mutationFn: async () => {
       const configWithTheme = { ...config, theme_id: activeThemeId };
-      const { error } = await supabase
-        .from("product_page_builder_config" as any)
-        .update({ config: configWithTheme as any, updated_at: new Date().toISOString() } as any)
-        .eq("id", configId);
-      if (error) throw error;
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Não autenticado");
+
+      if (configId) {
+        const { error } = await supabase
+          .from("product_page_builder_config" as any)
+          .update({ config: configWithTheme as any, updated_at: new Date().toISOString() } as any)
+          .eq("id", configId);
+        if (error) throw error;
+      } else {
+        const { data: inserted, error } = await supabase
+          .from("product_page_builder_config" as any)
+          .insert({ config: configWithTheme as any, user_id: user.id } as any)
+          .select("id")
+          .single();
+        if (error) throw error;
+        if (inserted) setConfigId((inserted as any).id);
+      }
 
       // Sync logo to store_settings
       if (config.appearance.header_logo_url) {
@@ -203,7 +216,7 @@ const AdminProductBuilder = () => {
           .from("store_settings")
           .select("id")
           .limit(1)
-          .single();
+          .maybeSingle();
         if (storeSettings) {
           await supabase
             .from("store_settings")
