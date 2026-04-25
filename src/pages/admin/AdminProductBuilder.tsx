@@ -54,6 +54,28 @@ interface ConversionConfig {
   units_available_count: number;
 }
 
+interface ProductBuilderConfig extends ProductPageBuilderConfig {
+  sections: Section[];
+  appearance: AppearanceConfig;
+  texts: TextsConfig;
+  conversion: ConversionConfig;
+}
+
+const DEFAULT_CONFIG: ProductBuilderConfig = {
+  ...DEFAULT_PRODUCT_PAGE_BUILDER_CONFIG,
+  sections: [
+    { id: "gallery", enabled: true, label: "Galeria de Imagens" },
+    { id: "pricing", enabled: true, label: "Preço e Desconto" },
+    { id: "info", enabled: true, label: "Informações do Produto" },
+    { id: "shipping", enabled: true, label: "Frete" },
+    { id: "trust_badges", enabled: true, label: "Selos de Confiança" },
+    { id: "store_card", enabled: true, label: "Card da Loja" },
+    { id: "reviews", enabled: true, label: "Avaliações" },
+    { id: "description", enabled: true, label: "Descrição" },
+    { id: "related", enabled: true, label: "Produtos Relacionados" },
+  ],
+};
+
 const SECTION_ICONS: Record<string, React.ReactNode> = {
   gallery: <Image className="w-4 h-4" />,
   pricing: <DollarSign className="w-4 h-4" />,
