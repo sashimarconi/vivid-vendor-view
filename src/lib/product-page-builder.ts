@@ -28,6 +28,7 @@ export interface ProductPageBuilderConfig {
 }
 
 export const PRODUCT_PAGE_PREVIEW_MESSAGE_TYPE = "product-page-builder-preview";
+export const PRODUCT_PAGE_PREVIEW_READY_MESSAGE_TYPE = "product-page-builder-preview-ready";
 
 export const DEFAULT_PRODUCT_PAGE_BUILDER_CONFIG: ProductPageBuilderConfig = {
   sections: [
