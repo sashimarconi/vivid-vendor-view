@@ -9,6 +9,7 @@ import {
   DEFAULT_PRODUCT_PAGE_BUILDER_CONFIG,
   normalizeProductPageBuilderConfig,
   PRODUCT_PAGE_PREVIEW_MESSAGE_TYPE,
+  PRODUCT_PAGE_PREVIEW_READY_MESSAGE_TYPE,
   type ProductPageBuilderConfig,
 } from "@/lib/product-page-builder";
 import ProductHeader from "@/components/product/ProductHeader";
@@ -85,7 +86,10 @@ const ProductPage = () => {
     const isPreviewMode = new URLSearchParams(window.location.search).get("preview") === "true";
     if (!isPreviewMode) return;
 
+    window.parent.postMessage({ type: PRODUCT_PAGE_PREVIEW_READY_MESSAGE_TYPE }, window.location.origin);
+
     const handleMessage = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) return;
       if (event.data?.type !== PRODUCT_PAGE_PREVIEW_MESSAGE_TYPE) return;
       setPreviewBuilder(normalizeProductPageBuilderConfig(event.data.config));
     };

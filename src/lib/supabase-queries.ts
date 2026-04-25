@@ -108,10 +108,10 @@ export async function fetchStoreSettings() {
     .from("store_settings")
     .select("*")
     .limit(1)
-    .single();
+    .maybeSingle();
 
   if (error) throw error;
-  return data;
+  return data ?? null;
 }
 
 export async function fetchStoreBySlug(slug: string) {
