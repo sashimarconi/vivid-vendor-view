@@ -354,18 +354,24 @@ const MfaDevicesSection = () => {
         </DialogContent>
       </Dialog>
 
-      {/* AAL2 prompt for removal */}
+      {/* AAL2 prompt for removal / regenerate */}
       <Mfa2faPrompt
         open={aal2Open}
         onClose={() => {
           setAal2Open(false);
           setPendingRemoveId(null);
+          setPendingRegenerate(null);
         }}
         onVerified={async () => {
           setAal2Open(false);
           if (pendingRemoveId) {
             await performRemove(pendingRemoveId);
             setPendingRemoveId(null);
+          }
+          if (pendingRegenerate) {
+            const { id, name } = pendingRegenerate;
+            setPendingRegenerate(null);
+            await performRegenerate(id, name);
           }
         }}
       />
