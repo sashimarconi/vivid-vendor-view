@@ -30,6 +30,16 @@ type NotificationSettingsRow = {
   mobile_pending_image_url?: string | null;
 };
 
+function normalizeBase64Url(value: string) {
+  return value.trim().replace(/^['\"]|['\"]$/g, "").replace(/\s+/g, "");
+}
+
+function decodedByteLength(base64Url: string) {
+  const padding = "=".repeat((4 - (base64Url.length % 4)) % 4);
+  const base64 = (base64Url + padding).replace(/-/g, "+").replace(/_/g, "/");
+  return atob(base64).length;
+}
+
 function formatCurrency(value: unknown) {
   return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(Number(value) || 0);
 }
@@ -119,9 +129,17 @@ Deno.serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const vapidPublicKey = Deno.env.get("VAPID_PUBLIC_KEY")!;
-    const vapidPrivateKey = Deno.env.get("VAPID_PRIVATE_KEY")!;
+    const vapidPublicKey = normalizeBase64Url(Deno.env.get("VAPID_PUBLIC_KEY") || "");
+    const vapidPrivateKey = normalizeBase64Url(Deno.env.get("VAPID_PRIVATE_KEY") || "");
     const supabase = createClient(supabaseUrl, serviceRoleKey);
+
+    if (!vapidPublicKey || !vapidPrivateKey) {
+      throw new Error("Missing VAPID keys");
+    }
+
+    if (decodedByteLength(vapidPublicKey) !== 65) {
+      throw new Error(`Invalid VAPID public key length after normalization: ${decodedByteLength(vapidPublicKey)} bytes`);
+    }
 
     const requestBody = await req.json();
     const { event_type, user_id, owner_user_id } = requestBody;
