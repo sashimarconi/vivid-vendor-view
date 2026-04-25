@@ -11,6 +11,7 @@ import { PRODUCT_THEMES, type ProductThemePreset } from "@/data/productThemes";
 import {
   DEFAULT_PRODUCT_PAGE_BUILDER_CONFIG,
   PRODUCT_PAGE_PREVIEW_MESSAGE_TYPE,
+  PRODUCT_PAGE_PREVIEW_READY_MESSAGE_TYPE,
   type ProductPageBuilderConfig,
 } from "@/lib/product-page-builder";
 import {
@@ -108,6 +109,17 @@ const AdminProductBuilder = () => {
   const logoInputRef = useRef<HTMLInputElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
+  useEffect(() => {
+    const handlePreviewReady = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) return;
+      if (event.data?.type !== PRODUCT_PAGE_PREVIEW_READY_MESSAGE_TYPE) return;
+      postPreviewConfig();
+    };
+
+    window.addEventListener("message", handlePreviewReady);
+    return () => window.removeEventListener("message", handlePreviewReady);
+  }, [config]);
+
   const { data: previewProduct } = useQuery({
     queryKey: ["builder-preview-product"],
     queryFn: async () => {
@@ -203,13 +215,23 @@ const AdminProductBuilder = () => {
         const { data: storeSettings } = await supabase
           .from("store_settings")
           .select("id")
+          .eq("user_id", user.id)
           .limit(1)
           .maybeSingle();
         if (storeSettings) {
-          await supabase
+          const { error } = await supabase
             .from("store_settings")
-            .update({ product_page_logo_url: config.appearance.header_logo_url })
+            .update({ product_page_logo_url: config.appearance.header_logo_url } as any)
             .eq("id", storeSettings.id);
+          if (error) throw error;
+        } else {
+          const { error } = await supabase
+            .from("store_settings")
+            .insert({
+              user_id: user.id,
+              product_page_logo_url: config.appearance.header_logo_url,
+            } as any);
+          if (error) throw error;
         }
       }
     },
