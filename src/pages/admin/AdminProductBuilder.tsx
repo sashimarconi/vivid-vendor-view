@@ -162,12 +162,19 @@ const AdminProductBuilder = () => {
     toast({ title: `Tema "${theme.name}" aplicado!`, description: "Personalize à vontade e salve quando quiser." });
   };
 
-  // Reload iframe when config changes
-  const reloadPreview = () => {
-    if (iframeRef.current) {
-      iframeRef.current.src = iframeRef.current.src;
-    }
+  const postPreviewConfig = () => {
+    iframeRef.current?.contentWindow?.postMessage(
+      {
+        type: PRODUCT_PAGE_PREVIEW_MESSAGE_TYPE,
+        config,
+      },
+      window.location.origin,
+    );
   };
+
+  useEffect(() => {
+    postPreviewConfig();
+  }, [config]);
 
   const saveMutation = useMutation({
     mutationFn: async () => {
@@ -210,7 +217,7 @@ const AdminProductBuilder = () => {
       queryClient.invalidateQueries({ queryKey: ["product-page-builder-config"] });
       queryClient.invalidateQueries({ queryKey: ["store-settings"] });
       toast({ title: "Builder salvo com sucesso!" });
-      setTimeout(reloadPreview, 500);
+      setTimeout(postPreviewConfig, 150);
     },
     onError: (err: Error) => {
       toast({ title: "Erro ao salvar", description: err.message, variant: "destructive" });
