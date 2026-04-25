@@ -156,6 +156,57 @@ const MfaDevicesSection = () => {
     performRemove(id);
   };
 
+  const performRegenerate = async (id: string, name: string) => {
+    setEnrolling(true);
+    setAddOpen(true);
+    setFriendlyName(name);
+    setQrCode("");
+    setSecret("");
+    setFactorId("");
+    setCode("");
+    try {
+      // Remove o fator atual (precisa de AAL2 — já garantido pelo prompt anterior)
+      const { error: unErr } = await supabase.auth.mfa.unenroll({ factorId: id });
+      if (unErr) throw unErr;
+
+      // Limpa fatores não verificados pendentes
+      const { data: existing } = await supabase.auth.mfa.listFactors();
+      const stale = existing?.totp?.filter((f) => f.status !== "verified") ?? [];
+      for (const f of stale) {
+        await supabase.auth.mfa.unenroll({ factorId: f.id });
+      }
+
+      // Cria um novo fator e exibe QR + secret
+      const { data, error } = await supabase.auth.mfa.enroll({
+        factorType: "totp",
+        friendlyName: `${name} - ${Date.now()}`,
+      });
+      if (error) throw error;
+      setQrCode(data.totp.qr_code);
+      setSecret(data.totp.secret);
+      setFactorId(data.id);
+      await loadFactors();
+      toast.success("Novo código gerado. Escaneie para reativar o 2FA.");
+    } catch (err: any) {
+      toast.error(err.message || "Erro ao regenerar código");
+      setAddOpen(false);
+    } finally {
+      setEnrolling(false);
+    }
+  };
+
+  const handleViewCode = (id: string, name?: string | null) => {
+    const displayName = name || "Dispositivo 2FA";
+    if (
+      !confirm(
+        `Por segurança, o código secreto e o QR Code originais não podem ser exibidos novamente.\n\nPara visualizar um novo código, será necessário GERAR UM NOVO 2FA: o dispositivo atual "${displayName}" será desativado e você precisará escanear o novo QR Code para reativar.\n\nDeseja continuar?`,
+      )
+    )
+      return;
+    setPendingRegenerate({ id, name: displayName });
+    setAal2Open(true);
+  };
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
