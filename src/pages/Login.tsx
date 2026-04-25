@@ -151,14 +151,6 @@ const Login = () => {
             </Button>
           </form>
 
-          <div className="text-center">
-            <p className="text-sm text-muted-foreground">
-              Não tem conta?{" "}
-              <Link to="/register" className="text-void-cyan hover:underline font-semibold">
-                Criar conta
-              </Link>
-            </p>
-          </div>
         </div>
       </div>
     </div>

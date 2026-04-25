@@ -6,11 +6,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { DomainProvider, useDomain } from "@/contexts/DomainContext";
 import CustomDomainRoutes from "@/components/CustomDomainRoutes";
 import Index from "./pages/Index";
-import LandingPage from "./pages/LandingPage";
 import ProductPage from "./pages/ProductPage";
 import StorePage from "./pages/StorePage";
 import Login from "./pages/Login";
-import Register from "./pages/Register";
 import AdminLayout from "./components/admin/AdminLayout";
 import AdminProducts from "./pages/admin/AdminProducts";
 import AdminProductForm from "./pages/admin/AdminProductForm";
@@ -66,7 +64,6 @@ const AppRoutes = () => {
   // Platform domain: full app
   return (
     <Routes>
-      <Route path="/" element={<LandingPage />} />
       <Route path="/marketplace" element={<Index />} />
       <Route path="/product/:slug" element={<ProductPage />} />
       <Route path="/products/:slug" element={<ProductPage />} />
@@ -75,7 +72,6 @@ const AppRoutes = () => {
       <Route path="/obrigado/:slug" element={<ThankYouRedirect />} />
       <Route path="/login" element={<Login />} />
       <Route path="/reset-password" element={<ResetPassword />} />
-      <Route path="/register" element={<Register />} />
       <Route path="/admin" element={<SaasAdminLayout />}>
         <Route index element={<SaasMetrics />} />
         <Route path="analytics" element={<SaasAnalytics />} />
