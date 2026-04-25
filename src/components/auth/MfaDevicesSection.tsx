@@ -33,8 +33,9 @@ const MfaDevicesSection = () => {
   const [verifying, setVerifying] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  // AAL2 step-up for removal
+  // AAL2 step-up for removal / regenerate
   const [pendingRemoveId, setPendingRemoveId] = useState<string | null>(null);
+  const [pendingRegenerate, setPendingRegenerate] = useState<{ id: string; name: string } | null>(null);
   const [aal2Open, setAal2Open] = useState(false);
 
   const loadFactors = async () => {
