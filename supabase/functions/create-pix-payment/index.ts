@@ -174,12 +174,12 @@ function toAbsoluteUrl(baseUrl: string, value?: string | null) {
   return `${base}${path}`;
 }
 
-async function getGatewayForProductOwner(supabase: ReturnType<typeof createClient>, productId: string) {
+async function getGatewayForProductOwner(supabase: any, productId: string) {
   const { data: product, error: productError } = await supabase
     .from("products")
     .select("id, user_id, thank_you_url")
     .eq("id", productId)
-    .maybeSingle();
+    .maybeSingle() as { data: any; error: any };
 
   if (productError) {
     throw new Error(`Erro ao buscar produto: ${productError.message}`);
@@ -199,7 +199,7 @@ async function getGatewayForProductOwner(supabase: ReturnType<typeof createClien
     .eq("user_id", product.user_id)
     .eq("active", true)
     .limit(1)
-    .maybeSingle();
+    .maybeSingle() as { data: any; error: any };
 
   if (gatewayError) {
     throw new Error(`Erro ao buscar gateway: ${gatewayError.message}`);
