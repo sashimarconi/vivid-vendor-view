@@ -5,6 +5,12 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchProductBySlug, fetchStoreForProduct, fetchStoreProducts, fetchStoreSettings } from "@/lib/supabase-queries";
+import {
+  DEFAULT_PRODUCT_PAGE_BUILDER_CONFIG,
+  normalizeProductPageBuilderConfig,
+  PRODUCT_PAGE_PREVIEW_MESSAGE_TYPE,
+  type ProductPageBuilderConfig,
+} from "@/lib/product-page-builder";
 import ProductHeader from "@/components/product/ProductHeader";
 import ProductGallery from "@/components/product/ProductGallery";
 import PricingBlock from "@/components/product/PricingBlock";
@@ -16,52 +22,6 @@ import StoreCard from "@/components/product/StoreCard";
 import RelatedProducts from "@/components/product/RelatedProducts";
 import FixedFooter from "@/components/product/FixedFooter";
 import BuySheet from "@/components/product/BuySheet";
-
-export interface ProductPageBuilderConfig {
-  sections: { id: string; enabled: boolean; label: string }[];
-  appearance: {
-    bg_color: string;
-    header_bg_color: string;
-    header_logo_url: string;
-    header_logo_height: number;
-    show_cart_icon: boolean;
-    button_color: string;
-    button_text_color: string;
-    button_radius: string;
-  };
-  texts: {
-    buy_button_text: string;
-    shipping_label: string;
-    reviews_title: string;
-    units_available_text: string;
-    description_title: string;
-    related_title: string;
-  };
-  conversion: {
-    show_discount_badge: boolean;
-    show_flash_sale: boolean;
-    show_sold_count: boolean;
-    show_units_available: boolean;
-    units_available_count: number;
-  };
-}
-
-const DEFAULT_BUILDER: ProductPageBuilderConfig = {
-  sections: [
-    { id: "gallery", enabled: true, label: "Galeria" },
-    { id: "pricing", enabled: true, label: "Preço" },
-    { id: "info", enabled: true, label: "Info" },
-    { id: "shipping", enabled: true, label: "Frete" },
-    { id: "trust_badges", enabled: true, label: "Badges" },
-    { id: "store_card", enabled: true, label: "Loja" },
-    { id: "reviews", enabled: true, label: "Avaliações" },
-    { id: "description", enabled: true, label: "Descrição" },
-    { id: "related", enabled: true, label: "Relacionados" },
-  ],
-  appearance: { bg_color: "", header_bg_color: "", header_logo_url: "", header_logo_height: 28, show_cart_icon: true, button_color: "#E63946", button_text_color: "#FFFFFF", button_radius: "lg" },
-  texts: { buy_button_text: "Comprar agora", shipping_label: "Frete grátis", reviews_title: "Avaliações", units_available_text: "13 unidades disponíveis", description_title: "Descrição do produto", related_title: "Mais desta loja" },
-  conversion: { show_discount_badge: true, show_flash_sale: true, show_sold_count: true, show_units_available: true, units_available_count: 13 },
-};
 
 const ProductPage = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -119,16 +79,22 @@ const ProductPage = () => {
     },
   });
 
-  const builder: ProductPageBuilderConfig = (() => {
-    if (!builderRaw?.config || Object.keys(builderRaw.config).length === 0) return DEFAULT_BUILDER;
-    const c = builderRaw.config as any;
-    return {
-      sections: c.sections || DEFAULT_BUILDER.sections,
-      appearance: { ...DEFAULT_BUILDER.appearance, ...(c.appearance || {}) },
-      texts: { ...DEFAULT_BUILDER.texts, ...(c.texts || {}) },
-      conversion: { ...DEFAULT_BUILDER.conversion, ...(c.conversion || {}) },
+  const [previewBuilder, setPreviewBuilder] = useState<ProductPageBuilderConfig | null>(null);
+
+  useEffect(() => {
+    const isPreviewMode = new URLSearchParams(window.location.search).get("preview") === "true";
+    if (!isPreviewMode) return;
+
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data?.type !== PRODUCT_PAGE_PREVIEW_MESSAGE_TYPE) return;
+      setPreviewBuilder(normalizeProductPageBuilderConfig(event.data.config));
     };
-  })();
+
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, []);
+
+  const builder = previewBuilder ?? normalizeProductPageBuilderConfig(builderRaw?.config ?? DEFAULT_PRODUCT_PAGE_BUILDER_CONFIG);
 
   const reviewsRef = useRef<HTMLDivElement>(null);
   const descriptionRef = useRef<HTMLDivElement>(null);

@@ -9,6 +9,11 @@ import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { PRODUCT_THEMES, type ProductThemePreset } from "@/data/productThemes";
 import {
+  DEFAULT_PRODUCT_PAGE_BUILDER_CONFIG,
+  PRODUCT_PAGE_PREVIEW_MESSAGE_TYPE,
+  type ProductPageBuilderConfig,
+} from "@/lib/product-page-builder";
+import {
   GripVertical, Eye, EyeOff, Palette, Type, Layout, Sparkles,
   Save, Smartphone, Monitor, Upload, Image, DollarSign, Truck,
   ShieldCheck, Store, Star, FileText, ShoppingBag, ChevronDown, ChevronRight,
@@ -49,7 +54,7 @@ interface ConversionConfig {
   units_available_count: number;
 }
 
-interface ProductBuilderConfig {
+interface ProductBuilderConfig extends ProductPageBuilderConfig {
   sections: Section[];
   appearance: AppearanceConfig;
   texts: TextsConfig;
@@ -57,6 +62,7 @@ interface ProductBuilderConfig {
 }
 
 const DEFAULT_CONFIG: ProductBuilderConfig = {
+  ...DEFAULT_PRODUCT_PAGE_BUILDER_CONFIG,
   sections: [
     { id: "gallery", enabled: true, label: "Galeria de Imagens" },
     { id: "pricing", enabled: true, label: "Preço e Desconto" },
@@ -68,31 +74,6 @@ const DEFAULT_CONFIG: ProductBuilderConfig = {
     { id: "description", enabled: true, label: "Descrição" },
     { id: "related", enabled: true, label: "Produtos Relacionados" },
   ],
-  appearance: {
-    bg_color: "",
-    header_bg_color: "",
-    header_logo_url: "",
-    header_logo_height: 28,
-    show_cart_icon: true,
-    button_color: "#E63946",
-    button_text_color: "#FFFFFF",
-    button_radius: "lg",
-  },
-  texts: {
-    buy_button_text: "Comprar agora",
-    shipping_label: "Frete grátis",
-    reviews_title: "Avaliações",
-    units_available_text: "13 unidades disponíveis",
-    description_title: "Descrição do produto",
-    related_title: "Mais desta loja",
-  },
-  conversion: {
-    show_discount_badge: true,
-    show_flash_sale: true,
-    show_sold_count: true,
-    show_units_available: true,
-    units_available_count: 13,
-  },
 };
 
 const SECTION_ICONS: Record<string, React.ReactNode> = {
@@ -181,12 +162,19 @@ const AdminProductBuilder = () => {
     toast({ title: `Tema "${theme.name}" aplicado!`, description: "Personalize à vontade e salve quando quiser." });
   };
 
-  // Reload iframe when config changes
-  const reloadPreview = () => {
-    if (iframeRef.current) {
-      iframeRef.current.src = iframeRef.current.src;
-    }
+  const postPreviewConfig = () => {
+    iframeRef.current?.contentWindow?.postMessage(
+      {
+        type: PRODUCT_PAGE_PREVIEW_MESSAGE_TYPE,
+        config,
+      },
+      window.location.origin,
+    );
   };
+
+  useEffect(() => {
+    postPreviewConfig();
+  }, [config]);
 
   const saveMutation = useMutation({
     mutationFn: async () => {
@@ -229,7 +217,7 @@ const AdminProductBuilder = () => {
       queryClient.invalidateQueries({ queryKey: ["product-page-builder-config"] });
       queryClient.invalidateQueries({ queryKey: ["store-settings"] });
       toast({ title: "Builder salvo com sucesso!" });
-      setTimeout(reloadPreview, 500);
+      setTimeout(postPreviewConfig, 150);
     },
     onError: (err: Error) => {
       toast({ title: "Erro ao salvar", description: err.message, variant: "destructive" });
@@ -697,6 +685,7 @@ const AdminProductBuilder = () => {
                 ref={iframeRef}
                 key={`${previewMode}-${previewProduct.slug}`}
                 src={`/product/${previewProduct.slug}?preview=true`}
+                onLoad={postPreviewConfig}
                 className="w-full h-full border-0"
                 style={{ minHeight: 800 }}
                 title="Product Page Preview"
