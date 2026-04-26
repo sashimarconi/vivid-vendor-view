@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { usePageTracking, useVisitorHeartbeat } from "@/hooks/usePageTracking";
+import { usePageTracking, useVisitorHeartbeat, trackEvent } from "@/hooks/usePageTracking";
 import { useTikTokPixel, trackTikTokViewContent } from "@/hooks/useTikTokPixel";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -113,6 +113,16 @@ const ProductPage = () => {
 
   const handleBuyNow = (selectedVariants: Record<string, string> | string | null, quantity: number) => {
     setBuySheetOpen(false);
+    // Funil tracking: registra clique em "Comprar"
+    if (product?.user_id) {
+      trackEvent("buy_click", product.user_id, {
+        product_id: product.id,
+        product_slug: slug,
+        quantity,
+      }).then(({ error }) => {
+        if (error) console.error("[Funnel] buy_click error:", error.message);
+      });
+    }
     if (product?.checkout_type === "external" && product.external_checkout_url) {
       window.open(product.external_checkout_url, "_blank");
     } else {

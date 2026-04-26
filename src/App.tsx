@@ -28,6 +28,8 @@ import AdminStores from "./pages/admin/AdminStores";
 import AdminLiveView from "./pages/admin/AdminLiveView";
 import AdminAbandonedCarts from "./pages/admin/AdminAbandonedCarts";
 import AdminAnalytics from "./pages/admin/AdminAnalytics";
+import AdminFunnel from "./pages/admin/AdminFunnel";
+import AdminPaymentHealth from "./pages/admin/AdminPaymentHealth";
 import AdminPlans from "./pages/admin/AdminPlans";
 import SaasAdminLayout from "./components/admin/SaasAdminLayout";
 import SaasMetrics from "./pages/admin/SaasMetrics";
@@ -84,6 +86,8 @@ const AppRoutes = () => {
         <Route index element={<AdminDashboard />} />
         <Route path="live-view" element={<AdminLiveView />} />
         <Route path="analytics" element={<AdminAnalytics />} />
+        <Route path="funnel" element={<AdminFunnel />} />
+        <Route path="payment-health" element={<AdminPaymentHealth />} />
         <Route path="orders" element={<AdminOrders />} />
         <Route path="abandoned-carts" element={<AdminAbandonedCarts />} />
         <Route path="products" element={<AdminProducts />} />

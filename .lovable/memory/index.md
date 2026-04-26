@@ -24,3 +24,4 @@ Português BR em toda UI do dashboard.
 - [Admin Reviews](mem://features/admin-reviews) — Avaliações vinculadas a múltiplos produtos
 - [Conversion Tools](mem://admin/conversion-tools) — Fretes e order bumps
 - [Variant Management](mem://features/variant-management) — Variantes agrupadas por categorias
+- [Funnel & Payment Health](mem://features/funnel-and-payment-health) — Funil sessões→PIX→pago com alertas, gateway health logs, fallback automático por prioridade

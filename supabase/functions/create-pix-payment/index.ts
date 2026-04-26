@@ -188,7 +188,7 @@ function toAbsoluteUrl(baseUrl: string, value?: string | null) {
   return `${base}${path}`;
 }
 
-async function getGatewayForProductOwner(supabase: any, productId: string) {
+async function getGatewaysForProductOwner(supabase: any, productId: string) {
   const { data: product, error: productError } = await supabase
     .from("products")
     .select("id, user_id, thank_you_url")
@@ -207,23 +207,64 @@ async function getGatewayForProductOwner(supabase: any, productId: string) {
     throw new Error("Produto sem proprietário configurado");
   }
 
-  const { data: gateway, error: gatewayError } = await supabase
+  // Pega o gateway ativo + os demais configurados (com chaves) ordenados por fallback_priority desc
+  // Para uso como fallback se o ativo falhar.
+  const { data: gateways, error: gatewayError } = await supabase
     .from("gateway_settings")
     .select("*")
     .eq("user_id", product.user_id)
-    .eq("active", true)
-    .limit(1)
-    .maybeSingle() as { data: any; error: any };
+    .not("secret_key", "is", null)
+    .order("active", { ascending: false })
+    .order("fallback_priority", { ascending: false }) as { data: any; error: any };
 
   if (gatewayError) {
     throw new Error(`Erro ao buscar gateway: ${gatewayError.message}`);
   }
 
-  if (!gateway?.secret_key) {
+  const valid = (gateways || []).filter((g: any) => g.secret_key && g.secret_key.trim().length > 0);
+
+  if (valid.length === 0) {
     throw new Error("Gateway de pagamento não configurado para o dono do produto");
   }
 
-  return { gateway, product };
+  return { gateways: valid, product };
+}
+
+async function logGatewayHealth(supabase: any, params: {
+  userId: string;
+  gatewayName: string;
+  success: boolean;
+  statusCode: number | null;
+  latencyMs: number;
+  errorMessage?: string | null;
+  fallbackFrom?: string | null;
+  orderId?: string | null;
+}) {
+  try {
+    await supabase.from("gateway_health_logs").insert({
+      user_id: params.userId,
+      gateway_name: params.gatewayName,
+      success: params.success,
+      status_code: params.statusCode,
+      latency_ms: params.latencyMs,
+      error_message: params.errorMessage || null,
+      fallback_from: params.fallbackFrom || null,
+      order_id: params.orderId || null,
+    });
+  } catch (e) {
+    console.error("[health log] insert error:", e);
+  }
+}
+
+async function callGateway(name: string, gateway: any, body: any, items: any[], webhookUrl: string) {
+  switch (name) {
+    case "blackcatpay": return callBlackCatPay(gateway, body, items, webhookUrl);
+    case "ghostspay":   return callGhostsPay(gateway, body, items, webhookUrl);
+    case "duck":        return callDuck(gateway, body, items, webhookUrl);
+    case "hisounique":  return callHisoUnique(gateway, body, items, webhookUrl);
+    case "paradise":    return callParadise(gateway, body, items, webhookUrl);
+    default: throw new Error(`Gateway desconhecido: ${name}`);
+  }
 }
 
 // ─── Gateway-specific payment callers ───
@@ -529,11 +570,11 @@ Deno.serve(async (req) => {
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
-    let gateway;
+    let gateways: any[] = [];
     let product;
     try {
-      const lookup = await getGatewayForProductOwner(supabase, body.productId);
-      gateway = lookup.gateway;
+      const lookup = await getGatewaysForProductOwner(supabase, body.productId);
+      gateways = lookup.gateways;
       product = lookup.product;
     } catch (gatewayLookupError: any) {
       console.error("Gateway lookup error:", gatewayLookupError?.message || gatewayLookupError);
@@ -571,38 +612,65 @@ Deno.serve(async (req) => {
     // Build webhook URL
     const webhookUrl = `${supabaseUrl}/functions/v1/payment-webhook`;
 
-    // Route to correct gateway
-    let paymentResult;
-    try {
-      switch (gateway.gateway_name) {
-        case "blackcatpay":
-          paymentResult = await callBlackCatPay(gateway, body, items, webhookUrl);
-          break;
-        case "ghostspay":
-          paymentResult = await callGhostsPay(gateway, body, items, webhookUrl);
-          break;
-        case "duck":
-          paymentResult = await callDuck(gateway, body, items, webhookUrl);
-          break;
-        case "hisounique":
-          paymentResult = await callHisoUnique(gateway, body, items, webhookUrl);
-          break;
-        case "paradise":
-          paymentResult = await callParadise(gateway, body, items, webhookUrl);
-          break;
-        default:
-          return new Response(
-            JSON.stringify({ error: `Gateway desconhecido: ${gateway.gateway_name}` }),
-            { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
+    // Tenta cada gateway em ordem (ativo primeiro, depois fallbacks por prioridade).
+    // Logs cada tentativa em gateway_health_logs.
+    let paymentResult: any = null;
+    let usedGateway: any = null;
+    let lastError: any = null;
+    const tried: string[] = [];
+
+    for (let i = 0; i < gateways.length; i++) {
+      const gw = gateways[i];
+      const fallbackFrom = i > 0 ? tried[tried.length - 1] : null;
+      const startedAt = Date.now();
+      try {
+        paymentResult = await callGateway(gw.gateway_name, gw, body, items, webhookUrl);
+        const latency = Date.now() - startedAt;
+        await logGatewayHealth(supabase, {
+          userId: product.user_id,
+          gatewayName: gw.gateway_name,
+          success: true,
+          statusCode: 200,
+          latencyMs: latency,
+          fallbackFrom,
+        });
+        usedGateway = gw;
+        tried.push(gw.gateway_name);
+        if (fallbackFrom) {
+          console.log(`[Fallback] ✅ ${gw.gateway_name} OK depois de ${fallbackFrom} falhar`);
+        }
+        break;
+      } catch (err: any) {
+        const latency = Date.now() - startedAt;
+        const errMsg = (err?.data ? JSON.stringify(err.data).slice(0, 500) : String(err?.message || err)).slice(0, 500);
+        console.error(`[Gateway ${gw.gateway_name}] erro (tentativa ${i + 1}/${gateways.length}):`, errMsg);
+        await logGatewayHealth(supabase, {
+          userId: product.user_id,
+          gatewayName: gw.gateway_name,
+          success: false,
+          statusCode: err?.status || null,
+          latencyMs: latency,
+          errorMessage: errMsg,
+          fallbackFrom,
+        });
+        tried.push(gw.gateway_name);
+        lastError = err;
+        // segue para próximo gateway
       }
-    } catch (err: any) {
-      console.error(`${gateway.gateway_name} error:`, JSON.stringify(err.data || err));
+    }
+
+    if (!paymentResult || !usedGateway) {
       return new Response(
-        JSON.stringify({ error: "Erro no gateway de pagamento", details: err.data }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({
+          error: "Todos os gateways de pagamento falharam",
+          tried,
+          details: lastError?.data || null,
+        }),
+        { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    const gateway = usedGateway;
 
     // Sanitize expiresAt
     let safeExpiresAt: string | null = null;
