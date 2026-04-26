@@ -136,19 +136,31 @@ const MfaDevicesSection = () => {
   };
 
   const performRemove = async (id: string) => {
+    // Tenta remoção direta primeiro
     const { error } = await supabase.auth.mfa.unenroll({ factorId: id });
-    if (error) {
-      const msg = error.message || "";
-      if (msg.includes("AAL2") || (error as any).code === "insufficient_aal") {
-        setPendingRemoveId(id);
-        setAal2Open(true);
-        return;
-      }
-      toast.error(msg || "Erro ao remover dispositivo");
+    if (!error) {
+      toast.success("Dispositivo removido");
+      await loadFactors();
       return;
     }
-    toast.success("Dispositivo removido");
-    await loadFactors();
+
+    // Se exigir AAL2, usa edge function admin para remover sem código
+    const msg = error.message || "";
+    const needsAal2 = msg.includes("AAL2") || (error as any).code === "insufficient_aal";
+    if (needsAal2) {
+      const { error: fnErr } = await supabase.functions.invoke("admin-unenroll-mfa", {
+        body: { factorId: id },
+      });
+      if (fnErr) {
+        toast.error(fnErr.message || "Erro ao remover dispositivo");
+        return;
+      }
+      toast.success("Dispositivo removido");
+      await loadFactors();
+      return;
+    }
+
+    toast.error(msg || "Erro ao remover dispositivo");
   };
 
   const handleRemove = (id: string, name?: string | null) => {
