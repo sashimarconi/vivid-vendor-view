@@ -188,7 +188,7 @@ function toAbsoluteUrl(baseUrl: string, value?: string | null) {
   return `${base}${path}`;
 }
 
-async function getGatewayForProductOwner(supabase: any, productId: string) {
+async function getGatewaysForProductOwner(supabase: any, productId: string) {
   const { data: product, error: productError } = await supabase
     .from("products")
     .select("id, user_id, thank_you_url")
@@ -207,23 +207,64 @@ async function getGatewayForProductOwner(supabase: any, productId: string) {
     throw new Error("Produto sem proprietário configurado");
   }
 
-  const { data: gateway, error: gatewayError } = await supabase
+  // Pega o gateway ativo + os demais configurados (com chaves) ordenados por fallback_priority desc
+  // Para uso como fallback se o ativo falhar.
+  const { data: gateways, error: gatewayError } = await supabase
     .from("gateway_settings")
     .select("*")
     .eq("user_id", product.user_id)
-    .eq("active", true)
-    .limit(1)
-    .maybeSingle() as { data: any; error: any };
+    .not("secret_key", "is", null)
+    .order("active", { ascending: false })
+    .order("fallback_priority", { ascending: false }) as { data: any; error: any };
 
   if (gatewayError) {
     throw new Error(`Erro ao buscar gateway: ${gatewayError.message}`);
   }
 
-  if (!gateway?.secret_key) {
+  const valid = (gateways || []).filter((g: any) => g.secret_key && g.secret_key.trim().length > 0);
+
+  if (valid.length === 0) {
     throw new Error("Gateway de pagamento não configurado para o dono do produto");
   }
 
-  return { gateway, product };
+  return { gateways: valid, product };
+}
+
+async function logGatewayHealth(supabase: any, params: {
+  userId: string;
+  gatewayName: string;
+  success: boolean;
+  statusCode: number | null;
+  latencyMs: number;
+  errorMessage?: string | null;
+  fallbackFrom?: string | null;
+  orderId?: string | null;
+}) {
+  try {
+    await supabase.from("gateway_health_logs").insert({
+      user_id: params.userId,
+      gateway_name: params.gatewayName,
+      success: params.success,
+      status_code: params.statusCode,
+      latency_ms: params.latencyMs,
+      error_message: params.errorMessage || null,
+      fallback_from: params.fallbackFrom || null,
+      order_id: params.orderId || null,
+    });
+  } catch (e) {
+    console.error("[health log] insert error:", e);
+  }
+}
+
+async function callGateway(name: string, gateway: any, body: any, items: any[], webhookUrl: string) {
+  switch (name) {
+    case "blackcatpay": return callBlackCatPay(gateway, body, items, webhookUrl);
+    case "ghostspay":   return callGhostsPay(gateway, body, items, webhookUrl);
+    case "duck":        return callDuck(gateway, body, items, webhookUrl);
+    case "hisounique":  return callHisoUnique(gateway, body, items, webhookUrl);
+    case "paradise":    return callParadise(gateway, body, items, webhookUrl);
+    default: throw new Error(`Gateway desconhecido: ${name}`);
+  }
 }
 
 // ─── Gateway-specific payment callers ───
