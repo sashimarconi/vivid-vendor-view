@@ -130,7 +130,7 @@ async function dispatchTikTokPixGenerated(supabase: any, params: {
           data: [{
             event: eventName,
             event_time: Math.floor(Date.now() / 1000),
-            event_id: `${params.orderId}:${eventName}`,
+            event_id: params.orderId,
             user: userData,
             properties: {
               currency: "BRL",
@@ -156,7 +156,7 @@ async function dispatchTikTokPixGenerated(supabase: any, params: {
         });
         const result = await resp.json().catch(() => ({}));
         if (resp.ok && result?.code === 0) {
-          console.log(`[TikTok S2S PIX] ✅ Pixel ${pixel.pixel_id} → ${eventName} (event_id: ${params.orderId}:${eventName})`);
+          console.log(`[TikTok S2S PIX] ✅ Pixel ${pixel.pixel_id} → ${eventName} (event_id: ${params.orderId})`);
         } else {
           console.error(`[TikTok S2S PIX] ❌ Pixel ${pixel.pixel_id} → erro em ${eventName}`, JSON.stringify(result));
         }
