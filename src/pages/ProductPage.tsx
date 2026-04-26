@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { usePageTracking, useVisitorHeartbeat, trackEvent } from "@/hooks/usePageTracking";
 import { useTikTokPixel, trackTikTokViewContent } from "@/hooks/useTikTokPixel";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchProductBySlug, fetchStoreForProduct, fetchStoreProducts, fetchStoreSettings } from "@/lib/supabase-queries";
@@ -24,9 +24,31 @@ import RelatedProducts from "@/components/product/RelatedProducts";
 import FixedFooter from "@/components/product/FixedFooter";
 import BuySheet from "@/components/product/BuySheet";
 
+// Tracking params que devem ser preservados ao navegar entre páginas (produto → checkout)
+const TRACKING_PARAMS = ["ttclid", "fbclid", "gclid", "src", "sck", "utm_source", "utm_campaign", "utm_medium", "utm_content", "utm_term"];
+
 const ProductPage = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const [currentSearchParams] = useSearchParams();
+
+  // Persiste tracking params em sessionStorage assim que o user chega na página
+  // Isso garante que o ttclid sobreviva mesmo se o user recarregar/navegar
+  useEffect(() => {
+    const stored: Record<string, string> = {};
+    TRACKING_PARAMS.forEach((key) => {
+      const val = currentSearchParams.get(key);
+      if (val) stored[key] = val;
+    });
+    if (Object.keys(stored).length > 0) {
+      try {
+        const existing = JSON.parse(sessionStorage.getItem("tracking_params") || "{}");
+        sessionStorage.setItem("tracking_params", JSON.stringify({ ...existing, ...stored }));
+      } catch {
+        sessionStorage.setItem("tracking_params", JSON.stringify(stored));
+      }
+    }
+  }, [currentSearchParams]);
 
   const { data: product, isLoading } = useQuery({
     queryKey: ["product", slug],
@@ -134,6 +156,19 @@ const ProductPage = () => {
         if (variantValues) params.set("variant", variantValues);
       }
       if (quantity > 1) params.set("qty", String(quantity));
+      // Preserva tracking params (ttclid, UTMs, etc) — vindos da URL ou do sessionStorage
+      try {
+        const stored = JSON.parse(sessionStorage.getItem("tracking_params") || "{}");
+        TRACKING_PARAMS.forEach((key) => {
+          const val = currentSearchParams.get(key) || stored[key];
+          if (val) params.set(key, val);
+        });
+      } catch {
+        TRACKING_PARAMS.forEach((key) => {
+          const val = currentSearchParams.get(key);
+          if (val) params.set(key, val);
+        });
+      }
       navigate(`/checkout/${slug}?${params.toString()}`);
     }
   };
