@@ -240,7 +240,9 @@ Deno.serve(async (req) => {
     });
   } catch (err) {
     console.error("Push notification error:", err);
-    return new Response(JSON.stringify({ error: "Internal server error" }), {
+    const message = err instanceof Error ? err.message : String(err);
+    const stack = err instanceof Error ? err.stack : undefined;
+    return new Response(JSON.stringify({ error: "Internal server error", message, stack }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
