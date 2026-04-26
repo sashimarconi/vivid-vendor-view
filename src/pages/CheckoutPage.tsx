@@ -605,6 +605,7 @@ const CheckoutPage = () => {
             utmParams: {
               src: searchParams.get("src") || null,
               sck: searchParams.get("sck") || null,
+              ttclid: searchParams.get("ttclid") || null,
               utm_source: searchParams.get("utm_source") || null,
               utm_campaign: searchParams.get("utm_campaign") || null,
               utm_medium: searchParams.get("utm_medium") || null,
