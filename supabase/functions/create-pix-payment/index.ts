@@ -10,6 +10,7 @@ const corsHeaders = {
 const UtmParamsSchema = z.object({
   src: z.string().nullable().optional(),
   sck: z.string().nullable().optional(),
+  ttclid: z.string().nullable().optional(),
   utm_source: z.string().nullable().optional(),
   utm_campaign: z.string().nullable().optional(),
   utm_medium: z.string().nullable().optional(),
@@ -82,11 +83,14 @@ async function dispatchTikTokPixGenerated(supabase: any, params: {
   userId: string;
   orderId: string;
   productId: string;
+  productTitle: string;
+  quantity: number;
   total: number;
   customerEmail: string;
   customerPhone: string;
   customerIp: string | null;
   customerUserAgent: string | null;
+  ttclid?: string | null;
 }) {
   try {
     const { data: pixels } = await supabase
@@ -106,6 +110,7 @@ async function dispatchTikTokPixGenerated(supabase: any, params: {
     if (params.customerPhone) userData.phone = await sha256Hex(params.customerPhone);
     if (params.customerIp) userData.ip = params.customerIp;
     if (params.customerUserAgent) userData.user_agent = params.customerUserAgent;
+    if (params.ttclid) userData.ttclid = params.ttclid;
 
     for (const pixel of pixels) {
       // Pixels "fire_on_paid_only" só disparam no webhook de pagamento confirmado
@@ -118,34 +123,43 @@ async function dispatchTikTokPixGenerated(supabase: any, params: {
         continue;
       }
 
-      const body = {
-        event_source: "web",
-        event_source_id: pixel.pixel_id,
-        data: [{
-          event: "CompletePayment",
-          event_time: Math.floor(Date.now() / 1000),
-          event_id: params.orderId,
-          user: userData,
-          properties: {
-            currency: "BRL",
-            value: Number(params.total) || 0,
-            content_type: "product",
-            order_id: params.orderId,
-            ...(params.productId ? { content_id: params.productId } : {}),
-          },
-        }],
-      };
+      for (const eventName of ["PlaceAnOrder", "CompletePayment"]) {
+        const body = {
+          event_source: "web",
+          event_source_id: pixel.pixel_id,
+          data: [{
+            event: eventName,
+            event_time: Math.floor(Date.now() / 1000),
+            event_id: `${params.orderId}:${eventName}`,
+            user: userData,
+            properties: {
+              currency: "BRL",
+              value: Number(params.total) || 0,
+              content_type: "product",
+              order_id: params.orderId,
+              ...(params.productId ? { content_id: params.productId } : {}),
+              contents: [{
+                content_type: "product",
+                ...(params.productId ? { content_id: params.productId } : {}),
+                ...(params.productTitle ? { content_name: params.productTitle } : {}),
+                quantity: Number(params.quantity) || 1,
+                price: Number(params.total) || 0,
+              }],
+            },
+          }],
+        };
 
-      const resp = await fetch("https://business-api.tiktok.com/open_api/v1.3/event/track/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Access-Token": pixel.access_token },
-        body: JSON.stringify(body),
-      });
-      const result = await resp.json().catch(() => ({}));
-      if (resp.ok && result?.code === 0) {
-        console.log(`[TikTok S2S PIX] ✅ Pixel ${pixel.pixel_id} → CompletePayment (event_id: ${params.orderId})`);
-      } else {
-        console.error(`[TikTok S2S PIX] ❌ Pixel ${pixel.pixel_id} → erro`, JSON.stringify(result));
+        const resp = await fetch("https://business-api.tiktok.com/open_api/v1.3/event/track/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Access-Token": pixel.access_token },
+          body: JSON.stringify(body),
+        });
+        const result = await resp.json().catch(() => ({}));
+        if (resp.ok && result?.code === 0) {
+          console.log(`[TikTok S2S PIX] ✅ Pixel ${pixel.pixel_id} → ${eventName} (event_id: ${params.orderId}:${eventName})`);
+        } else {
+          console.error(`[TikTok S2S PIX] ❌ Pixel ${pixel.pixel_id} → erro em ${eventName}`, JSON.stringify(result));
+        }
       }
     }
   } catch (err) {
@@ -651,11 +665,14 @@ Deno.serve(async (req) => {
         userId: product.user_id,
         orderId: orderData.id,
         productId: body.productId,
+        productTitle: body.productTitle,
+        quantity: body.quantity,
         total: body.amount / 100,
         customerEmail: body.customerEmail,
         customerPhone: body.customerPhone,
         customerIp,
         customerUserAgent: body.customerUserAgent || null,
+        ttclid: body.utmParams?.ttclid ?? null,
       });
     }
 
