@@ -3,7 +3,7 @@ import { Bell, BellOff, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
-const VAPID_PUBLIC_KEY = "BHQeRdppP4LDBfmqTwTjivfQeUs_tnfvMnsjHfbh44VGC-ygObsEGwYjI8HfZ5IRwgwMpMnbnrlKocFT3py7SH8";
+const VAPID_PUBLIC_KEY = "BOUMZ1R2Ru3NqkO84k2W-kmidvLrCAQhfb3xYvj7WLqcYh3nYE2PSB30LSaCamR6r4TVUTcsp1Xm1x1IN3QNnik";
 
 function urlBase64ToUint8Array(base64String: string) {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
