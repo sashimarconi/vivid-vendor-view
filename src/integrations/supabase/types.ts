@@ -173,12 +173,52 @@ export type Database = {
         }
         Relationships: []
       }
+      gateway_health_logs: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          fallback_from: string | null
+          gateway_name: string
+          id: string
+          latency_ms: number
+          order_id: string | null
+          status_code: number | null
+          success: boolean
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          fallback_from?: string | null
+          gateway_name: string
+          id?: string
+          latency_ms: number
+          order_id?: string | null
+          status_code?: number | null
+          success: boolean
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          fallback_from?: string | null
+          gateway_name?: string
+          id?: string
+          latency_ms?: number
+          order_id?: string | null
+          status_code?: number | null
+          success?: boolean
+          user_id?: string
+        }
+        Relationships: []
+      }
       gateway_settings: {
         Row: {
           active: boolean | null
           created_at: string
           description: string | null
           display_name: string | null
+          fallback_priority: number
           gateway_name: string
           id: string
           logo_url: string | null
@@ -192,6 +232,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           display_name?: string | null
+          fallback_priority?: number
           gateway_name?: string
           id?: string
           logo_url?: string | null
@@ -205,6 +246,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           display_name?: string | null
+          fallback_priority?: number
           gateway_name?: string
           id?: string
           logo_url?: string | null
@@ -1603,6 +1645,48 @@ export type Database = {
         Returns: boolean
       }
       mark_pix_copied: { Args: { _order_id: string }; Returns: undefined }
+      user_funnel_alerts: {
+        Args: never
+        Returns: {
+          avg_7d: number
+          drop_pct: number
+          step: string
+          today_value: number
+        }[]
+      }
+      user_funnel_metrics: {
+        Args: { _hours?: number }
+        Returns: {
+          buy_clicks: number
+          checkout_views: number
+          paid_orders: number
+          pix_generated: number
+          product_views: number
+          sessions: number
+        }[]
+      }
+      user_gateway_health: {
+        Args: { _hours?: number }
+        Returns: {
+          avg_latency_ms: number
+          error_calls: number
+          error_rate_pct: number
+          gateway_name: string
+          last_call_at: string
+          last_error: string
+          p95_latency_ms: number
+          success_calls: number
+          total_calls: number
+        }[]
+      }
+      user_orphan_pix: {
+        Args: { _hours?: number }
+        Returns: {
+          orphan_count: number
+          orphan_pct: number
+          total_orders: number
+        }[]
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
