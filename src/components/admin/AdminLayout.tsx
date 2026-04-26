@@ -5,7 +5,7 @@ import {
   Package, Star, ShieldCheck, LogOut, Menu, CreditCard, Truck, Tag,
   BarChart3, LayoutDashboard, ClipboardList, Store, PenTool, Radio,
   ChevronLeft, ExternalLink, ShoppingCart, Webhook, Bell, Zap, Crown,
-  ChevronDown, Sun, Moon, Globe, User
+  ChevronDown, Sun, Moon, Globe, User, Filter, Activity
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import SaleNotification from "@/components/admin/SaleNotification";
@@ -21,6 +21,8 @@ const navSections = [
       { label: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
       { label: "Live View", path: "/dashboard/live-view", icon: Radio },
       { label: "Análises", path: "/dashboard/analytics", icon: BarChart3 },
+      { label: "Funil", path: "/dashboard/funnel", icon: Filter },
+      { label: "Saúde do Pagamento", path: "/dashboard/payment-health", icon: Activity },
     ],
   },
   {
