@@ -104,11 +104,14 @@ async function dispatchTikTokS2S(supabase: any, order: any) {
         continue;
       }
 
-      const userData: Record<string, string> = {};
+      const userData: Record<string, any> = {};
       if (order.customer_email) userData.email = await sha256Hex(order.customer_email);
       if (order.customer_phone) userData.phone = await sha256Hex(order.customer_phone);
       if (order.customer_ip) userData.ip = order.customer_ip;
       if (order.customer_user_agent) userData.user_agent = order.customer_user_agent;
+      // ttclid é o identificador do clique TikTok — CRÍTICO para atribuição/otimização
+      const ttclid = order.utm_params?.ttclid || null;
+      if (ttclid) userData.ttclid = ttclid;
 
       // event_id IGUAL ao do client-side pixel (order.id) → permite deduplicação no TikTok
       const body = {

@@ -602,16 +602,24 @@ const CheckoutPage = () => {
               .filter((b) => selectedBumps.includes(b.id))
               .map((b) => ({ id: b.id, title: b.title, price: Math.round(Number(b.price) * 100) })),
             productVariant: selectedVariant || undefined,
-            utmParams: {
-              src: searchParams.get("src") || null,
-              sck: searchParams.get("sck") || null,
-              ttclid: searchParams.get("ttclid") || null,
-              utm_source: searchParams.get("utm_source") || null,
-              utm_campaign: searchParams.get("utm_campaign") || null,
-              utm_medium: searchParams.get("utm_medium") || null,
-              utm_content: searchParams.get("utm_content") || null,
-              utm_term: searchParams.get("utm_term") || null,
-            },
+            utmParams: (() => {
+              // Lê tracking params da URL atual + fallback do sessionStorage
+              let stored: Record<string, string> = {};
+              try { stored = JSON.parse(sessionStorage.getItem("tracking_params") || "{}"); } catch {}
+              const get = (key: string) => searchParams.get(key) || stored[key] || null;
+              return {
+                src: get("src"),
+                sck: get("sck"),
+                ttclid: get("ttclid"),
+                fbclid: get("fbclid"),
+                gclid: get("gclid"),
+                utm_source: get("utm_source"),
+                utm_campaign: get("utm_campaign"),
+                utm_medium: get("utm_medium"),
+                utm_content: get("utm_content"),
+                utm_term: get("utm_term"),
+              };
+            })(),
           }),
         }
       );
