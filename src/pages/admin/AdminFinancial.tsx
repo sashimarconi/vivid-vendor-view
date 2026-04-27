@@ -603,7 +603,7 @@ function ExpensesTab() {
           <TableBody>
             {expenses.map((e: any) => (
               <TableRow key={e.id}>
-                <TableCell className="font-mono text-xs">{new Date(e.date).toLocaleDateString("pt-BR")}</TableCell>
+                <TableCell className="font-mono text-xs">{parseLocalDate(e.date).toLocaleDateString("pt-BR")}</TableCell>
                 <TableCell>
                   <Badge variant="outline" style={{ borderColor: `${CATEGORY_COLORS[e.category]}40`, color: CATEGORY_COLORS[e.category] }}>
                     {CATEGORY_LABELS[e.category] ?? e.category}
