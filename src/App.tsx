@@ -31,6 +31,7 @@ import AdminAnalytics from "./pages/admin/AdminAnalytics";
 import AdminFunnel from "./pages/admin/AdminFunnel";
 import AdminPaymentHealth from "./pages/admin/AdminPaymentHealth";
 import AdminPlans from "./pages/admin/AdminPlans";
+import AdminFinancial from "./pages/admin/AdminFinancial";
 import SaasAdminLayout from "./components/admin/SaasAdminLayout";
 import SaasMetrics from "./pages/admin/SaasMetrics";
 import SaasUsers from "./pages/admin/SaasUsers";
@@ -88,6 +89,7 @@ const AppRoutes = () => {
         <Route path="analytics" element={<AdminAnalytics />} />
         <Route path="funnel" element={<AdminFunnel />} />
         <Route path="payment-health" element={<AdminPaymentHealth />} />
+        <Route path="financial" element={<AdminFinancial />} />
         <Route path="orders" element={<AdminOrders />} />
         <Route path="abandoned-carts" element={<AdminAbandonedCarts />} />
         <Route path="products" element={<AdminProducts />} />
