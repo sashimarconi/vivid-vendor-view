@@ -47,28 +47,42 @@ const PERIOD_PRESETS = [
   { value: "lastmonth", label: "Mês passado" },
 ];
 
+// Format Date as YYYY-MM-DD using LOCAL timezone (avoids UTC shift bug)
+function toLocalISODate(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
 function getRange(preset: string): { start: string; end: string } {
   const today = new Date();
-  const end = today.toISOString().slice(0, 10);
+  const end = toLocalISODate(today);
   if (preset === "today") return { start: end, end };
   if (preset === "7d") {
     const d = new Date(today); d.setDate(d.getDate() - 6);
-    return { start: d.toISOString().slice(0, 10), end };
+    return { start: toLocalISODate(d), end };
   }
   if (preset === "30d") {
     const d = new Date(today); d.setDate(d.getDate() - 29);
-    return { start: d.toISOString().slice(0, 10), end };
+    return { start: toLocalISODate(d), end };
   }
   if (preset === "month") {
     const d = new Date(today.getFullYear(), today.getMonth(), 1);
-    return { start: d.toISOString().slice(0, 10), end };
+    return { start: toLocalISODate(d), end };
   }
   if (preset === "lastmonth") {
     const s = new Date(today.getFullYear(), today.getMonth() - 1, 1);
     const e = new Date(today.getFullYear(), today.getMonth(), 0);
-    return { start: s.toISOString().slice(0, 10), end: e.toISOString().slice(0, 10) };
+    return { start: toLocalISODate(s), end: toLocalISODate(e) };
   }
   return { start: end, end };
+}
+
+// Parse YYYY-MM-DD as a LOCAL date (not UTC) to avoid off-by-one when displaying
+function parseLocalDate(iso: string): Date {
+  const [y, m, d] = iso.slice(0, 10).split("-").map(Number);
+  return new Date(y, (m || 1) - 1, d || 1);
 }
 
 const fmtBRL = (v: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v || 0);
@@ -102,7 +116,7 @@ export default function AdminFinancial() {
       if (error) throw error;
       return (data ?? []).map((d: any) => ({
         ...d,
-        day: new Date(d.day).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }),
+        day: parseLocalDate(d.day).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }),
         revenue: Number(d.revenue),
         costs_and_fees: Number(d.costs_and_fees),
         expenses: Number(d.expenses),
@@ -125,7 +139,7 @@ export default function AdminFinancial() {
 
   // Goal for current month
   const monthStart = useMemo(() => {
-    const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1).toISOString().slice(0, 10);
+    const d = new Date(); return toLocalISODate(new Date(d.getFullYear(), d.getMonth(), 1));
   }, []);
   const { data: goal } = useQuery({
     queryKey: ["fin-goal", monthStart],
@@ -589,7 +603,7 @@ function ExpensesTab() {
           <TableBody>
             {expenses.map((e: any) => (
               <TableRow key={e.id}>
-                <TableCell className="font-mono text-xs">{new Date(e.date).toLocaleDateString("pt-BR")}</TableCell>
+                <TableCell className="font-mono text-xs">{parseLocalDate(e.date).toLocaleDateString("pt-BR")}</TableCell>
                 <TableCell>
                   <Badge variant="outline" style={{ borderColor: `${CATEGORY_COLORS[e.category]}40`, color: CATEGORY_COLORS[e.category] }}>
                     {CATEGORY_LABELS[e.category] ?? e.category}
@@ -616,7 +630,7 @@ function ExpensesTab() {
 
 function ExpenseDialog({ onClose }: { onClose: () => void }) {
   const qc = useQueryClient();
-  const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
+  const [date, setDate] = useState(toLocalISODate(new Date()));
   const [category, setCategory] = useState("marketing_facebook");
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
@@ -698,7 +712,7 @@ function ExpenseDialog({ onClose }: { onClose: () => void }) {
 function GoalsTab() {
   const qc = useQueryClient();
   const monthStart = useMemo(() => {
-    const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1).toISOString().slice(0, 10);
+    const d = new Date(); return toLocalISODate(new Date(d.getFullYear(), d.getMonth(), 1));
   }, []);
 
   const { data: goal } = useQuery({
