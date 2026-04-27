@@ -116,7 +116,7 @@ export default function AdminFinancial() {
       if (error) throw error;
       return (data ?? []).map((d: any) => ({
         ...d,
-        day: new Date(d.day).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }),
+        day: parseLocalDate(d.day).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }),
         revenue: Number(d.revenue),
         costs_and_fees: Number(d.costs_and_fees),
         expenses: Number(d.expenses),
