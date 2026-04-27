@@ -139,7 +139,7 @@ export default function AdminFinancial() {
 
   // Goal for current month
   const monthStart = useMemo(() => {
-    const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1).toISOString().slice(0, 10);
+    const d = new Date(); return toLocalISODate(new Date(d.getFullYear(), d.getMonth(), 1));
   }, []);
   const { data: goal } = useQuery({
     queryKey: ["fin-goal", monthStart],
