@@ -47,28 +47,42 @@ const PERIOD_PRESETS = [
   { value: "lastmonth", label: "Mês passado" },
 ];
 
+// Format Date as YYYY-MM-DD using LOCAL timezone (avoids UTC shift bug)
+function toLocalISODate(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
 function getRange(preset: string): { start: string; end: string } {
   const today = new Date();
-  const end = today.toISOString().slice(0, 10);
+  const end = toLocalISODate(today);
   if (preset === "today") return { start: end, end };
   if (preset === "7d") {
     const d = new Date(today); d.setDate(d.getDate() - 6);
-    return { start: d.toISOString().slice(0, 10), end };
+    return { start: toLocalISODate(d), end };
   }
   if (preset === "30d") {
     const d = new Date(today); d.setDate(d.getDate() - 29);
-    return { start: d.toISOString().slice(0, 10), end };
+    return { start: toLocalISODate(d), end };
   }
   if (preset === "month") {
     const d = new Date(today.getFullYear(), today.getMonth(), 1);
-    return { start: d.toISOString().slice(0, 10), end };
+    return { start: toLocalISODate(d), end };
   }
   if (preset === "lastmonth") {
     const s = new Date(today.getFullYear(), today.getMonth() - 1, 1);
     const e = new Date(today.getFullYear(), today.getMonth(), 0);
-    return { start: s.toISOString().slice(0, 10), end: e.toISOString().slice(0, 10) };
+    return { start: toLocalISODate(s), end: toLocalISODate(e) };
   }
   return { start: end, end };
+}
+
+// Parse YYYY-MM-DD as a LOCAL date (not UTC) to avoid off-by-one when displaying
+function parseLocalDate(iso: string): Date {
+  const [y, m, d] = iso.slice(0, 10).split("-").map(Number);
+  return new Date(y, (m || 1) - 1, d || 1);
 }
 
 const fmtBRL = (v: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v || 0);
