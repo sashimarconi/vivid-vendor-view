@@ -10,7 +10,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import {
@@ -76,14 +75,13 @@ const fmtBRL = (v: number) => new Intl.NumberFormat("pt-BR", { style: "currency"
 const fmtPct = (v: number) => `${(v || 0).toFixed(1)}%`;
 
 export default function AdminFinancial() {
-  const qc = useQueryClient();
   const [preset, setPreset] = useState("30d");
   const [tab, setTab] = useState("overview");
 
   const range = useMemo(() => getRange(preset), [preset]);
 
   // Summary
-  const { data: summary, isLoading: loadingSummary } = useQuery({
+  const { data: summary } = useQuery({
     queryKey: ["fin-summary", range],
     queryFn: async () => {
       const { data, error } = await supabase.rpc("user_financial_summary", {
