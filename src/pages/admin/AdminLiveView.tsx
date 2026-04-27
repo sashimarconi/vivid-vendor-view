@@ -73,7 +73,7 @@ const AdminLiveView = () => {
     const revenue = paidOrders.reduce((sum, o) => sum + Number(o.total), 0);
 
     const checkoutViews = events.filter(e => e.event_type === "checkout_view").length;
-    const conversionRate = checkoutViews > 0 ? (paidOrders.length / checkoutViews) * 100 : 0;
+    const conversionRate = orders.length > 0 ? (paidOrders.length / orders.length) * 100 : 0;
 
     const checkoutActive = sessionsArr.filter(s => s.page_url?.includes("/checkout")).length;
     setBehavior({
