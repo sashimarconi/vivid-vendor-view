@@ -630,7 +630,7 @@ function ExpensesTab() {
 
 function ExpenseDialog({ onClose }: { onClose: () => void }) {
   const qc = useQueryClient();
-  const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
+  const [date, setDate] = useState(toLocalISODate(new Date()));
   const [category, setCategory] = useState("marketing_facebook");
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
