@@ -147,6 +147,15 @@ const AdminLiveView = () => {
   }, [fetchData]);
 
   const formatCurrency = (v: number) => `R$ ${v.toFixed(2).replace(".", ",")}`;
+  const formatCompact = (v: number): string => {
+    if (v < 1000) return String(v);
+    if (v < 1_000_000) {
+      const k = v / 1000;
+      return `${(Math.floor(k * 10) / 10).toString().replace(".", ",")}k`;
+    }
+    const m = v / 1_000_000;
+    return `${(Math.floor(m * 10) / 10).toString().replace(".", ",")}M`;
+  };
 
   return (
     <div className="space-y-6">
