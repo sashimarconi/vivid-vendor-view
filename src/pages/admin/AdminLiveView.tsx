@@ -45,12 +45,41 @@ const AdminLiveView = () => {
     const liveCutoff = new Date(now.getTime() - 20 * 1000).toISOString();
     const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
 
-    const [sessionsRes, ordersRes, eventsRes, todaySessionsRes] = await Promise.all([
-      supabase.from("visitor_sessions").select("session_id, page_url, last_seen_at, city, region, country, latitude, longitude").gte("last_seen_at", liveCutoff),
-      supabase.from("orders").select("id, total, payment_status, created_at").gte("created_at", todayStart),
-      supabase.from("page_events").select("event_type, page_url, created_at").gte("created_at", todayStart),
-      supabase.from("visitor_sessions").select("session_id, city, region, country").gte("last_seen_at", todayStart),
+    // Helper to fetch all rows bypassing the 1000-row default limit
+    const fetchAll = async <T,>(build: (from: number, to: number) => Promise<{ data: T[] | null }>): Promise<T[]> => {
+      const pageSize = 1000;
+      let from = 0;
+      const all: T[] = [];
+      // Hard cap to avoid runaway loops
+      for (let i = 0; i < 50; i++) {
+        const { data } = await build(from, from + pageSize - 1);
+        if (!data || data.length === 0) break;
+        all.push(...data);
+        if (data.length < pageSize) break;
+        from += pageSize;
+      }
+      return all;
+    };
+
+    const [sessionsAll, ordersAll, eventsAll, todaySessionsAll] = await Promise.all([
+      fetchAll<SessionData>((f, t) =>
+        supabase.from("visitor_sessions").select("session_id, page_url, last_seen_at, city, region, country, latitude, longitude").gte("last_seen_at", liveCutoff).range(f, t)
+      ),
+      fetchAll<{ id: string; total: number; payment_status: string; created_at: string }>((f, t) =>
+        supabase.from("orders").select("id, total, payment_status, created_at").gte("created_at", todayStart).range(f, t)
+      ),
+      fetchAll<{ event_type: string; page_url: string | null; created_at: string }>((f, t) =>
+        supabase.from("page_events").select("event_type, page_url, created_at").gte("created_at", todayStart).range(f, t)
+      ),
+      fetchAll<{ session_id: string; city?: string | null; region?: string | null; country?: string | null }>((f, t) =>
+        supabase.from("visitor_sessions").select("session_id, city, region, country").gte("last_seen_at", todayStart).range(f, t)
+      ),
     ]);
+
+    const sessionsRes = { data: sessionsAll };
+    const ordersRes = { data: ordersAll };
+    const eventsRes = { data: eventsAll };
+    const todaySessionsRes = { data: todaySessionsAll };
 
     const activeSessions = sessionsRes.data || [];
     const uniqueSessions = new Map<string, SessionData>();
