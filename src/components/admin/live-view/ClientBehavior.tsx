@@ -8,7 +8,16 @@ interface ClientBehaviorProps {
 }
 
 export default function ClientBehavior({ activeCarts, inCheckout, purchased }: ClientBehaviorProps) {
+  const fmt = (v: number): string => {
+    if (v < 1000) return String(v);
+    if (v < 1_000_000) return `${(Math.floor((v / 1000) * 10) / 10).toString().replace(".", ",")}k`;
+    return `${(Math.floor((v / 1_000_000) * 10) / 10).toString().replace(".", ",")}M`;
+  };
   const items = [
+    { label: "Na loja", value: fmt(activeCarts), icon: ShoppingCart },
+    { label: "No checkout", value: fmt(inCheckout), icon: CreditCard },
+    { label: "Comprado", value: fmt(purchased), icon: CheckCircle },
+  ];
     { label: "Na loja", value: activeCarts, icon: ShoppingCart },
     { label: "No checkout", value: inCheckout, icon: CreditCard },
     { label: "Comprado", value: purchased, icon: CheckCircle },
