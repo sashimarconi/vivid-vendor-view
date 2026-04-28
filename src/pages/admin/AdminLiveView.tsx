@@ -180,10 +180,10 @@ const AdminLiveView = () => {
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
             {[
-              { label: "Visitantes", value: String(stats.visitors), icon: Users },
+              { label: "Visitantes", value: formatCompact(stats.visitors), icon: Users },
               { label: "Vendas (hoje)", value: formatCurrency(stats.revenue), icon: DollarSign },
-              { label: "Pedidos", value: String(stats.orders), icon: ShoppingCart },
-              { label: "Pagos", value: String(stats.paidOrders), icon: ShoppingCart },
+              { label: "Pedidos", value: formatCompact(stats.orders), icon: ShoppingCart },
+              { label: "Pagos", value: formatCompact(stats.paidOrders), icon: ShoppingCart },
               { label: "Conversão", value: `${stats.conversionRate.toFixed(1)}%`, icon: Percent },
               { label: "Ticket médio", value: formatCurrency(stats.avgTicket), icon: DollarSign },
             ].map((card) => (
