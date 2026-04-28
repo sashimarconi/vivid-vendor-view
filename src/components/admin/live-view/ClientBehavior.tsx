@@ -18,10 +18,6 @@ export default function ClientBehavior({ activeCarts, inCheckout, purchased }: C
     { label: "No checkout", value: fmt(inCheckout), icon: CreditCard },
     { label: "Comprado", value: fmt(purchased), icon: CheckCircle },
   ];
-    { label: "Na loja", value: activeCarts, icon: ShoppingCart },
-    { label: "No checkout", value: inCheckout, icon: CreditCard },
-    { label: "Comprado", value: purchased, icon: CheckCircle },
-  ];
 
   return (
     <Card className="border-border">
