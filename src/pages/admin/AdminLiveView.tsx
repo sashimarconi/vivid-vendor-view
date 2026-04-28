@@ -254,7 +254,7 @@ const AdminLiveView = () => {
               </div>
 
               <div className="absolute bottom-4 left-4 z-10">
-                <p className="text-4xl font-bold text-foreground">{stats.visitors}</p>
+                <p className="text-4xl font-bold text-foreground">{formatCompact(stats.visitors)}</p>
                 <p className="text-sm text-muted-foreground">visitantes ativos</p>
               </div>
 
