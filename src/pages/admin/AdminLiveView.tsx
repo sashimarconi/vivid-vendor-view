@@ -62,16 +62,16 @@ const AdminLiveView = () => {
 
     const [sessionsAll, ordersAll, eventsAll, todaySessionsAll] = await Promise.all([
       fetchAll<SessionData>((f, t) =>
-        supabase.from("visitor_sessions").select("session_id, page_url, last_seen_at, city, region, country, latitude, longitude").gte("last_seen_at", liveCutoff).range(f, t) as unknown as PromiseLike<{ data: SessionData[] | null }>
+        supabase.from("visitor_sessions").select("session_id, page_url, last_seen_at, city, region, country, latitude, longitude").gte("last_seen_at", liveCutoff).order("last_seen_at", { ascending: true }).range(f, t) as unknown as PromiseLike<{ data: SessionData[] | null }>
       ),
       fetchAll<{ id: string; total: number; payment_status: string; created_at: string }>((f, t) =>
-        supabase.from("orders").select("id, total, payment_status, created_at").gte("created_at", todayStart).range(f, t) as unknown as PromiseLike<{ data: { id: string; total: number; payment_status: string; created_at: string }[] | null }>
+        supabase.from("orders").select("id, total, payment_status, created_at").gte("created_at", todayStart).order("created_at", { ascending: true }).range(f, t) as unknown as PromiseLike<{ data: { id: string; total: number; payment_status: string; created_at: string }[] | null }>
       ),
       fetchAll<{ event_type: string; page_url: string | null; created_at: string }>((f, t) =>
-        supabase.from("page_events").select("event_type, page_url, created_at").gte("created_at", todayStart).range(f, t) as unknown as PromiseLike<{ data: { event_type: string; page_url: string | null; created_at: string }[] | null }>
+        supabase.from("page_events").select("event_type, page_url, created_at").gte("created_at", todayStart).order("created_at", { ascending: true }).range(f, t) as unknown as PromiseLike<{ data: { event_type: string; page_url: string | null; created_at: string }[] | null }>
       ),
       fetchAll<{ session_id: string; city?: string | null; region?: string | null; country?: string | null }>((f, t) =>
-        supabase.from("visitor_sessions").select("session_id, city, region, country").gte("last_seen_at", todayStart).range(f, t) as unknown as PromiseLike<{ data: { session_id: string; city?: string | null; region?: string | null; country?: string | null }[] | null }>
+        supabase.from("visitor_sessions").select("session_id, city, region, country").gte("last_seen_at", todayStart).order("last_seen_at", { ascending: true }).range(f, t) as unknown as PromiseLike<{ data: { session_id: string; city?: string | null; region?: string | null; country?: string | null }[] | null }>
       ),
     ]);
 
