@@ -9,6 +9,40 @@ import ClientBehavior from "@/components/admin/live-view/ClientBehavior";
 import SessionsByLocation from "@/components/admin/live-view/SessionsByLocation";
 import PagesVisited from "@/components/admin/live-view/PagesVisited";
 
+const SAO_PAULO_TZ = "America/Sao_Paulo";
+
+const getSaoPauloDateParts = (date: Date) => {
+  const formatter = new Intl.DateTimeFormat("en-CA", {
+    timeZone: SAO_PAULO_TZ,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  });
+
+  const parts = formatter.formatToParts(date);
+  const get = (type: string) => Number(parts.find((part) => part.type === type)?.value ?? "0");
+
+  return {
+    year: get("year"),
+    month: get("month"),
+    day: get("day"),
+    hour: get("hour"),
+    minute: get("minute"),
+    second: get("second"),
+  };
+};
+
+const getSaoPauloDayStartIso = (date: Date) => {
+  const { year, month, day } = getSaoPauloDateParts(date);
+  return new Date(Date.UTC(year, month - 1, day, 3, 0, 0)).toISOString();
+};
+
+const getSaoPauloHour = (value: string) => getSaoPauloDateParts(new Date(value)).hour;
+
 interface SessionData {
   session_id: string;
   page_url: string | null;
@@ -43,7 +77,7 @@ const AdminLiveView = () => {
   const fetchData = useCallback(async () => {
     const now = new Date();
     const liveCutoff = new Date(now.getTime() - 20 * 1000).toISOString();
-    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+    const todayStart = getSaoPauloDayStartIso(now);
 
     // Helper to fetch all rows bypassing the 1000-row default limit
     const fetchAll = async <T,>(build: (from: number, to: number) => PromiseLike<{ data: T[] | null }>): Promise<T[]> => {
@@ -60,12 +94,15 @@ const AdminLiveView = () => {
       return all;
     };
 
-    const [sessionsAll, ordersAll, eventsAll, todaySessionsAll] = await Promise.all([
+    const [sessionsAll, createdOrdersAll, paidOrdersAll, eventsAll, todaySessionsAll] = await Promise.all([
       fetchAll<SessionData>((f, t) =>
         supabase.from("visitor_sessions").select("session_id, page_url, last_seen_at, city, region, country, latitude, longitude").gte("last_seen_at", liveCutoff).order("last_seen_at", { ascending: true }).range(f, t) as unknown as PromiseLike<{ data: SessionData[] | null }>
       ),
-      fetchAll<{ id: string; total: number; payment_status: string; created_at: string }>((f, t) =>
-        supabase.from("orders").select("id, total, payment_status, created_at").gte("created_at", todayStart).order("created_at", { ascending: true }).range(f, t) as unknown as PromiseLike<{ data: { id: string; total: number; payment_status: string; created_at: string }[] | null }>
+      fetchAll<{ id: string; total: number; payment_status: string; created_at: string; paid_at: string | null }>((f, t) =>
+        supabase.from("orders").select("id, total, payment_status, created_at, paid_at").gte("created_at", todayStart).order("created_at", { ascending: true }).range(f, t) as unknown as PromiseLike<{ data: { id: string; total: number; payment_status: string; created_at: string; paid_at: string | null }[] | null }>
+      ),
+      fetchAll<{ id: string; total: number; payment_status: string; created_at: string; paid_at: string | null }>((f, t) =>
+        supabase.from("orders").select("id, total, payment_status, created_at, paid_at").in("payment_status", ["paid", "approved"]).gte("paid_at", todayStart).order("paid_at", { ascending: true }).range(f, t) as unknown as PromiseLike<{ data: { id: string; total: number; payment_status: string; created_at: string; paid_at: string | null }[] | null }>
       ),
       fetchAll<{ event_type: string; page_url: string | null; created_at: string }>((f, t) =>
         supabase.from("page_events").select("event_type, page_url, created_at").gte("created_at", todayStart).order("created_at", { ascending: true }).range(f, t) as unknown as PromiseLike<{ data: { event_type: string; page_url: string | null; created_at: string }[] | null }>
@@ -76,7 +113,8 @@ const AdminLiveView = () => {
     ]);
 
     const sessionsRes = { data: sessionsAll };
-    const ordersRes = { data: ordersAll };
+    const ordersRes = { data: createdOrdersAll };
+    const paidOrdersRes = { data: paidOrdersAll };
     const eventsRes = { data: eventsAll };
     const todaySessionsRes = { data: todaySessionsAll };
 
@@ -97,7 +135,7 @@ const AdminLiveView = () => {
     setTodayEvents(events);
 
     const orders = ordersRes.data || [];
-    const paidOrders = orders.filter(o => o.payment_status === "paid" || o.payment_status === "approved");
+    const paidOrders = paidOrdersRes.data || [];
     const revenue = paidOrders.reduce((sum, o) => sum + Number(o.total), 0);
 
     const checkoutViews = events.filter(e => e.event_type === "checkout_view").length;
@@ -124,7 +162,8 @@ const AdminLiveView = () => {
       value: 0,
     }));
     paidOrders.forEach(o => {
-      const h = new Date(o.created_at).getHours();
+      const paidAt = o.paid_at || o.created_at;
+      const h = getSaoPauloHour(paidAt);
       hours[h].value += Number(o.total);
     });
     setHourlyData(hours);
