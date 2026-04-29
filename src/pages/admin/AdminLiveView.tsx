@@ -94,12 +94,15 @@ const AdminLiveView = () => {
       return all;
     };
 
-    const [sessionsAll, ordersAll, eventsAll, todaySessionsAll] = await Promise.all([
+    const [sessionsAll, createdOrdersAll, paidOrdersAll, eventsAll, todaySessionsAll] = await Promise.all([
       fetchAll<SessionData>((f, t) =>
         supabase.from("visitor_sessions").select("session_id, page_url, last_seen_at, city, region, country, latitude, longitude").gte("last_seen_at", liveCutoff).order("last_seen_at", { ascending: true }).range(f, t) as unknown as PromiseLike<{ data: SessionData[] | null }>
       ),
       fetchAll<{ id: string; total: number; payment_status: string; created_at: string; paid_at: string | null }>((f, t) =>
         supabase.from("orders").select("id, total, payment_status, created_at, paid_at").gte("created_at", todayStart).order("created_at", { ascending: true }).range(f, t) as unknown as PromiseLike<{ data: { id: string; total: number; payment_status: string; created_at: string; paid_at: string | null }[] | null }>
+      ),
+      fetchAll<{ id: string; total: number; payment_status: string; created_at: string; paid_at: string | null }>((f, t) =>
+        supabase.from("orders").select("id, total, payment_status, created_at, paid_at").in("payment_status", ["paid", "approved"]).gte("paid_at", todayStart).order("paid_at", { ascending: true }).range(f, t) as unknown as PromiseLike<{ data: { id: string; total: number; payment_status: string; created_at: string; paid_at: string | null }[] | null }>
       ),
       fetchAll<{ event_type: string; page_url: string | null; created_at: string }>((f, t) =>
         supabase.from("page_events").select("event_type, page_url, created_at").gte("created_at", todayStart).order("created_at", { ascending: true }).range(f, t) as unknown as PromiseLike<{ data: { event_type: string; page_url: string | null; created_at: string }[] | null }>
@@ -110,7 +113,8 @@ const AdminLiveView = () => {
     ]);
 
     const sessionsRes = { data: sessionsAll };
-    const ordersRes = { data: ordersAll };
+    const ordersRes = { data: createdOrdersAll };
+    const paidOrdersRes = { data: paidOrdersAll };
     const eventsRes = { data: eventsAll };
     const todaySessionsRes = { data: todaySessionsAll };
 
@@ -131,7 +135,7 @@ const AdminLiveView = () => {
     setTodayEvents(events);
 
     const orders = ordersRes.data || [];
-    const paidOrders = orders.filter(o => (o.payment_status === "paid" || o.payment_status === "approved") && !!o.paid_at);
+    const paidOrders = paidOrdersRes.data || [];
     const revenue = paidOrders.reduce((sum, o) => sum + Number(o.total), 0);
 
     const checkoutViews = events.filter(e => e.event_type === "checkout_view").length;
