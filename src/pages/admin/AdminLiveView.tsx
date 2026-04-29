@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, Suspense } from "react";
+import { useEffect, useState, useCallback, Suspense, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Users, DollarSign, Percent, ShoppingCart } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
@@ -41,7 +41,25 @@ const getSaoPauloDayStartIso = (date: Date) => {
   return new Date(Date.UTC(year, month - 1, day, 3, 0, 0)).toISOString();
 };
 
+const getSaoPauloDateKey = (date: Date) => {
+  const { year, month, day } = getSaoPauloDateParts(date);
+  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+};
+
 const getSaoPauloHour = (value: string) => getSaoPauloDateParts(new Date(value)).hour;
+
+const createHourlyBuckets = () => Array.from({ length: 24 }, (_, i) => ({
+  hour: `${String(i).padStart(2, "0")}h`,
+  value: 0,
+}));
+
+const dedupeSessions = <T extends { session_id: string }>(items: T[]) => {
+  const unique = new Map<string, T>();
+  items.forEach((item) => {
+    if (!unique.has(item.session_id)) unique.set(item.session_id, item);
+  });
+  return Array.from(unique.values());
+};
 
 interface SessionData {
   session_id: string;
@@ -63,6 +81,11 @@ interface LiveStats {
   avgTicket: number;
 }
 
+interface FinancialSummaryRow {
+  gross_revenue: number | string | null;
+  total_orders_paid: number | null;
+}
+
 const AdminLiveView = () => {
   const [stats, setStats] = useState<LiveStats>({
     visitors: 0, revenue: 0, orders: 0, paidOrders: 0, conversionRate: 0, avgTicket: 0,
@@ -73,117 +96,172 @@ const AdminLiveView = () => {
   const [hourlyData, setHourlyData] = useState<{ hour: string; value: number }[]>([]);
   const [funnelData, setFunnelData] = useState<{ label: string; value: number; pct: number }[]>([]);
   const [behavior, setBehavior] = useState({ activeCarts: 0, inCheckout: 0, purchased: 0 });
+  const fastRequestRef = useRef(0);
+  const slowRequestRef = useRef(0);
 
-  const fetchData = useCallback(async () => {
+  const fetchAll = useCallback(async <T,>(
+    build: (from: number, to: number) => PromiseLike<{ data: T[] | null; error?: { message?: string } | null }>,
+    maxPages = 50,
+  ): Promise<T[]> => {
+    const pageSize = 1000;
+    let from = 0;
+    const all: T[] = [];
+
+    for (let i = 0; i < maxPages; i++) {
+      const response = await build(from, from + pageSize - 1);
+      if (response.error) throw new Error(response.error.message || "Erro ao buscar dados");
+
+      const batch = response.data || [];
+      if (batch.length === 0) break;
+
+      all.push(...batch);
+      if (batch.length < pageSize) break;
+      from += pageSize;
+    }
+
+    return all;
+  }, []);
+
+  const fetchOverview = useCallback(async () => {
+    const requestId = ++fastRequestRef.current;
     const now = new Date();
     const liveCutoff = new Date(now.getTime() - 20 * 1000).toISOString();
     const todayStart = getSaoPauloDayStartIso(now);
+    const todayDate = getSaoPauloDateKey(now);
 
-    // Helper to fetch all rows bypassing the 1000-row default limit
-    const fetchAll = async <T,>(build: (from: number, to: number) => PromiseLike<{ data: T[] | null }>): Promise<T[]> => {
-      const pageSize = 1000;
-      let from = 0;
-      const all: T[] = [];
-      for (let i = 0; i < 50; i++) {
-        const { data } = await build(from, from + pageSize - 1);
-        if (!data || data.length === 0) break;
-        all.push(...data);
-        if (data.length < pageSize) break;
-        from += pageSize;
-      }
-      return all;
-    };
+    try {
+      const [liveSessionsRes, ordersCountRes, pageViewsCountRes, checkoutViewsCountRes, financialSummaryRes, paidOrdersRows] = await Promise.all([
+        supabase
+          .from("visitor_sessions")
+          .select("session_id, page_url, last_seen_at, city, region, country, latitude, longitude")
+          .gte("last_seen_at", liveCutoff)
+          .order("last_seen_at", { ascending: false }),
+        supabase
+          .from("orders")
+          .select("id", { count: "exact", head: true })
+          .gte("created_at", todayStart),
+        supabase
+          .from("page_events")
+          .select("id", { count: "exact", head: true })
+          .eq("event_type", "page_view")
+          .gte("created_at", todayStart),
+        supabase
+          .from("page_events")
+          .select("id", { count: "exact", head: true })
+          .eq("event_type", "checkout_view")
+          .gte("created_at", todayStart),
+        supabase.rpc("user_financial_summary", { _start: todayDate, _end: todayDate }),
+        fetchAll<{ total: number | string; paid_at: string | null; created_at: string }>((f, t) =>
+          supabase
+            .from("orders")
+            .select("total, paid_at, created_at")
+            .in("payment_status", ["paid", "approved"])
+            .gte("paid_at", todayStart)
+            .order("paid_at", { ascending: true })
+            .range(f, t) as unknown as PromiseLike<{ data: { total: number | string; paid_at: string | null; created_at: string }[] | null; error?: { message?: string } | null }>
+        ),
+      ]);
 
-    const [sessionsAll, createdOrdersAll, paidOrdersAll, eventsAll, todaySessionsAll] = await Promise.all([
-      fetchAll<SessionData>((f, t) =>
-        supabase.from("visitor_sessions").select("session_id, page_url, last_seen_at, city, region, country, latitude, longitude").gte("last_seen_at", liveCutoff).order("last_seen_at", { ascending: true }).range(f, t) as unknown as PromiseLike<{ data: SessionData[] | null }>
-      ),
-      fetchAll<{ id: string; total: number; payment_status: string; created_at: string; paid_at: string | null }>((f, t) =>
-        supabase.from("orders").select("id, total, payment_status, created_at, paid_at").gte("created_at", todayStart).order("created_at", { ascending: true }).range(f, t) as unknown as PromiseLike<{ data: { id: string; total: number; payment_status: string; created_at: string; paid_at: string | null }[] | null }>
-      ),
-      fetchAll<{ id: string; total: number; payment_status: string; created_at: string; paid_at: string | null }>((f, t) =>
-        supabase.from("orders").select("id, total, payment_status, created_at, paid_at").in("payment_status", ["paid", "approved"]).gte("paid_at", todayStart).order("paid_at", { ascending: true }).range(f, t) as unknown as PromiseLike<{ data: { id: string; total: number; payment_status: string; created_at: string; paid_at: string | null }[] | null }>
-      ),
-      fetchAll<{ event_type: string; page_url: string | null; created_at: string }>((f, t) =>
-        supabase.from("page_events").select("event_type, page_url, created_at").gte("created_at", todayStart).order("created_at", { ascending: true }).range(f, t) as unknown as PromiseLike<{ data: { event_type: string; page_url: string | null; created_at: string }[] | null }>
-      ),
-      fetchAll<{ session_id: string; city?: string | null; region?: string | null; country?: string | null }>((f, t) =>
-        supabase.from("visitor_sessions").select("session_id, city, region, country").gte("last_seen_at", todayStart).order("last_seen_at", { ascending: true }).range(f, t) as unknown as PromiseLike<{ data: { session_id: string; city?: string | null; region?: string | null; country?: string | null }[] | null }>
-      ),
-    ]);
+      if (requestId !== fastRequestRef.current) return;
 
-    const sessionsRes = { data: sessionsAll };
-    const ordersRes = { data: createdOrdersAll };
-    const paidOrdersRes = { data: paidOrdersAll };
-    const eventsRes = { data: eventsAll };
-    const todaySessionsRes = { data: todaySessionsAll };
+      if (liveSessionsRes.error) throw liveSessionsRes.error;
+      if (ordersCountRes.error) throw ordersCountRes.error;
+      if (pageViewsCountRes.error) throw pageViewsCountRes.error;
+      if (checkoutViewsCountRes.error) throw checkoutViewsCountRes.error;
+      if (financialSummaryRes.error) throw financialSummaryRes.error;
 
-    const activeSessions = sessionsRes.data || [];
-    const uniqueSessions = new Map<string, SessionData>();
-    activeSessions.forEach(s => {
-      if (!uniqueSessions.has(s.session_id)) uniqueSessions.set(s.session_id, s);
-    });
-    const sessionsArr = Array.from(uniqueSessions.values());
-    setSessions(sessionsArr);
+      const sessionsArr = dedupeSessions((liveSessionsRes.data || []) as SessionData[]);
+      const financialSummary = (financialSummaryRes.data?.[0] || null) as FinancialSummaryRow | null;
+      const revenue = Number(financialSummary?.gross_revenue ?? 0);
+      const paidOrdersCount = Number(financialSummary?.total_orders_paid ?? 0);
+      const ordersCount = ordersCountRes.count ?? 0;
+      const pageViewsCount = pageViewsCountRes.count ?? 0;
+      const checkoutViewsCount = checkoutViewsCountRes.count ?? 0;
+      const checkoutActive = sessionsArr.filter((s) => s.page_url?.includes("/checkout")).length;
 
-    const todayAll = todaySessionsRes.data || [];
-    const uniqueToday = new Map<string, { session_id: string; city?: string | null; region?: string | null; country?: string | null }>();
-    todayAll.forEach(s => { if (!uniqueToday.has(s.session_id)) uniqueToday.set(s.session_id, s); });
-    setTodaySessions(Array.from(uniqueToday.values()));
+      setSessions(sessionsArr);
+      setBehavior({
+        activeCarts: sessionsArr.length,
+        inCheckout: checkoutActive,
+        purchased: paidOrdersCount,
+      });
 
-    const events = (eventsRes.data || []) as { event_type: string; page_url: string | null; created_at: string }[];
-    setTodayEvents(events);
+      setStats({
+        visitors: sessionsArr.length,
+        revenue,
+        orders: ordersCount,
+        paidOrders: paidOrdersCount,
+        conversionRate: ordersCount > 0 ? (paidOrdersCount / ordersCount) * 100 : 0,
+        avgTicket: paidOrdersCount > 0 ? revenue / paidOrdersCount : 0,
+      });
 
-    const orders = ordersRes.data || [];
-    const paidOrders = paidOrdersRes.data || [];
-    const revenue = paidOrders.reduce((sum, o) => sum + Number(o.total), 0);
+      const hours = createHourlyBuckets();
+      paidOrdersRows.forEach((order) => {
+        const paidAt = order.paid_at || order.created_at;
+        const hour = getSaoPauloHour(paidAt);
+        hours[hour].value += Number(order.total);
+      });
+      setHourlyData(hours);
 
-    const checkoutViews = events.filter(e => e.event_type === "checkout_view").length;
-    const conversionRate = orders.length > 0 ? (paidOrders.length / orders.length) * 100 : 0;
+      const funnelBase = Math.max(pageViewsCount, 1);
+      setFunnelData([
+        { label: "Acessos", value: pageViewsCount, pct: pageViewsCount > 0 ? 100 : 0 },
+        { label: "Checkout", value: checkoutViewsCount, pct: Math.round((checkoutViewsCount / funnelBase) * 100) },
+        { label: "PIX Gerado", value: ordersCount, pct: Math.round((ordersCount / funnelBase) * 100) },
+        { label: "Pagos", value: paidOrdersCount, pct: Math.round((paidOrdersCount / funnelBase) * 100) },
+      ]);
+    } catch (error) {
+      console.error("Erro ao atualizar os KPIs do radar", error);
+    }
+  }, [fetchAll]);
 
-    const checkoutActive = sessionsArr.filter(s => s.page_url?.includes("/checkout")).length;
-    setBehavior({
-      activeCarts: sessionsArr.length,
-      inCheckout: checkoutActive,
-      purchased: paidOrders.length,
-    });
+  const fetchSupportingData = useCallback(async () => {
+    const requestId = ++slowRequestRef.current;
+    const now = new Date();
+    const todayStart = getSaoPauloDayStartIso(now);
 
-    setStats({
-      visitors: uniqueSessions.size,
-      revenue,
-      orders: orders.length,
-      paidOrders: paidOrders.length,
-      conversionRate,
-      avgTicket: paidOrders.length > 0 ? revenue / paidOrders.length : 0,
-    });
+    try {
+      const [eventsRows, todaySessionRows] = await Promise.all([
+        fetchAll<{ event_type: string; page_url: string | null; created_at: string }>((f, t) =>
+          supabase
+            .from("page_events")
+            .select("event_type, page_url, created_at")
+            .eq("event_type", "page_view")
+            .gte("created_at", todayStart)
+            .order("created_at", { ascending: false })
+            .range(f, t) as unknown as PromiseLike<{ data: { event_type: string; page_url: string | null; created_at: string }[] | null; error?: { message?: string } | null }>
+        ),
+        fetchAll<{ session_id: string; city?: string | null; region?: string | null; country?: string | null }>((f, t) =>
+          supabase
+            .from("visitor_sessions")
+            .select("session_id, city, region, country")
+            .gte("last_seen_at", todayStart)
+            .order("last_seen_at", { ascending: false })
+            .range(f, t) as unknown as PromiseLike<{ data: { session_id: string; city?: string | null; region?: string | null; country?: string | null }[] | null; error?: { message?: string } | null }>
+        ),
+      ]);
 
-    const hours = Array.from({ length: 24 }, (_, i) => ({
-      hour: `${String(i).padStart(2, "0")}h`,
-      value: 0,
-    }));
-    paidOrders.forEach(o => {
-      const paidAt = o.paid_at || o.created_at;
-      const h = getSaoPauloHour(paidAt);
-      hours[h].value += Number(o.total);
-    });
-    setHourlyData(hours);
+      if (requestId !== slowRequestRef.current) return;
 
-    const pageViews = events.filter(e => e.event_type === "page_view").length;
-    const pixGenerated = orders.length;
-    const total = pageViews || 1;
-    setFunnelData([
-      { label: "Acessos", value: pageViews, pct: 100 },
-      { label: "Checkout", value: checkoutViews, pct: Math.round((checkoutViews / total) * 100) },
-      { label: "PIX Gerado", value: pixGenerated, pct: Math.round((pixGenerated / total) * 100) },
-      { label: "Pagos", value: paidOrders.length, pct: Math.round((paidOrders.length / total) * 100) },
-    ]);
-  }, []);
+      setTodayEvents(eventsRows);
+      setTodaySessions(dedupeSessions(todaySessionRows));
+    } catch (error) {
+      console.error("Erro ao atualizar listas do radar", error);
+    }
+  }, [fetchAll]);
 
   useEffect(() => {
-    fetchData();
-    const interval = setInterval(fetchData, 5000);
-    return () => clearInterval(interval);
-  }, [fetchData]);
+    fetchOverview();
+    fetchSupportingData();
+
+    const fastInterval = setInterval(fetchOverview, 5000);
+    const slowInterval = setInterval(fetchSupportingData, 60000);
+
+    return () => {
+      clearInterval(fastInterval);
+      clearInterval(slowInterval);
+    };
+  }, [fetchOverview, fetchSupportingData]);
 
   const formatCurrency = (v: number) => `R$ ${v.toFixed(2).replace(".", ",")}`;
   const formatCompact = (v: number): string => {
