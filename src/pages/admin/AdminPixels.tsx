@@ -457,6 +457,10 @@ const AdminPixels = () => {
                   setView("utmify");
                   return;
                 }
+                if ((p as any).isXtracky) {
+                  setView("xtracky");
+                  return;
+                }
                 setActivePlatform(p.id);
                 setView("list");
               }}
@@ -468,6 +472,9 @@ const AdminPixels = () => {
                     <div className="flex items-center gap-2">
                       <h3 className="text-sm font-semibold text-foreground">{p.name}</h3>
                       {p.id === "utmify" && utmifySettings?.active && (
+                        <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-marketplace-green/15 text-marketplace-green">Conectado</span>
+                      )}
+                      {p.id === "xtracky" && xtrackySettings?.active && (
                         <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-marketplace-green/15 text-marketplace-green">Conectado</span>
                       )}
                     </div>
