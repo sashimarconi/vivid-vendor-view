@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import QRCode from "qrcode";
 import { useTikTokPixel, trackTikTokPurchase, trackTikTokInitiateCheckout } from "@/hooks/useTikTokPixel";
 import { usePageTracking, useVisitorHeartbeat, trackEvent } from "@/hooks/usePageTracking";
+import { useXtrackyHandler } from "@/hooks/useXtrackyHandler";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
