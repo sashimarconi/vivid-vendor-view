@@ -276,6 +276,7 @@ const CheckoutPage = () => {
   useTikTokPixel(product?.user_id);
   usePageTracking("checkout_view", product?.user_id);
   useVisitorHeartbeat(product?.user_id);
+  useXtrackyHandler(product?.user_id);
 
   // Dispara InitiateCheckout quando o produto e preço estão disponíveis
   const initiateCheckoutFiredRef = useRef(false);
