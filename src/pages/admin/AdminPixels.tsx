@@ -22,6 +22,15 @@ const PLATFORMS = [
     isUtmify: true,
   },
   {
+    id: "xtracky",
+    name: "Xtracky",
+    description: "Rastreamento de UTMs e atribuição de vendas via API",
+    icon: "🎯",
+    color: "bg-gradient-to-br from-cyan-500 to-purple-600 text-white",
+    enabled: true,
+    isXtracky: true,
+  },
+  {
     id: "tiktok",
     name: "TikTok Pixel",
     description: "Rastreie conversões e otimize campanhas no TikTok Ads",
