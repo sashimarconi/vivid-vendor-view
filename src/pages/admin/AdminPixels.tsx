@@ -328,6 +328,96 @@ const AdminPixels = () => {
     );
   };
 
+  // ─── Xtracky config view ───
+  if (view === "xtracky") {
+    const hasExisting = !!xtrackySettings;
+
+    if (xtrackySettings && !xtrackyToken && xtrackySettings.api_token) {
+      setXtrackyToken(xtrackySettings.api_token);
+      setXtrackyActive(xtrackySettings.active);
+    }
+
+    return (
+      <div className="space-y-6 max-w-2xl">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <button onClick={() => setView("grid")} className="hover:text-foreground transition-colors">Integrações</button>
+          <span>/</span>
+          <span className="text-foreground">Xtracky</span>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-purple-600 flex items-center justify-center text-lg shrink-0">🎯</div>
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Xtracky</h1>
+            <p className="text-sm text-muted-foreground mt-0.5">Atribuição automática de UTMs e vendas</p>
+          </div>
+        </div>
+
+        <Card className="border-border">
+          <CardContent className="p-6 space-y-5">
+            <div className="space-y-2">
+              <Label className="text-sm font-semibold text-primary">Token da API (data-token)</Label>
+              <Input
+                type="password"
+                value={xtrackyToken}
+                onChange={(e) => setXtrackyToken(e.target.value)}
+                placeholder="Ex: 68728f08-1e91-4a34-bd7d-bd86666d225e"
+              />
+              <p className="text-xs text-muted-foreground">
+                Encontre em: Xtracky → Integrações → API → Token
+              </p>
+            </div>
+
+            <div className="flex items-center justify-between py-3">
+              <div>
+                <p className="text-sm font-semibold text-foreground">Integração Ativa</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Quando ativa, o script de captura é injetado no checkout e os pedidos são enviados para a Xtracky
+                </p>
+              </div>
+              <Switch checked={xtrackyActive} onCheckedChange={setXtrackyActive} />
+            </div>
+
+            <div className="flex justify-between pt-2">
+              {hasExisting && (
+                <Button
+                  variant="outline"
+                  className="text-destructive border-destructive/30 hover:bg-destructive/10"
+                  onClick={() => deleteXtrackyMutation.mutate()}
+                  disabled={deleteXtrackyMutation.isPending}
+                >
+                  <Trash2 className="w-4 h-4 mr-1.5" />
+                  Remover
+                </Button>
+              )}
+              <div className="flex gap-3 ml-auto">
+                <Button variant="outline" onClick={() => setView("grid")}>Cancelar</Button>
+                <Button
+                  onClick={() => saveXtrackyMutation.mutate()}
+                  disabled={!xtrackyToken.trim() || saveXtrackyMutation.isPending}
+                  className="bg-primary hover:bg-primary/90"
+                >
+                  Salvar
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="bg-muted/30 rounded-lg p-3 space-y-2">
+          <p className="text-xs font-semibold text-foreground">Como funciona:</p>
+          <ul className="text-xs text-muted-foreground space-y-1 list-disc pl-4">
+            <li>O script <code className="text-primary/80">utm-handler.js</code> da Xtracky é injetado automaticamente no checkout</li>
+            <li>Quando um PIX é <strong>gerado</strong>, enviamos para a Xtracky com status <code className="text-primary/80">waiting_payment</code></li>
+            <li>Quando o pagamento é <strong>confirmado</strong>, enviamos com status <code className="text-primary/80">paid</code></li>
+            <li>O <code className="text-primary/80">utm_source</code> capturado da URL é enviado junto com o pedido</li>
+            <li>Cada usuário usa seu próprio token — dados completamente isolados</li>
+          </ul>
+        </div>
+      </div>
+    );
+  }
+
   // ─── Utmify config view ───
   if (view === "utmify") {
     const hasExisting = !!utmifySettings;
