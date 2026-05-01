@@ -2,9 +2,11 @@ import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 /**
- * Injeta o script utm-handler da Xtracky no checkout do lojista
- * que tiver Xtracky ativa. O script captura UTMs da URL e mantém
- * persistência para que apareçam no momento da compra.
+ * Injeta o script utm-handler da Xtracky em qualquer página do funil
+ * (produto, checkout, vitrine) do lojista que tiver Xtracky ativa.
+ *
+ * Usa a RPC pública `get_xtracky_token`, pois visitantes anônimos não têm
+ * permissão para ler `xtracky_settings` diretamente via RLS.
  */
 export function useXtrackyHandler(userId?: string | null) {
   useEffect(() => {
@@ -13,15 +15,17 @@ export function useXtrackyHandler(userId?: string | null) {
     const SCRIPT_ID = "xtracky-utm-handler";
 
     (async () => {
-      const { data } = await supabase
-        .from("xtracky_settings" as any)
-        .select("api_token, active")
-        .eq("user_id", userId)
-        .eq("active", true)
-        .maybeSingle();
+      const { data, error } = await supabase.rpc("get_xtracky_token" as any, {
+        _user_id: userId,
+      });
 
       if (cancelled) return;
-      const token = (data as any)?.api_token;
+      if (error) {
+        console.warn("[Xtracky] erro ao buscar token:", error.message);
+        return;
+      }
+
+      const token = typeof data === "string" ? data : null;
       if (!token) return;
       if (document.getElementById(SCRIPT_ID)) return;
 
@@ -31,6 +35,7 @@ export function useXtrackyHandler(userId?: string | null) {
       s.setAttribute("data-token", token);
       s.async = true;
       document.head.appendChild(s);
+      console.log("[Xtracky] script injetado para user", userId);
     })();
 
     return () => {
