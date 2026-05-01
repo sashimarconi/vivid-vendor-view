@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { usePageTracking, useVisitorHeartbeat, trackEvent } from "@/hooks/usePageTracking";
 import { useTikTokPixel, trackTikTokViewContent } from "@/hooks/useTikTokPixel";
+import { useXtrackyHandler } from "@/hooks/useXtrackyHandler";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -60,6 +61,7 @@ const ProductPage = () => {
   useTikTokPixel(product?.user_id);
   usePageTracking("page_view", product?.user_id);
   useVisitorHeartbeat(product?.user_id);
+  useXtrackyHandler(product?.user_id);
 
   // Dispara ViewContent quando o produto é carregado
   useEffect(() => {
