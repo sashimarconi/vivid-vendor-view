@@ -280,6 +280,15 @@ Deno.serve(async (req) => {
           }).then(() => {}).catch((e) => console.error("Utmify dispatch error:", e))
         );
 
+        // Xtracky
+        tasks.push(
+          fetch(`${supabaseUrl}/functions/v1/send-xtracky-order`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${serviceRoleKey}` },
+            body: JSON.stringify({ order_id: order.id, status: "paid" }),
+          }).then(() => {}).catch((e) => console.error("Xtracky dispatch error:", e))
+        );
+
         // TikTok S2S
         tasks.push(dispatchTikTokS2S(supabase, order));
 

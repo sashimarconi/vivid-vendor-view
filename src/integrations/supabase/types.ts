@@ -1543,6 +1543,33 @@ export type Database = {
         }
         Relationships: []
       }
+      xtracky_settings: {
+        Row: {
+          active: boolean
+          api_token: string
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean
+          api_token: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active?: boolean
+          api_token?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       custom_domains_public: {
