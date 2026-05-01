@@ -179,7 +179,61 @@ const AdminPixels = () => {
     },
   });
 
-  // Pixel mutations
+  // ─── Xtracky queries/mutations ───
+  const { data: xtrackySettings } = useQuery({
+    queryKey: ["xtracky-settings"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("xtracky_settings" as any)
+        .select("*")
+        .maybeSingle();
+      if (error) throw error;
+      return data as any;
+    },
+  });
+
+  const [xtrackyToken, setXtrackyToken] = useState("");
+  const [xtrackyActive, setXtrackyActive] = useState(true);
+
+  const saveXtrackyMutation = useMutation({
+    mutationFn: async () => {
+      if (xtrackySettings?.id) {
+        const { error } = await supabase
+          .from("xtracky_settings" as any)
+          .update({ api_token: xtrackyToken.trim(), active: xtrackyActive })
+          .eq("id", xtrackySettings.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from("xtracky_settings" as any)
+          .insert({ api_token: xtrackyToken.trim(), active: xtrackyActive });
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["xtracky-settings"] });
+      toast({ title: "Xtracky configurado com sucesso!" });
+    },
+    onError: (err: Error) => toast({ title: "Erro", description: err.message, variant: "destructive" }),
+  });
+
+  const deleteXtrackyMutation = useMutation({
+    mutationFn: async () => {
+      if (!xtrackySettings?.id) return;
+      const { error } = await supabase
+        .from("xtracky_settings" as any)
+        .delete()
+        .eq("id", xtrackySettings.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["xtracky-settings"] });
+      setXtrackyToken("");
+      setXtrackyActive(true);
+      toast({ title: "Configuração da Xtracky removida!" });
+    },
+  });
+
   const [accessToken, setAccessToken] = useState("");
 
   const addMutation = useMutation({
