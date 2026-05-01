@@ -817,6 +817,23 @@ Deno.serve(async (req) => {
         } catch (utmifyErr) {
           console.error("Utmify dispatch error:", utmifyErr);
         }
+
+        // Send to Xtracky (waiting_payment)
+        try {
+          await fetch(`${supabaseUrl}/functions/v1/send-xtracky-order`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${serviceRoleKey}`,
+            },
+            body: JSON.stringify({
+              order_id: orderData.id,
+              status: "waiting_payment",
+            }),
+          });
+        } catch (xtrackyErr) {
+          console.error("Xtracky dispatch error:", xtrackyErr);
+        }
       }
     }
 
