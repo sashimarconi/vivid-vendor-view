@@ -80,7 +80,7 @@ const PLATFORMS = [
   },
 ];
 
-type View = "grid" | "list" | "create" | "edit" | "utmify";
+type View = "grid" | "list" | "create" | "edit" | "utmify" | "xtracky";
 
 const AdminPixels = () => {
   const [view, setView] = useState<View>("grid");
