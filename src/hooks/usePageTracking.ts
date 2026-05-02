@@ -97,8 +97,7 @@ export function usePageTracking(eventType: string = "page_view", userId?: string
     const sessionId = getSessionId();
     const pageUrl = window.location.pathname;
 
-    console.log("[Tracking] Tracking page event:", { eventType, userId, pageUrl });
-
+    // 1) Registra evento da página imediatamente
     supabase.from("page_events").insert({
       event_type: eventType,
       page_url: pageUrl,
@@ -107,26 +106,34 @@ export function usePageTracking(eventType: string = "page_view", userId?: string
       user_id: userId,
     } as any).then(({ error }) => {
       if (error) console.error("[Tracking] page_events insert error:", error.message);
-      else console.log("[Tracking] page_events inserted OK");
     });
 
+    // 2) Marca presença IMEDIATAMENTE (sem esperar geo) para o Radar contar o visitante já
+    supabase.from("visitor_sessions").upsert(
+      { session_id: sessionId, last_seen_at: new Date().toISOString(), page_url: pageUrl, user_id: userId },
+      { onConflict: "session_id" }
+    ).then(({ error }) => {
+      if (error) console.error("[Tracking] visitor_sessions presence upsert error:", error.message);
+    });
+
+    // 3) Em paralelo, busca geo e enriquece o registro quando disponível
     fetchGeoOnce().then(geo => {
-      const sessionData: any = {
-        session_id: sessionId,
-        last_seen_at: new Date().toISOString(),
-        page_url: pageUrl,
-        user_id: userId,
-      };
-      if (geo) {
-        sessionData.city = geo.city;
-        sessionData.region = geo.region;
-        sessionData.country = geo.country;
-        sessionData.latitude = geo.latitude;
-        sessionData.longitude = geo.longitude;
-      }
-      supabase.from("visitor_sessions").upsert(sessionData, { onConflict: "session_id" }).then(({ error }) => {
-        if (error) console.error("[Tracking] visitor_sessions upsert error:", error.message);
-        else console.log("[Tracking] visitor_sessions upserted OK");
+      if (!geo) return;
+      supabase.from("visitor_sessions").upsert(
+        {
+          session_id: sessionId,
+          last_seen_at: new Date().toISOString(),
+          page_url: pageUrl,
+          user_id: userId,
+          city: geo.city,
+          region: geo.region,
+          country: geo.country,
+          latitude: geo.latitude,
+          longitude: geo.longitude,
+        },
+        { onConflict: "session_id" }
+      ).then(({ error }) => {
+        if (error) console.error("[Tracking] visitor_sessions geo upsert error:", error.message);
       });
     });
   }, [eventType, userId, metadata]);
@@ -148,13 +155,27 @@ export function useVisitorHeartbeat(userId?: string | null) {
   useEffect(() => {
     if (!userId) return;
     const sessionId = getSessionId();
-    const interval = setInterval(() => {
+
+    const beat = () => {
       supabase.from("visitor_sessions").upsert(
         { session_id: sessionId, last_seen_at: new Date().toISOString(), page_url: window.location.pathname, user_id: userId },
         { onConflict: "session_id" }
       ).then();
-    }, 10000);
+    };
 
-    return () => clearInterval(interval);
+    // batida imediata + intervalo curto para o "ao vivo" não cair por causa de 1 batida atrasada
+    beat();
+    const interval = setInterval(beat, 8000);
+
+    // refaz a batida ao voltar foco / ficar visível (mobile economiza energia)
+    const onVisible = () => { if (document.visibilityState === "visible") beat(); };
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("focus", beat);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("focus", beat);
+    };
   }, [userId]);
 }
