@@ -77,6 +77,7 @@ interface LiveStats {
   revenue: number;
   orders: number;
   paidOrders: number;
+  pendingOrders: number;
   conversionRate: number;
   avgTicket: number;
 }
@@ -88,7 +89,7 @@ interface FinancialSummaryRow {
 
 const AdminLiveView = () => {
   const [stats, setStats] = useState<LiveStats>({
-    visitors: 0, revenue: 0, orders: 0, paidOrders: 0, conversionRate: 0, avgTicket: 0,
+    visitors: 0, revenue: 0, orders: 0, paidOrders: 0, pendingOrders: 0, conversionRate: 0, avgTicket: 0,
   });
   const [sessions, setSessions] = useState<SessionData[]>([]);
   const [todaySessions, setTodaySessions] = useState<{ session_id: string; city?: string | null; region?: string | null; country?: string | null }[]>([]);
@@ -130,7 +131,7 @@ const AdminLiveView = () => {
     const todayDate = getSaoPauloDateKey(now);
 
     try {
-      const [liveSessionsRes, ordersCountRes, pageViewsCountRes, checkoutViewsCountRes, financialSummaryRes, paidOrdersRows] = await Promise.all([
+      const [liveSessionsRes, ordersCountRes, pendingOrdersCountRes, pageViewsCountRes, checkoutViewsCountRes, financialSummaryRes, paidOrdersRows] = await Promise.all([
         supabase
           .from("visitor_sessions")
           .select("session_id, page_url, last_seen_at, city, region, country, latitude, longitude")
@@ -139,6 +140,11 @@ const AdminLiveView = () => {
         supabase
           .from("orders")
           .select("id", { count: "exact", head: true })
+          .gte("created_at", todayStart),
+        supabase
+          .from("orders")
+          .select("id", { count: "exact", head: true })
+          .eq("payment_status", "pending")
           .gte("created_at", todayStart),
         supabase
           .from("page_events")
@@ -166,6 +172,7 @@ const AdminLiveView = () => {
 
       if (liveSessionsRes.error) throw liveSessionsRes.error;
       if (ordersCountRes.error) throw ordersCountRes.error;
+      if (pendingOrdersCountRes.error) throw pendingOrdersCountRes.error;
       if (pageViewsCountRes.error) throw pageViewsCountRes.error;
       if (checkoutViewsCountRes.error) throw checkoutViewsCountRes.error;
       if (financialSummaryRes.error) throw financialSummaryRes.error;
@@ -175,13 +182,14 @@ const AdminLiveView = () => {
       const revenue = Number(financialSummary?.gross_revenue ?? 0);
       const paidOrdersCount = Number(financialSummary?.total_orders_paid ?? 0);
       const ordersCount = ordersCountRes.count ?? 0;
+      const pendingOrdersCount = pendingOrdersCountRes.count ?? 0;
       const pageViewsCount = pageViewsCountRes.count ?? 0;
       const checkoutViewsCount = checkoutViewsCountRes.count ?? 0;
-      const checkoutActive = sessionsArr.filter((s) => s.page_url?.includes("/checkout")).length;
+      const checkoutActive = Math.max(checkoutViewsCount, sessionsArr.filter((s) => s.page_url?.includes("/checkout")).length);
 
       setSessions(sessionsArr);
       setBehavior({
-        activeCarts: sessionsArr.length,
+        activeCarts: pendingOrdersCount,
         inCheckout: checkoutActive,
         purchased: paidOrdersCount,
       });
@@ -191,6 +199,7 @@ const AdminLiveView = () => {
         revenue,
         orders: ordersCount,
         paidOrders: paidOrdersCount,
+        pendingOrders: pendingOrdersCount,
         conversionRate: ordersCount > 0 ? (paidOrdersCount / ordersCount) * 100 : 0,
         avgTicket: paidOrdersCount > 0 ? revenue / paidOrdersCount : 0,
       });
@@ -295,12 +304,13 @@ const AdminLiveView = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left column */}
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 xl:grid-cols-3 gap-3">
             {[
               { label: "Visitantes", value: formatCompact(stats.visitors), icon: Users },
               { label: "Vendas (hoje)", value: formatCurrency(stats.revenue), icon: DollarSign },
               { label: "Pedidos", value: formatCompact(stats.orders), icon: ShoppingCart },
               { label: "Pagos", value: formatCompact(stats.paidOrders), icon: ShoppingCart },
+              { label: "Pendentes", value: formatCompact(stats.pendingOrders), icon: ShoppingCart },
               { label: "Conversão", value: `${stats.conversionRate.toFixed(1)}%`, icon: Percent },
               { label: "Ticket médio", value: formatCurrency(stats.avgTicket), icon: DollarSign },
             ].map((card) => (
