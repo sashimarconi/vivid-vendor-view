@@ -126,17 +126,24 @@ const AdminLiveView = () => {
   const fetchOverview = useCallback(async () => {
     const requestId = ++fastRequestRef.current;
     const now = new Date();
-    const liveCutoff = new Date(now.getTime() - 20 * 1000).toISOString();
+    // Janela "ao vivo" de 60s: tolera 1-2 heartbeats perdidos sem zerar o KPI
+    const liveCutoff = new Date(now.getTime() - 60 * 1000).toISOString();
+    const eventLiveCutoff = new Date(now.getTime() - 60 * 1000).toISOString();
     const todayStart = getSaoPauloDayStartIso(now);
     const todayDate = getSaoPauloDateKey(now);
 
     try {
-      const [liveSessionsRes, ordersCountRes, pendingOrdersCountRes, pageViewsCountRes, checkoutViewsCountRes, financialSummaryRes, paidOrdersRows] = await Promise.all([
+      const [liveSessionsRes, liveEventSessionsRes, ordersCountRes, pendingOrdersCountRes, pageViewsCountRes, checkoutViewsCountRes, financialSummaryRes, paidOrdersRows] = await Promise.all([
         supabase
           .from("visitor_sessions")
           .select("session_id, page_url, last_seen_at, city, region, country, latitude, longitude")
           .gte("last_seen_at", liveCutoff)
           .order("last_seen_at", { ascending: false }),
+        supabase
+          .from("page_events")
+          .select("session_id, page_url, created_at")
+          .gte("created_at", eventLiveCutoff)
+          .order("created_at", { ascending: false }),
         supabase
           .from("orders")
           .select("id", { count: "exact", head: true })
