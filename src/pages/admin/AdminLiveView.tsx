@@ -178,6 +178,7 @@ const AdminLiveView = () => {
       if (requestId !== fastRequestRef.current) return;
 
       if (liveSessionsRes.error) throw liveSessionsRes.error;
+      if (liveEventSessionsRes.error) throw liveEventSessionsRes.error;
       if (ordersCountRes.error) throw ordersCountRes.error;
       if (pendingOrdersCountRes.error) throw pendingOrdersCountRes.error;
       if (pageViewsCountRes.error) throw pageViewsCountRes.error;
@@ -185,6 +186,20 @@ const AdminLiveView = () => {
       if (financialSummaryRes.error) throw financialSummaryRes.error;
 
       const sessionsArr = dedupeSessions((liveSessionsRes.data || []) as SessionData[]);
+
+      // Reforço: sessões com evento recente que ainda não bateram heartbeat (mobile/aba inativa).
+      // Usadas só na contagem ao vivo, não no globo (que precisa de coordenadas).
+      const sessionMap = new Map<string, true>();
+      sessionsArr.forEach((s) => sessionMap.set(s.session_id, true));
+      const eventOnlySessions = new Set<string>();
+      const eventCheckoutSessions = new Set<string>();
+      ((liveEventSessionsRes.data || []) as { session_id: string; page_url: string | null }[]).forEach((ev) => {
+        if (!ev.session_id) return;
+        if (!sessionMap.has(ev.session_id)) eventOnlySessions.add(ev.session_id);
+        if (ev.page_url?.includes("/checkout")) eventCheckoutSessions.add(ev.session_id);
+      });
+      const liveVisitorsCount = sessionsArr.length + eventOnlySessions.size;
+
       const financialSummary = (financialSummaryRes.data?.[0] || null) as FinancialSummaryRow | null;
       const revenue = Number(financialSummary?.gross_revenue ?? 0);
       const paidOrdersCount = Number(financialSummary?.total_orders_paid ?? 0);
@@ -192,7 +207,8 @@ const AdminLiveView = () => {
       const pendingOrdersCount = pendingOrdersCountRes.count ?? 0;
       const pageViewsCount = pageViewsCountRes.count ?? 0;
       const checkoutViewsCount = checkoutViewsCountRes.count ?? 0;
-      const checkoutActive = Math.max(checkoutViewsCount, sessionsArr.filter((s) => s.page_url?.includes("/checkout")).length);
+      const checkoutActiveLive = sessionsArr.filter((s) => s.page_url?.includes("/checkout")).length + eventCheckoutSessions.size;
+      const checkoutActive = Math.max(checkoutViewsCount, checkoutActiveLive);
 
       setSessions(sessionsArr);
       setBehavior({
@@ -202,7 +218,7 @@ const AdminLiveView = () => {
       });
 
       setStats({
-        visitors: sessionsArr.length,
+        visitors: liveVisitorsCount,
         revenue,
         orders: ordersCount,
         paidOrders: paidOrdersCount,
