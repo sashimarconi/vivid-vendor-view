@@ -755,6 +755,7 @@ Deno.serve(async (req) => {
           },
           body: JSON.stringify({
             event: "order_created",
+            owner_user_id: product.user_id,
             payload: {
               order_id: orderData.id,
               transaction_id: paymentResult.transactionId,
