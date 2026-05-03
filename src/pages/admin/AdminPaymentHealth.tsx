@@ -228,6 +228,8 @@ const AdminPaymentHealth = () => {
         </CardContent>
       </Card>
 
+      <GatewayConversion />
+
       {/* Fallback config */}
       <Card>
         <CardContent className="p-5">
