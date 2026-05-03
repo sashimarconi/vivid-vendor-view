@@ -62,14 +62,14 @@ export default function PagesVisited({ todayEvents, liveSessions }: PagesVisited
   const maxCount = allPages.length > 0 ? allPages[0].count : 1;
 
   return (
-    <Card className="border-border">
+    <Card className="border-border/60 bg-card/60 backdrop-blur">
       <CardContent className="p-4">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <FileText className="w-4 h-4 text-muted-foreground" />
-            <span className="text-sm font-medium text-foreground">Páginas visitadas</span>
+            <FileText className="w-4 h-4 text-cyan-400" />
+            <span className="text-sm font-semibold text-foreground">Páginas visitadas</span>
           </div>
-          <div className="flex rounded-lg border border-border overflow-hidden">
+          <div className="flex rounded-lg border border-border/60 overflow-hidden bg-background/40">
             <button
               onClick={() => setMode("live")}
               className={`px-2.5 py-1 text-[10px] font-medium transition-colors flex items-center gap-1 ${
@@ -101,13 +101,13 @@ export default function PagesVisited({ todayEvents, liveSessions }: PagesVisited
           <div className="space-y-3">
             {visiblePages.map((p) => (
               <div key={p.page}>
-                <div className="flex items-center justify-between mb-1">
+                <div className="flex items-center justify-between mb-1.5">
                   <span className="text-xs text-foreground truncate max-w-[200px]">{p.page}</span>
-                  <span className="text-xs font-semibold text-foreground">{p.count}</span>
+                  <span className="text-xs font-bold text-foreground tabular-nums">{p.count}</span>
                 </div>
-                <div className="w-full h-2 rounded-full bg-muted overflow-hidden">
+                <div className="w-full h-1.5 rounded-full bg-muted/40 overflow-hidden">
                   <div
-                    className="h-full rounded-full bg-marketplace-green transition-all duration-500"
+                    className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-cyan-400 transition-all duration-700 shadow-[0_0_8px_hsl(150_80%_50%/0.5)]"
                     style={{ width: `${(p.count / maxCount) * 100}%` }}
                   />
                 </div>

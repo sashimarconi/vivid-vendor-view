@@ -47,14 +47,14 @@ export default function SessionsByLocation({ liveSessions, todaySessions }: Sess
   const maxCount = allLocations.length > 0 ? allLocations[0].count : 1;
 
   return (
-    <Card className="border-border">
+    <Card className="border-border/60 bg-card/60 backdrop-blur">
       <CardContent className="p-4">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <MapPin className="w-4 h-4 text-muted-foreground" />
-            <span className="text-sm font-medium text-foreground">Sessões por local</span>
+            <MapPin className="w-4 h-4 text-violet-400" />
+            <span className="text-sm font-semibold text-foreground">Sessões por local</span>
           </div>
-          <div className="flex rounded-lg border border-border overflow-hidden">
+          <div className="flex rounded-lg border border-border/60 overflow-hidden bg-background/40">
             <button
               onClick={() => setMode("live")}
               className={`px-2.5 py-1 text-[10px] font-medium transition-colors flex items-center gap-1 ${
@@ -86,13 +86,13 @@ export default function SessionsByLocation({ liveSessions, todaySessions }: Sess
           <div className="space-y-3">
             {visibleLocations.map((loc) => (
               <div key={loc.location}>
-                <div className="flex items-center justify-between mb-1">
+                <div className="flex items-center justify-between mb-1.5">
                   <span className="text-xs text-foreground">{loc.location}</span>
-                  <span className="text-xs font-semibold text-foreground">{loc.count}</span>
+                  <span className="text-xs font-bold text-foreground tabular-nums">{loc.count}</span>
                 </div>
-                <div className="w-full h-2 rounded-full bg-muted overflow-hidden">
+                <div className="w-full h-1.5 rounded-full bg-muted/40 overflow-hidden">
                   <div
-                    className="h-full rounded-full bg-primary transition-all duration-500"
+                    className="h-full rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-400 transition-all duration-700 shadow-[0_0_8px_hsl(280_80%_60%/0.5)]"
                     style={{ width: `${(loc.count / maxCount) * 100}%` }}
                   />
                 </div>
