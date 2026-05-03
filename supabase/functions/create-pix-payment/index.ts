@@ -818,22 +818,9 @@ Deno.serve(async (req) => {
           console.error("Utmify dispatch error:", utmifyErr);
         }
 
-        // Send to Xtracky (waiting_payment)
-        try {
-          await fetch(`${supabaseUrl}/functions/v1/send-xtracky-order`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${serviceRoleKey}`,
-            },
-            body: JSON.stringify({
-              order_id: orderData.id,
-              status: "waiting_payment",
-            }),
-          });
-        } catch (xtrackyErr) {
-          console.error("Xtracky dispatch error:", xtrackyErr);
-        }
+        // Xtracky deduplica orderId + utm_source; se enviarmos waiting_payment aqui,
+        // o evento paid posterior pode ser ignorado como duplicado.
+        // Por isso, o envio fica somente na confirmação real do pagamento.
       }
     }
 
