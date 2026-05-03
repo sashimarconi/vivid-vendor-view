@@ -16,7 +16,7 @@ Deno.serve(async (req) => {
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
-    const { event, payload } = await req.json();
+    const { event, payload, owner_user_id } = await req.json();
     if (!event || !payload) {
       return new Response(
         JSON.stringify({ error: "Missing event or payload" }),
@@ -27,10 +27,16 @@ Deno.serve(async (req) => {
     console.log(`Dispatching webhook event: ${event}`);
 
     // Get all active webhooks that listen to this event
-    const { data: webhooks, error } = await supabase
+    let query = supabase
       .from("webhooks")
       .select("*")
       .eq("active", true);
+
+    if (owner_user_id) {
+      query = query.eq("user_id", owner_user_id);
+    }
+
+    const { data: webhooks, error } = await query;
 
     if (error) {
       console.error("Error fetching webhooks:", error);
