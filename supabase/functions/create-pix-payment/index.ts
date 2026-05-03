@@ -755,9 +755,12 @@ Deno.serve(async (req) => {
           },
           body: JSON.stringify({
             event: "order_created",
+            owner_user_id: product.user_id,
             payload: {
               order_id: orderData.id,
               transaction_id: paymentResult.transactionId,
+              utm_source: body.utmParams?.utm_source || body.utmParams?.src || "",
+              utm_params: body.utmParams || {},
               customer_name: body.customerName,
               customer_email: body.customerEmail,
               customer_phone: body.customerPhone,

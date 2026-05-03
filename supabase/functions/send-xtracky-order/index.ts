@@ -72,22 +72,29 @@ serve(async (req) => {
     const amountInCents = Math.round(Number(order.total) * 100);
     const utmSource = order.utm_params?.utm_source ?? order.utm_params?.src ?? null;
 
+    const normalizedUtmSource = typeof utmSource === "string" ? utmSource.trim() : "";
+
     const payload = {
-      token: settings.api_token,
       orderId: order.id,
       amount: amountInCents,
       status: xtrackyStatus,
-      utm_source: utmSource,
+      utm_source: normalizedUtmSource,
       leadName: order.customer_name ?? undefined,
       leadEmail: order.customer_email ?? undefined,
       leadPhone: order.customer_phone ?? undefined,
     };
 
-    console.log("Sending to Xtracky:", JSON.stringify({ ...payload, token: "***" }));
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${settings.api_token}`,
+      "X-API-Token": settings.api_token,
+    };
+
+    console.log("Sending to Xtracky:", JSON.stringify(payload));
 
     const xtrackyResponse = await fetch(XTRACKY_API_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers,
       body: JSON.stringify(payload),
     });
 
