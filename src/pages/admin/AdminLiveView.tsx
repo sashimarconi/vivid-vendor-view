@@ -366,33 +366,36 @@ const AdminLiveView = () => {
             purchased={behavior.purchased}
           />
 
-          <Card className="border-border">
+          <Card className="border-border/60 bg-card/60 backdrop-blur">
             <CardContent className="p-4">
-              <span className="text-sm font-medium text-foreground">Histórico de Vendas (hoje)</span>
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-semibold text-foreground">Histórico de Vendas</span>
+                <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Hoje</span>
+              </div>
               <div className="h-[180px] mt-3">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={hourlyData}>
                     <defs>
                       <linearGradient id="liveRevenueGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="hsl(263, 70%, 50%)" stopOpacity={0.3} />
-                        <stop offset="100%" stopColor="hsl(263, 70%, 50%)" stopOpacity={0.02} />
+                        <stop offset="0%" stopColor="hsl(263, 80%, 60%)" stopOpacity={0.5} />
+                        <stop offset="100%" stopColor="hsl(263, 80%, 60%)" stopOpacity={0} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
                     <XAxis dataKey="hour" tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }} axisLine={false} tickLine={false} />
                     <YAxis tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }} axisLine={false} tickLine={false} />
                     <Tooltip
                       contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, color: "hsl(var(--foreground))" }}
                       formatter={(value: number) => [formatCurrency(value), "Receita"]}
                     />
-                    <Area type="monotone" dataKey="value" stroke="hsl(263, 70%, 50%)" strokeWidth={2} fill="url(#liveRevenueGrad)" dot={false} />
+                    <Area type="monotone" dataKey="value" stroke="hsl(263, 80%, 65%)" strokeWidth={2.5} fill="url(#liveRevenueGrad)" dot={false} />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-border">
+          <Card className="border-border/60 bg-card/60 backdrop-blur">
             <CardContent className="p-5">
               <AnimatedFunnel data={funnelData} />
             </CardContent>
