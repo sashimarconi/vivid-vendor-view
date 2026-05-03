@@ -314,13 +314,13 @@ const AdminLiveView = () => {
   };
 
   const kpiCards = [
-    { label: "Visitantes", value: formatCompact(stats.visitors), icon: Users, accent: "from-cyan-500/20 to-cyan-500/0", iconColor: "text-cyan-400", glow: "shadow-[0_0_24px_-8px_hsl(190_90%_50%/0.45)]", colSpan: "" },
-    { label: "Ticket médio", value: formatCurrency(stats.avgTicket), icon: DollarSign, accent: "from-violet-500/20 to-violet-500/0", iconColor: "text-violet-400", glow: "", colSpan: "" },
-    { label: "Pedidos", value: formatCompact(stats.orders), icon: ShoppingCart, accent: "from-violet-500/20 to-violet-500/0", iconColor: "text-violet-400", glow: "", colSpan: "" },
-    { label: "Pagos", value: formatCompact(stats.paidOrders), icon: ShoppingCart, accent: "from-emerald-500/20 to-emerald-500/0", iconColor: "text-emerald-400", glow: "", colSpan: "" },
-    { label: "Pendentes", value: formatCompact(stats.pendingOrders), icon: ShoppingCart, accent: "from-amber-500/20 to-amber-500/0", iconColor: "text-amber-400", glow: "", colSpan: "" },
-    { label: "Conversão", value: `${stats.conversionRate.toFixed(1)}%`, icon: Percent, accent: "from-fuchsia-500/20 to-fuchsia-500/0", iconColor: "text-fuchsia-400", glow: "", colSpan: "" },
-    { label: "Vendas (hoje)", value: formatCurrency(stats.revenue), icon: DollarSign, accent: "from-emerald-500/20 to-emerald-500/0", iconColor: "text-emerald-400", glow: "shadow-[0_0_24px_-8px_hsl(150_80%_45%/0.45)]", colSpan: "col-span-2" },
+    { label: "Visitantes", value: formatCompact(stats.visitors), icon: Users, colSpan: "" },
+    { label: "Ticket médio", value: formatCurrency(stats.avgTicket), icon: DollarSign, colSpan: "" },
+    { label: "Pedidos", value: formatCompact(stats.orders), icon: ShoppingCart, colSpan: "" },
+    { label: "Pagos", value: formatCompact(stats.paidOrders), icon: ShoppingCart, colSpan: "", valueClass: "text-emerald-400" },
+    { label: "Pendentes", value: formatCompact(stats.pendingOrders), icon: ShoppingCart, colSpan: "", valueClass: "text-amber-400" },
+    { label: "Conversão", value: `${stats.conversionRate.toFixed(1)}%`, icon: Percent, colSpan: "" },
+    { label: "Vendas (hoje)", value: formatCurrency(stats.revenue), icon: DollarSign, colSpan: "col-span-2", highlight: true },
   ];
 
   return (
@@ -347,17 +347,30 @@ const AdminLiveView = () => {
         {/* Left column */}
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
-            {kpiCards.map((card) => (
-              <Card key={card.label} className={`relative overflow-hidden border-border/60 bg-card/60 backdrop-blur transition-all hover:border-primary/40 hover:-translate-y-0.5 ${card.glow} ${card.colSpan}`}>
-                <div className={`absolute inset-0 bg-gradient-to-br ${card.accent} pointer-events-none`} />
-                <CardContent className="relative p-4">
-                  <span className="text-[11px] uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 font-medium">
-                    <card.icon className={`w-3.5 h-3.5 ${card.iconColor}`} /> {card.label}
-                  </span>
-                  <p className="text-2xl font-bold text-foreground mt-1.5 tabular-nums">{card.value}</p>
-                </CardContent>
-              </Card>
-            ))}
+            {kpiCards.map((card) => {
+              const isHighlight = "highlight" in card && card.highlight;
+              const valueClass = "valueClass" in card && card.valueClass ? card.valueClass : "text-foreground";
+              return (
+                <Card
+                  key={card.label}
+                  className={`relative overflow-hidden border-border/60 bg-card/40 backdrop-blur transition-all hover:border-primary/40 ${card.colSpan} ${
+                    isHighlight ? "shadow-[0_0_32px_-12px_hsl(var(--primary)/0.5)] border-primary/30" : ""
+                  }`}
+                >
+                  {isHighlight && (
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent pointer-events-none" />
+                  )}
+                  <CardContent className="relative p-4">
+                    <span className="text-[11px] uppercase tracking-wider text-muted-foreground/80 flex items-center gap-1.5 font-medium">
+                      <card.icon className="w-3.5 h-3.5 text-muted-foreground" /> {card.label}
+                    </span>
+                    <p className={`text-2xl font-bold mt-1.5 tabular-nums ${isHighlight ? "text-3xl text-foreground" : valueClass}`}>
+                      {card.value}
+                    </p>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
 
           <ClientBehavior
