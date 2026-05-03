@@ -8,6 +8,7 @@ import AnimatedFunnel from "@/components/admin/live-view/AnimatedFunnel";
 import ClientBehavior from "@/components/admin/live-view/ClientBehavior";
 import SessionsByLocation from "@/components/admin/live-view/SessionsByLocation";
 import PagesVisited from "@/components/admin/live-view/PagesVisited";
+import LiveSessionsDebug from "@/components/admin/live-view/LiveSessionsDebug";
 
 const SAO_PAULO_TZ = "America/Sao_Paulo";
 
@@ -391,6 +392,8 @@ const AdminLiveView = () => {
               <AnimatedFunnel data={funnelData} />
             </CardContent>
           </Card>
+
+          <LiveSessionsDebug />
         </div>
 
         {/* Right column */}
