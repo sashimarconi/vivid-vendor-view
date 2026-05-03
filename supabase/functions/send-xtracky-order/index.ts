@@ -28,7 +28,7 @@ serve(async (req) => {
 
     const { data: order, error: orderError } = await supabase
       .from("orders")
-      .select("id, user_id, total, payment_status, utm_params")
+      .select("id, user_id, total, payment_status, utm_params, customer_name, customer_email, customer_phone")
       .eq("id", order_id)
       .single();
 
@@ -78,6 +78,9 @@ serve(async (req) => {
       amount: amountInCents,
       status: xtrackyStatus,
       utm_source: utmSource,
+      leadName: order.customer_name ?? undefined,
+      leadEmail: order.customer_email ?? undefined,
+      leadPhone: order.customer_phone ?? undefined,
     };
 
     console.log("Sending to Xtracky:", JSON.stringify({ ...payload, token: "***" }));
