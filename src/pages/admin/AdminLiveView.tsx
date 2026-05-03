@@ -348,7 +348,7 @@ const AdminLiveView = () => {
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
             {kpiCards.map((card) => (
-              <Card key={card.label} className={`relative overflow-hidden border-border/60 bg-card/60 backdrop-blur transition-all hover:border-primary/40 hover:-translate-y-0.5 ${card.glow}`}>
+              <Card key={card.label} className={`relative overflow-hidden border-border/60 bg-card/60 backdrop-blur transition-all hover:border-primary/40 hover:-translate-y-0.5 ${card.glow} ${card.colSpan}`}>
                 <div className={`absolute inset-0 bg-gradient-to-br ${card.accent} pointer-events-none`} />
                 <CardContent className="relative p-4">
                   <span className="text-[11px] uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 font-medium">
