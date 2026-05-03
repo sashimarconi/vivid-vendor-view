@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Activity, AlertCircle, Clock, AlertTriangle, RefreshCw, ArrowUp, ArrowDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import GatewayConversion from "@/components/admin/payment-health/GatewayConversion";
 
 interface GatewayHealth {
   gateway_name: string;
@@ -226,6 +227,8 @@ const AdminPaymentHealth = () => {
           )}
         </CardContent>
       </Card>
+
+      <GatewayConversion />
 
       {/* Fallback config */}
       <Card>

@@ -1827,6 +1827,28 @@ export type Database = {
           sessions: number
         }[]
       }
+      user_gateway_conversion: {
+        Args: { _days?: number }
+        Returns: {
+          conversion_pct: number
+          day: string
+          gateway_name: string
+          paid: number
+          pix_generated: number
+          revenue: number
+        }[]
+      }
+      user_gateway_conversion_summary: {
+        Args: { _days?: number }
+        Returns: {
+          avg_ticket: number
+          conversion_pct: number
+          gateway_name: string
+          paid: number
+          pix_generated: number
+          revenue: number
+        }[]
+      }
       user_gateway_health: {
         Args: { _hours?: number }
         Returns: {
