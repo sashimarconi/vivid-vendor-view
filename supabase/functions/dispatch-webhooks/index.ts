@@ -6,6 +6,25 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const XTRACKY_API_URL = "https://api.xtracky.com/api/integrations/api";
+
+function buildWebhookBody(wh: any, event: string, payload: any) {
+  if (wh.url.startsWith(XTRACKY_API_URL) && ["order_created", "order_paid"].includes(event)) {
+    return JSON.stringify({
+      orderId: payload.order_id || payload.id,
+      amount: Math.round(Number(payload.total ?? payload.amount ?? 0) * 100),
+      status: event === "order_paid" ? "paid" : "waiting_payment",
+      utm_source: payload.utm_source || payload.utm_params?.utm_source || "",
+    });
+  }
+
+  return JSON.stringify({
+    event,
+    timestamp: new Date().toISOString(),
+    data: payload,
+  });
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -63,11 +82,7 @@ Deno.serve(async (req) => {
           headers["X-Webhook-Secret"] = wh.secret_key;
         }
 
-        const body = JSON.stringify({
-          event,
-          timestamp: new Date().toISOString(),
-          data: payload,
-        });
+        const body = buildWebhookBody(wh, event, payload);
 
         const response = await fetch(wh.url, {
           method: "POST",
