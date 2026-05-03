@@ -314,13 +314,13 @@ const AdminLiveView = () => {
   };
 
   const kpiCards = [
-    { label: "Visitantes", value: formatCompact(stats.visitors), icon: Users, accent: "from-cyan-500/20 to-cyan-500/0", iconColor: "text-cyan-400", glow: "shadow-[0_0_24px_-8px_hsl(190_90%_50%/0.45)]", colSpan: "" },
-    { label: "Ticket médio", value: formatCurrency(stats.avgTicket), icon: DollarSign, accent: "from-violet-500/20 to-violet-500/0", iconColor: "text-violet-400", glow: "", colSpan: "" },
-    { label: "Pedidos", value: formatCompact(stats.orders), icon: ShoppingCart, accent: "from-violet-500/20 to-violet-500/0", iconColor: "text-violet-400", glow: "", colSpan: "" },
-    { label: "Pagos", value: formatCompact(stats.paidOrders), icon: ShoppingCart, accent: "from-emerald-500/20 to-emerald-500/0", iconColor: "text-emerald-400", glow: "", colSpan: "" },
-    { label: "Pendentes", value: formatCompact(stats.pendingOrders), icon: ShoppingCart, accent: "from-amber-500/20 to-amber-500/0", iconColor: "text-amber-400", glow: "", colSpan: "" },
-    { label: "Conversão", value: `${stats.conversionRate.toFixed(1)}%`, icon: Percent, accent: "from-fuchsia-500/20 to-fuchsia-500/0", iconColor: "text-fuchsia-400", glow: "", colSpan: "" },
-    { label: "Vendas (hoje)", value: formatCurrency(stats.revenue), icon: DollarSign, accent: "from-emerald-500/20 to-emerald-500/0", iconColor: "text-emerald-400", glow: "shadow-[0_0_24px_-8px_hsl(150_80%_45%/0.45)]", colSpan: "col-span-2" },
+    { label: "Visitantes", value: formatCompact(stats.visitors), icon: Users, colSpan: "" },
+    { label: "Ticket médio", value: formatCurrency(stats.avgTicket), icon: DollarSign, colSpan: "" },
+    { label: "Pedidos", value: formatCompact(stats.orders), icon: ShoppingCart, colSpan: "" },
+    { label: "Pagos", value: formatCompact(stats.paidOrders), icon: ShoppingCart, colSpan: "", valueClass: "text-emerald-400" },
+    { label: "Pendentes", value: formatCompact(stats.pendingOrders), icon: ShoppingCart, colSpan: "", valueClass: "text-amber-400" },
+    { label: "Conversão", value: `${stats.conversionRate.toFixed(1)}%`, icon: Percent, colSpan: "" },
+    { label: "Vendas (hoje)", value: formatCurrency(stats.revenue), icon: DollarSign, colSpan: "col-span-2", highlight: true },
   ];
 
   return (
