@@ -392,6 +392,8 @@ const AdminLiveView = () => {
               <AnimatedFunnel data={funnelData} />
             </CardContent>
           </Card>
+
+          <LiveSessionsDebug />
         </div>
 
         {/* Right column */}
