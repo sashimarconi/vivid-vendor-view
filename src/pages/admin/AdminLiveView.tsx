@@ -208,12 +208,12 @@ const AdminLiveView = () => {
       const pageViewsCount = pageViewsCountRes.count ?? 0;
       const checkoutViewsCount = checkoutViewsCountRes.count ?? 0;
       const checkoutActiveLive = sessionsArr.filter((s) => s.page_url?.includes("/checkout")).length + eventCheckoutSessions.size;
-      const checkoutActive = Math.max(checkoutViewsCount, checkoutActiveLive);
+      const onStoreLive = liveVisitorsCount - checkoutActiveLive;
 
       setSessions(sessionsArr);
       setBehavior({
-        activeCarts: pendingOrdersCount,
-        inCheckout: checkoutActive,
+        activeCarts: Math.max(0, onStoreLive),
+        inCheckout: checkoutActiveLive,
         purchased: paidOrdersCount,
       });
 
