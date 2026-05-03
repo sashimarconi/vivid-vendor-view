@@ -189,16 +189,22 @@ const AdminLiveView = () => {
 
       // Reforço: sessões com evento recente que ainda não bateram heartbeat (mobile/aba inativa).
       // Usadas só na contagem ao vivo, não no globo (que precisa de coordenadas).
-      const sessionMap = new Map<string, true>();
-      sessionsArr.forEach((s) => sessionMap.set(s.session_id, true));
+      const sessionMap = new Map<string, SessionData>();
+      sessionsArr.forEach((s) => sessionMap.set(s.session_id, s));
       const eventOnlySessions = new Set<string>();
-      const eventCheckoutSessions = new Set<string>();
+      const checkoutLiveSessions = new Set<string>();
       ((liveEventSessionsRes.data || []) as { session_id: string; page_url: string | null }[]).forEach((ev) => {
         if (!ev.session_id) return;
         if (!sessionMap.has(ev.session_id)) eventOnlySessions.add(ev.session_id);
-        if (ev.page_url?.includes("/checkout")) eventCheckoutSessions.add(ev.session_id);
+        if ((sessionMap.get(ev.session_id)?.page_url || ev.page_url || "").includes("/checkout")) {
+          checkoutLiveSessions.add(ev.session_id);
+        }
       });
-      const liveVisitorsCount = sessionsArr.length + eventOnlySessions.size;
+      sessionsArr.forEach((session) => {
+        if ((session.page_url || "").includes("/checkout")) checkoutLiveSessions.add(session.session_id);
+      });
+
+      const liveVisitorsCount = sessionMap.size + eventOnlySessions.size;
 
       const financialSummary = (financialSummaryRes.data?.[0] || null) as FinancialSummaryRow | null;
       const revenue = Number(financialSummary?.gross_revenue ?? 0);
@@ -207,7 +213,7 @@ const AdminLiveView = () => {
       const pendingOrdersCount = pendingOrdersCountRes.count ?? 0;
       const pageViewsCount = pageViewsCountRes.count ?? 0;
       const checkoutViewsCount = checkoutViewsCountRes.count ?? 0;
-      const checkoutActiveLive = sessionsArr.filter((s) => s.page_url?.includes("/checkout")).length + eventCheckoutSessions.size;
+      const checkoutActiveLive = checkoutLiveSessions.size;
       const onStoreLive = liveVisitorsCount - checkoutActiveLive;
 
       setSessions(sessionsArr);
