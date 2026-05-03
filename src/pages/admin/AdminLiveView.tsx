@@ -346,7 +346,7 @@ const AdminLiveView = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left column */}
         <div className="space-y-4">
-          <div className="grid gap-3 grid-cols-2 sm:grid-cols-[repeat(auto-fit,minmax(140px,1fr))]">
+          <div className="grid grid-cols-2 gap-3">
             {kpiCards.map((card) => (
               <Card key={card.label} className={`relative overflow-hidden border-border/60 bg-card/60 backdrop-blur transition-all hover:border-primary/40 hover:-translate-y-0.5 ${card.glow}`}>
                 <div className={`absolute inset-0 bg-gradient-to-br ${card.accent} pointer-events-none`} />
