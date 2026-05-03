@@ -239,6 +239,7 @@ Deno.serve(async (req) => {
             headers: { "Content-Type": "application/json", "Authorization": `Bearer ${serviceRoleKey}` },
             body: JSON.stringify({
               event: "order_paid",
+              owner_user_id: order.user_id,
               payload: {
                 order_id: order.id, transaction_id: transactionId,
                 customer_name: order.customer_name, customer_email: order.customer_email,
