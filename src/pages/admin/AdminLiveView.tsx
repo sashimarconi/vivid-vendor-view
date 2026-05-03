@@ -313,13 +313,25 @@ const AdminLiveView = () => {
     return `${(Math.floor(m * 10) / 10).toString().replace(".", ",")}M`;
   };
 
+  const kpiCards = [
+    { label: "Visitantes", value: formatCompact(stats.visitors), icon: Users, accent: "from-cyan-500/20 to-cyan-500/0", iconColor: "text-cyan-400", glow: "shadow-[0_0_24px_-8px_hsl(190_90%_50%/0.45)]" },
+    { label: "Vendas (hoje)", value: formatCurrency(stats.revenue), icon: DollarSign, accent: "from-emerald-500/20 to-emerald-500/0", iconColor: "text-emerald-400", glow: "shadow-[0_0_24px_-8px_hsl(150_80%_45%/0.45)]" },
+    { label: "Pedidos", value: formatCompact(stats.orders), icon: ShoppingCart, accent: "from-violet-500/20 to-violet-500/0", iconColor: "text-violet-400", glow: "" },
+    { label: "Pagos", value: formatCompact(stats.paidOrders), icon: ShoppingCart, accent: "from-emerald-500/20 to-emerald-500/0", iconColor: "text-emerald-400", glow: "" },
+    { label: "Pendentes", value: formatCompact(stats.pendingOrders), icon: ShoppingCart, accent: "from-amber-500/20 to-amber-500/0", iconColor: "text-amber-400", glow: "" },
+    { label: "Conversão", value: `${stats.conversionRate.toFixed(1)}%`, icon: Percent, accent: "from-fuchsia-500/20 to-fuchsia-500/0", iconColor: "text-fuchsia-400", glow: "" },
+    { label: "Ticket médio", value: formatCurrency(stats.avgTicket), icon: DollarSign, accent: "from-violet-500/20 to-violet-500/0", iconColor: "text-violet-400", glow: "" },
+  ];
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-foreground">Radar de Vendas</h1>
-            <span className="flex items-center gap-1.5 bg-marketplace-green/10 text-marketplace-green text-xs font-medium px-2.5 py-1 rounded-full">
+            <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-foreground via-foreground to-primary bg-clip-text text-transparent">
+              Radar de Vendas
+            </h1>
+            <span className="flex items-center gap-1.5 bg-marketplace-green/10 text-marketplace-green text-xs font-medium px-2.5 py-1 rounded-full border border-marketplace-green/20">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-marketplace-green opacity-75" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-marketplace-green" />
@@ -335,21 +347,14 @@ const AdminLiveView = () => {
         {/* Left column */}
         <div className="space-y-4">
           <div className="grid grid-cols-2 xl:grid-cols-3 gap-3">
-            {[
-              { label: "Visitantes", value: formatCompact(stats.visitors), icon: Users },
-              { label: "Vendas (hoje)", value: formatCurrency(stats.revenue), icon: DollarSign },
-              { label: "Pedidos", value: formatCompact(stats.orders), icon: ShoppingCart },
-              { label: "Pagos", value: formatCompact(stats.paidOrders), icon: ShoppingCart },
-              { label: "Pendentes", value: formatCompact(stats.pendingOrders), icon: ShoppingCart },
-              { label: "Conversão", value: `${stats.conversionRate.toFixed(1)}%`, icon: Percent },
-              { label: "Ticket médio", value: formatCurrency(stats.avgTicket), icon: DollarSign },
-            ].map((card) => (
-              <Card key={card.label} className="border-border">
-                <CardContent className="p-4">
-                  <span className="text-xs text-muted-foreground flex items-center gap-1.5">
-                    <card.icon className="w-3.5 h-3.5" /> {card.label}
+            {kpiCards.map((card) => (
+              <Card key={card.label} className={`relative overflow-hidden border-border/60 bg-card/60 backdrop-blur transition-all hover:border-primary/40 hover:-translate-y-0.5 ${card.glow}`}>
+                <div className={`absolute inset-0 bg-gradient-to-br ${card.accent} pointer-events-none`} />
+                <CardContent className="relative p-4">
+                  <span className="text-[11px] uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 font-medium">
+                    <card.icon className={`w-3.5 h-3.5 ${card.iconColor}`} /> {card.label}
                   </span>
-                  <p className="text-2xl font-bold text-foreground mt-1">{card.value}</p>
+                  <p className="text-2xl font-bold text-foreground mt-1.5 tabular-nums">{card.value}</p>
                 </CardContent>
               </Card>
             ))}
