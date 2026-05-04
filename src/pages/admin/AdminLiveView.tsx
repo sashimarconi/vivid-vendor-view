@@ -294,7 +294,7 @@ const AdminLiveView = () => {
     fetchOverview();
     fetchSupportingData();
 
-    const fastInterval = setInterval(fetchOverview, 5000);
+    const fastInterval = setInterval(fetchOverview, 2000);
     const slowInterval = setInterval(fetchSupportingData, 60000);
 
     return () => {
