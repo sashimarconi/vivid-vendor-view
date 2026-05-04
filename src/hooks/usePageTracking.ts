@@ -163,19 +163,51 @@ export function useVisitorHeartbeat(userId?: string | null) {
       ).then();
     };
 
-    // batida imediata + intervalo curto para o "ao vivo" não cair por causa de 1 batida atrasada
-    beat();
-    const interval = setInterval(beat, 8000);
+    // Marca sessão como expirada imediatamente quando o usuário sai
+    // (seta last_seen_at para 1min atrás, fora da janela "ao vivo")
+    const expire = () => {
+      const expiredAt = new Date(Date.now() - 60_000).toISOString();
+      const url = `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/visitor_sessions?session_id=eq.${encodeURIComponent(sessionId)}`;
+      const body = JSON.stringify({ last_seen_at: expiredAt });
+      const headers = {
+        "Content-Type": "application/json",
+        apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        Prefer: "return=minimal",
+      };
+      try {
+        // sendBeacon não suporta PATCH; usamos fetch com keepalive para garantir envio na saída
+        fetch(url, { method: "PATCH", headers, body, keepalive: true }).catch(() => {});
+      } catch {
+        // ignore
+      }
+    };
 
-    // refaz a batida ao voltar foco / ficar visível (mobile economiza energia)
-    const onVisible = () => { if (document.visibilityState === "visible") beat(); };
-    document.addEventListener("visibilitychange", onVisible);
+    // batida imediata + intervalo curto para presença real-time
+    beat();
+    const interval = setInterval(beat, 5000);
+
+    const onVisibility = () => {
+      if (document.visibilityState === "visible") {
+        beat();
+      } else {
+        // usuário trocou de aba / minimizou — expira na hora
+        expire();
+      }
+    };
+    const onPageHide = () => expire();
+
+    document.addEventListener("visibilitychange", onVisibility);
     window.addEventListener("focus", beat);
+    window.addEventListener("pagehide", onPageHide);
+    window.addEventListener("beforeunload", onPageHide);
 
     return () => {
       clearInterval(interval);
-      document.removeEventListener("visibilitychange", onVisible);
+      document.removeEventListener("visibilitychange", onVisibility);
       window.removeEventListener("focus", beat);
+      window.removeEventListener("pagehide", onPageHide);
+      window.removeEventListener("beforeunload", onPageHide);
     };
   }, [userId]);
 }

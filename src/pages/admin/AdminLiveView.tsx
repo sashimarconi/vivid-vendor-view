@@ -127,9 +127,10 @@ const AdminLiveView = () => {
   const fetchOverview = useCallback(async () => {
     const requestId = ++fastRequestRef.current;
     const now = new Date();
-    // Janela "ao vivo" de 60s: tolera 1-2 heartbeats perdidos sem zerar o KPI
-    const liveCutoff = new Date(now.getTime() - 60 * 1000).toISOString();
-    const eventLiveCutoff = new Date(now.getTime() - 60 * 1000).toISOString();
+    // Janela "ao vivo" agressiva (20s): saída do visitante reflete em segundos.
+    // Heartbeat é a cada 5s + expiração ativa em pagehide/visibility hidden.
+    const liveCutoff = new Date(now.getTime() - 20 * 1000).toISOString();
+    const eventLiveCutoff = new Date(now.getTime() - 20 * 1000).toISOString();
     const todayStart = getSaoPauloDayStartIso(now);
     const todayDate = getSaoPauloDateKey(now);
 
@@ -293,7 +294,7 @@ const AdminLiveView = () => {
     fetchOverview();
     fetchSupportingData();
 
-    const fastInterval = setInterval(fetchOverview, 5000);
+    const fastInterval = setInterval(fetchOverview, 2000);
     const slowInterval = setInterval(fetchSupportingData, 60000);
 
     return () => {
