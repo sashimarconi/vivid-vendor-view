@@ -70,9 +70,32 @@ serve(async (req) => {
     const xtrackyStatus = statusMap[status || order.payment_status] || "waiting_payment";
 
     const amountInCents = Math.round(Number(order.total) * 100);
-    const utmSource = order.utm_params?.utm_source ?? order.utm_params?.src ?? null;
 
-    const normalizedUtmSource = typeof utmSource === "string" ? utmSource.trim() : "";
+    // Xtracky exige o CLICK ID no utm_source (formato TT-xxxx, ou o sck/ttclid)
+    // O TikTok Ads sobrescreve utm_source com "tiktok" genérico, perdendo a atribuição.
+    // Prioridade: src (click id explícito) > utm_source se já for click id (TT-/FB-/etc)
+    //            > sck > ttclid > fbclid > gclid > utm_source genérico (último recurso)
+    const u = order.utm_params || {};
+    const rawUtmSource = typeof u.utm_source === "string" ? u.utm_source.trim() : "";
+    const isClickId = (v: unknown) =>
+      typeof v === "string" && /^(TT|FB|GG|TW|KW|TB|XT)-/i.test(v.trim());
+
+    let normalizedUtmSource = "";
+    if (typeof u.src === "string" && u.src.trim()) {
+      normalizedUtmSource = u.src.trim();
+    } else if (isClickId(rawUtmSource)) {
+      normalizedUtmSource = rawUtmSource;
+    } else if (typeof u.sck === "string" && u.sck.trim()) {
+      normalizedUtmSource = u.sck.trim();
+    } else if (typeof u.ttclid === "string" && u.ttclid.trim()) {
+      normalizedUtmSource = u.ttclid.trim();
+    } else if (typeof u.fbclid === "string" && u.fbclid.trim()) {
+      normalizedUtmSource = u.fbclid.trim();
+    } else if (typeof u.gclid === "string" && u.gclid.trim()) {
+      normalizedUtmSource = u.gclid.trim();
+    } else {
+      normalizedUtmSource = rawUtmSource;
+    }
 
     const payload = {
       orderId: order.id,
