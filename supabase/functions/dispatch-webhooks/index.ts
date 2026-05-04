@@ -8,13 +8,28 @@ const corsHeaders = {
 
 const XTRACKY_API_URL = "https://api.xtracky.com/api/integrations/api";
 
+function resolveXtrackyUtmSource(payload: any): string {
+  const u = payload?.utm_params || {};
+  const isClickId = (v: unknown) =>
+    typeof v === "string" && /^(TT|FB|GG|TW|KW|TB|XT)-/i.test(v.trim());
+  const rawUtm = typeof u.utm_source === "string" ? u.utm_source.trim()
+    : (typeof payload?.utm_source === "string" ? payload.utm_source.trim() : "");
+  if (typeof u.src === "string" && u.src.trim()) return u.src.trim();
+  if (isClickId(rawUtm)) return rawUtm;
+  if (typeof u.sck === "string" && u.sck.trim()) return u.sck.trim();
+  if (typeof u.ttclid === "string" && u.ttclid.trim()) return u.ttclid.trim();
+  if (typeof u.fbclid === "string" && u.fbclid.trim()) return u.fbclid.trim();
+  if (typeof u.gclid === "string" && u.gclid.trim()) return u.gclid.trim();
+  return rawUtm;
+}
+
 function buildWebhookBody(wh: any, event: string, payload: any) {
   if (wh.url.startsWith(XTRACKY_API_URL) && ["order_created", "order_paid"].includes(event)) {
     return JSON.stringify({
       orderId: payload.order_id || payload.id,
       amount: Math.round(Number(payload.total ?? payload.amount ?? 0) * 100),
       status: event === "order_paid" ? "paid" : "waiting_payment",
-      utm_source: payload.utm_source || payload.utm_params?.utm_source || "",
+      utm_source: resolveXtrackyUtmSource(payload),
     });
   }
 
