@@ -879,30 +879,8 @@ const CheckoutPage = () => {
         </div>
       </header>
 
-      {/* TikTok Shop brand bar */}
-      <div className="bg-card flex items-center justify-center gap-1.5 py-2.5 border-b border-border">
-        <svg viewBox="0 0 24 24" className="w-5 h-5" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5.8 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1.84-.1z"/></svg>
-        <span className="text-base font-bold text-foreground">TikTok</span>
-        <span className="text-base font-medium text-foreground">Shop</span>
-      </div>
-
-      {/* Section title + stepper */}
+      {/* Stepper */}
       <div className="bg-card pt-4 pb-3 border-b border-border">
-        <div className="flex items-center justify-center mb-3 relative">
-          <button
-            onClick={() => {
-              if (checkoutStep === "review") setCheckoutStep("info");
-              else if (checkoutStep === "info") setCheckoutStep("cart");
-              else navigate(-1);
-            }}
-            className="absolute left-4 top-0"
-          >
-            <ArrowLeft className="w-5 h-5 text-foreground" />
-          </button>
-          <p className="text-base font-semibold text-foreground">
-            {checkoutStep === "cart" ? "Carrinho" : checkoutStep === "info" ? "Informações" : "Revisão do pedido"}
-          </p>
-        </div>
         <div className="flex items-center justify-center gap-2 max-w-[320px] mx-auto px-4">
           {[
             { id: "cart", label: "Carrinho", n: 1 },
