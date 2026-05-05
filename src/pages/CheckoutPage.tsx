@@ -1341,6 +1341,8 @@ const CheckoutPage = () => {
           </p>
         </div>
       )}
+      </>
+      )}
 
       {/* Trust strip */}
       <div className="mx-4 mt-3 mb-2 bg-card rounded-xl border border-border px-4 py-3 flex items-center justify-around text-[11px] text-muted-foreground">
