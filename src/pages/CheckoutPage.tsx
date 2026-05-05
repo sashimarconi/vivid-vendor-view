@@ -885,34 +885,6 @@ const CheckoutPage = () => {
         </div>
       </header>
 
-      {/* Stepper */}
-      <div className="bg-card pt-4 pb-3 border-b border-border">
-        <div className="flex items-center justify-center gap-2 max-w-[320px] mx-auto px-4">
-          {[
-            { id: "cart", label: "Carrinho", n: 1 },
-            { id: "info", label: "Dados", n: 2 },
-            { id: "review", label: "Pagamento", n: 3 },
-          ].map((s, i, arr) => {
-            const order = ["cart", "info", "review"];
-            const currentIdx = order.indexOf(checkoutStep);
-            const stepIdx = order.indexOf(s.id);
-            const done = stepIdx < currentIdx;
-            const active = stepIdx === currentIdx;
-            return (
-              <>
-                <div key={s.id} className="flex flex-col items-center gap-1">
-                  <div className={`w-7 h-7 rounded-full flex items-center justify-center ${done || active ? "bg-marketplace-red" : "bg-muted border border-border"}`}>
-                    {done ? <Check className="w-4 h-4 text-white" strokeWidth={3} /> : <span className={`text-[12px] font-bold ${active ? "text-white" : "text-muted-foreground"}`}>{s.n}</span>}
-                  </div>
-                  <span className={`text-[10px] font-medium ${active || done ? "text-foreground" : "text-muted-foreground"}`}>{s.label}</span>
-                </div>
-                {i < arr.length - 1 && <div key={`sep-${s.id}`} className={`flex-1 h-[2px] -mt-4 ${stepIdx < currentIdx ? "bg-marketplace-red" : "bg-border"}`} />}
-              </>
-            );
-          })}
-        </div>
-      </div>
-
       {/* Social proof */}
       <div className="bg-marketplace-green/10 mx-4 mt-3 rounded-lg px-3 py-2 flex items-center gap-2">
         <Check className="w-3.5 h-3.5 text-marketplace-green flex-shrink-0" />
