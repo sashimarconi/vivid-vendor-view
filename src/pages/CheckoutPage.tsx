@@ -1359,12 +1359,30 @@ const CheckoutPage = () => {
         </div>
         <div className="px-4 pb-2">
           <button
-            onClick={handleSubmitOrder}
+            onClick={() => {
+              if (checkoutStep === "cart") { setCheckoutStep("info"); window.scrollTo({ top: 0, behavior: "smooth" }); return; }
+              if (checkoutStep === "info") {
+                if (!customerName || !customerEmail || !customerPhone || !customerDocument) {
+                  toast.error("Preencha todos os campos obrigatórios");
+                  return;
+                }
+                setCheckoutStep("review");
+                window.scrollTo({ top: 0, behavior: "smooth" });
+                return;
+              }
+              handleSubmitOrder();
+            }}
             disabled={submitting}
             className="w-full py-3.5 rounded-full bg-marketplace-red text-white text-sm font-extrabold disabled:opacity-50 flex items-center justify-center gap-2 shadow-md active:scale-[0.99] transition-transform"
           >
             <Lock className="w-4 h-4" />
-            {submitting ? "Processando..." : (checkoutSettings?.checkout_button_text || "Continuar para pagamento")}
+            {submitting
+              ? "Processando..."
+              : checkoutStep === "cart"
+                ? "Continuar"
+                : checkoutStep === "info"
+                  ? "Ir para revisão"
+                  : (checkoutSettings?.checkout_button_text || "Pagar com PIX")}
           </button>
         </div>
         <div className="text-center space-y-0.5">
