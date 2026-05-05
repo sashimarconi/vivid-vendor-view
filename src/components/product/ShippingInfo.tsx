@@ -11,7 +11,7 @@ const ShippingInfo = ({ freeShipping, shippingCost, estimatedDelivery, shippingL
   return (
     <div className="bg-card mt-2 px-4 py-3">
       {/* Free shipping highlight */}
-      <div className="flex items-start gap-2.5 pt-3">
+      <div className="flex items-start gap-2.5">
         <div className="w-7 h-7 rounded-full bg-marketplace-green/15 flex items-center justify-center flex-shrink-0">
           <Truck className="w-3.5 h-3.5 text-marketplace-green" />
         </div>
