@@ -138,6 +138,7 @@ const CheckoutPage = () => {
   const [customerState, setCustomerState] = useState("");
   const [cepLoading, setCepLoading] = useState(false);
   const [, setShowForm] = useState(false);
+  const [checkoutStep, setCheckoutStep] = useState<"cart" | "info" | "review">("cart");
   const [submitting, setSubmitting] = useState(false);
   const [pixData, setPixData] = useState<PixDataState | null>(() => {
     if (!slug) return null;
