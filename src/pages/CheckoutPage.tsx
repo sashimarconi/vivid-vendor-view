@@ -918,33 +918,31 @@ const CheckoutPage = () => {
         </span>
       </div>
 
-      {/* Customer info toggle */}
-      <button
-        onClick={() => setShowForm(true)}
-        className="w-full bg-card border-b border-border px-4 py-3 flex items-center justify-between"
-      >
-        <div className="flex items-center gap-2">
-          <div className="w-5 h-5 rounded-full bg-muted flex items-center justify-center">
-            <span className="text-[10px]">📍</span>
-          </div>
-          <span className="text-sm text-foreground">
-            {customerName ? `${customerName} — ${customerDocument}` : "Adicionar informações do pedido"}
-          </span>
+      {/* Personal info card */}
+      <div className="mx-4 mt-3 bg-card rounded-xl border border-border p-4">
+        <div className="flex items-center gap-2 mb-3 pb-3 border-b border-border">
+          <User className="w-4 h-4 text-foreground" />
+          <p className="text-sm font-semibold text-foreground">Informações pessoais</p>
         </div>
-        <span className="text-muted-foreground text-lg">›</span>
-      </button>
-
-      {/* Customer info sheet */}
-      <Sheet open={showForm} onOpenChange={setShowForm}>
-        <SheetContent side="bottom" className="rounded-t-2xl max-h-[85vh] overflow-y-auto p-0">
-          <div className="px-5 py-4 border-b border-border">
-            <h2 className="text-base font-semibold text-foreground">Informações do pedido</h2>
-          </div>
-          <div className="px-5 py-5 space-y-4">
-            <div>
-              <label className="text-xs font-medium text-muted-foreground mb-1 block">CPF</label>
+        <div className="space-y-3">
+          <div>
+            <label className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase mb-1 block">Nome completo</label>
+            <div className="relative">
+              <User className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
               <input
-                className="w-full border-b border-border pb-2 text-sm bg-transparent text-foreground placeholder:text-muted-foreground/50 outline-none"
+                className="w-full bg-muted/40 border border-border rounded-lg pl-9 pr-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-marketplace-red focus:ring-1 focus:ring-marketplace-red/30"
+                placeholder="João da Silva"
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
+              />
+            </div>
+          </div>
+          <div>
+            <label className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase mb-1 block">CPF</label>
+            <div className="relative">
+              <Hash className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                className="w-full bg-muted/40 border border-border rounded-lg pl-9 pr-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-marketplace-red focus:ring-1 focus:ring-marketplace-red/30"
                 placeholder="000.000.000-00"
                 value={customerDocument}
                 onChange={(e) => setCustomerDocument(formatCpf(e.target.value))}
@@ -952,10 +950,13 @@ const CheckoutPage = () => {
                 inputMode="numeric"
               />
             </div>
+          </div>
+          <div className="relative">
+            <label className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase mb-1 block">Email</label>
             <div className="relative">
-              <label className="text-xs font-medium text-muted-foreground mb-1 block">E-mail</label>
+              <Mail className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
               <input
-                className="w-full border-b border-border pb-2 text-sm bg-transparent text-foreground placeholder:text-muted-foreground/50 outline-none"
+                className="w-full bg-muted/40 border border-border rounded-lg pl-9 pr-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-marketplace-red focus:ring-1 focus:ring-marketplace-red/30"
                 placeholder="seu@email.com"
                 type="email"
                 value={customerEmail}
@@ -963,134 +964,130 @@ const CheckoutPage = () => {
                   setCustomerEmail(e.target.value);
                   setShowEmailSuggestions(!e.target.value.includes("@") && e.target.value.length > 2);
                 }}
-                onFocus={() => {
-                  if (!customerEmail.includes("@") && customerEmail.length > 2) setShowEmailSuggestions(true);
-                }}
+                onFocus={() => { if (!customerEmail.includes("@") && customerEmail.length > 2) setShowEmailSuggestions(true); }}
                 onBlur={() => setTimeout(() => setShowEmailSuggestions(false), 200)}
               />
-              {showEmailSuggestions && customerEmail.length > 2 && !customerEmail.includes("@") && (
-                <div className="absolute left-0 right-0 top-full z-10 bg-card border border-border rounded-lg shadow-lg mt-1 max-h-48 overflow-y-auto">
-                  {EMAIL_DOMAINS.map((domain) => (
-                    <button
-                      key={domain}
-                      type="button"
-                      className="w-full text-left px-3 py-2 text-sm text-foreground hover:bg-muted/50 transition-colors"
-                      onMouseDown={(e) => {
-                        e.preventDefault();
-                        setCustomerEmail(customerEmail + domain);
-                        setShowEmailSuggestions(false);
-                      }}
-                    >
-                      {customerEmail}{domain}
-                    </button>
-                  ))}
-                </div>
-              )}
             </div>
-            <div>
-              <label className="text-xs font-medium text-muted-foreground mb-1 block">Nome completo</label>
+            {showEmailSuggestions && customerEmail.length > 2 && !customerEmail.includes("@") && (
+              <div className="absolute left-0 right-0 top-full z-10 bg-card border border-border rounded-lg shadow-lg mt-1 max-h-48 overflow-y-auto">
+                {EMAIL_DOMAINS.map((domain) => (
+                  <button
+                    key={domain}
+                    type="button"
+                    className="w-full text-left px-3 py-2 text-sm text-foreground hover:bg-muted/50"
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      setCustomerEmail(customerEmail + domain);
+                      setShowEmailSuggestions(false);
+                    }}
+                  >
+                    {customerEmail}{domain}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          <div>
+            <label className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase mb-1 block">Telefone</label>
+            <div className="relative">
+              <Phone className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
               <input
-                className="w-full border-b border-border pb-2 text-sm bg-transparent text-foreground placeholder:text-muted-foreground/50 outline-none"
-                placeholder="Seu nome"
-                value={customerName}
-                onChange={(e) => setCustomerName(e.target.value)}
-              />
-            </div>
-            <div>
-              <label className="text-xs font-medium text-muted-foreground mb-1 block">Telefone</label>
-              <input
-                className="w-full border-b border-border pb-2 text-sm bg-transparent text-foreground placeholder:text-muted-foreground/50 outline-none"
-                placeholder="(99) 99999-9999"
+                className="w-full bg-muted/40 border border-border rounded-lg pl-9 pr-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-marketplace-red focus:ring-1 focus:ring-marketplace-red/30"
+                placeholder="(00) 00000-0000"
                 value={customerPhone}
                 onChange={(e) => setCustomerPhone(formatPhone(e.target.value))}
                 maxLength={15}
                 inputMode="numeric"
               />
             </div>
-            <div>
-              <label className="text-xs font-medium text-muted-foreground mb-1 block">CEP</label>
-              <div className="relative">
-                <input
-                  className="w-full border-b border-border pb-2 text-sm bg-transparent text-foreground placeholder:text-muted-foreground/50 outline-none"
-                  placeholder="00000-000"
-                  maxLength={9}
-                  value={customerCep}
-                  onChange={(e) => handleCepChange(e.target.value)}
-                  inputMode="numeric"
-                />
-                {cepLoading && (
-                  <span className="absolute right-0 top-0 text-xs text-muted-foreground animate-pulse">Buscando...</span>
-                )}
-              </div>
-            </div>
-            <div>
-              <label className="text-xs font-medium text-muted-foreground mb-1 block">Endereço</label>
-              <input
-                className="w-full border-b border-border pb-2 text-sm bg-transparent text-foreground placeholder:text-muted-foreground/50 outline-none"
-                placeholder="Rua, Avenida..."
-                value={customerAddress}
-                onChange={(e) => setCustomerAddress(e.target.value)}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1 block">Número</label>
-                <input
-                  className="w-full border-b border-border pb-2 text-sm bg-transparent text-foreground placeholder:text-muted-foreground/50 outline-none"
-                  placeholder="123"
-                  value={customerNumber}
-                  onChange={(e) => setCustomerNumber(e.target.value)}
-                />
-              </div>
-              <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1 block">Complemento (opcional)</label>
-                <input
-                  className="w-full border-b border-border pb-2 text-sm bg-transparent text-foreground placeholder:text-muted-foreground/50 outline-none"
-                  placeholder="Apto, Bloco..."
-                  value={customerComplement}
-                  onChange={(e) => setCustomerComplement(e.target.value)}
-                />
-              </div>
-            </div>
-            <div>
-              <label className="text-xs font-medium text-muted-foreground mb-1 block">Bairro</label>
-              <input
-                className="w-full border-b border-border pb-2 text-sm bg-transparent text-foreground placeholder:text-muted-foreground/50 outline-none"
-                placeholder="Centro"
-                value={customerNeighborhood}
-                onChange={(e) => setCustomerNeighborhood(e.target.value)}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1 block">Cidade</label>
-                <input
-                  className="w-full border-b border-border pb-2 text-sm bg-transparent text-foreground placeholder:text-muted-foreground/50 outline-none"
-                  placeholder="São Paulo"
-                  value={customerCity}
-                  onChange={(e) => setCustomerCity(e.target.value)}
-                />
-              </div>
-              <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1 block">Estado</label>
-                <input
-                  className="w-full border-b border-border pb-2 text-sm bg-transparent text-foreground placeholder:text-muted-foreground/50 outline-none"
-                  placeholder="SP"
-                  maxLength={2}
-                  value={customerState}
-                  onChange={(e) => setCustomerState(e.target.value)}
-                />
-              </div>
-            </div>
-            <button
-              onClick={() => setShowForm(false)}
-              className="w-full py-3 rounded-full bg-marketplace-red text-white text-sm font-bold mt-4"
-            >
-              Salvar informações
-            </button>
           </div>
-        </SheetContent>
-      </Sheet>
+        </div>
+      </div>
+
+      {/* Address card */}
+      <div className="mx-4 mt-3 bg-card rounded-xl border border-border p-4">
+        <div className="flex items-center gap-2 mb-3 pb-3 border-b border-border">
+          <MapPin className="w-4 h-4 text-marketplace-red" />
+          <p className="text-sm font-semibold text-foreground">Endereço de entrega</p>
+        </div>
+        <div className="space-y-3">
+          <div>
+            <label className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase mb-1 block">CEP</label>
+            <div className="relative">
+              <input
+                className="w-full bg-muted/40 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-marketplace-red focus:ring-1 focus:ring-marketplace-red/30"
+                placeholder="00000-000"
+                maxLength={9}
+                value={customerCep}
+                onChange={(e) => handleCepChange(e.target.value)}
+                inputMode="numeric"
+              />
+              {cepLoading && (
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground animate-pulse">Buscando...</span>
+              )}
+            </div>
+          </div>
+          <div>
+            <label className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase mb-1 block">Rua</label>
+            <input
+              className="w-full bg-muted/40 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-marketplace-red focus:ring-1 focus:ring-marketplace-red/30"
+              placeholder="Rua, Avenida..."
+              value={customerAddress}
+              onChange={(e) => setCustomerAddress(e.target.value)}
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase mb-1 block">Número</label>
+              <input
+                className="w-full bg-muted/40 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-marketplace-red focus:ring-1 focus:ring-marketplace-red/30"
+                placeholder="Nº"
+                value={customerNumber}
+                onChange={(e) => setCustomerNumber(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase mb-1 block">Complemento</label>
+              <input
+                className="w-full bg-muted/40 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-marketplace-red focus:ring-1 focus:ring-marketplace-red/30"
+                placeholder="Apto, bloco..."
+                value={customerComplement}
+                onChange={(e) => setCustomerComplement(e.target.value)}
+              />
+            </div>
+          </div>
+          <div>
+            <label className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase mb-1 block">Bairro</label>
+            <input
+              className="w-full bg-muted/40 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-marketplace-red focus:ring-1 focus:ring-marketplace-red/30"
+              placeholder="Bairro"
+              value={customerNeighborhood}
+              onChange={(e) => setCustomerNeighborhood(e.target.value)}
+            />
+          </div>
+          <div className="grid grid-cols-[1fr_80px] gap-3">
+            <div>
+              <label className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase mb-1 block">Cidade</label>
+              <input
+                className="w-full bg-muted/40 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-marketplace-red focus:ring-1 focus:ring-marketplace-red/30"
+                placeholder="São Paulo"
+                value={customerCity}
+                onChange={(e) => setCustomerCity(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase mb-1 block">UF</label>
+              <input
+                className="w-full bg-muted/40 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-marketplace-red focus:ring-1 focus:ring-marketplace-red/30"
+                placeholder="SP"
+                maxLength={2}
+                value={customerState}
+                onChange={(e) => setCustomerState(e.target.value.toUpperCase())}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Store name */}
       <div className="bg-card px-4 py-3 mt-2 border-b border-border flex items-center justify-between">
