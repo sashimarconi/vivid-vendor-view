@@ -40,11 +40,11 @@ const PricingBlock = ({ originalPrice, salePrice, discountPercent, flashSale, fl
       <div className="flex items-end justify-between">
         <div className="flex items-end gap-1.5">
           <span className="text-[13px] font-bold text-white pb-1">R$</span>
-          <span className="text-[30px] leading-none font-black text-white tracking-tight">
+          <span className="text-[30px] leading-none font-black text-white tracking-tight inline-flex items-end">
             {Math.floor(salePrice).toLocaleString("pt-BR")}
-          </span>
-          <span className="text-[14px] font-bold text-white pb-1">
-            ,{(salePrice % 1).toFixed(2).slice(2)}
+            <span className="text-[14px] font-bold pb-[3px]">
+              ,{(salePrice % 1).toFixed(2).slice(2)}
+            </span>
           </span>
           <span className="text-[12px] text-white/80 line-through pb-1.5 ml-1">
             {formatCurrency(originalPrice)}
