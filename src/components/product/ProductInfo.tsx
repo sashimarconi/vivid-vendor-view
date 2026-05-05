@@ -110,23 +110,37 @@ const ProductInfo = ({ title, promoTag, rating, reviewCount, soldCount, variants
   };
 
   return (
-    <div className="bg-card px-4 py-3">
-      <h1 className="text-base font-bold text-foreground leading-snug">{title}</h1>
+    <div className="bg-card px-4 pt-3 pb-3">
+      {promoTag && (
+        <span className="inline-block bg-marketplace-red text-white text-[10px] font-extrabold px-2 py-0.5 rounded mb-1.5 uppercase tracking-wide">
+          {promoTag}
+        </span>
+      )}
+      <h1 className="text-[15px] font-bold text-foreground leading-snug">{title}</h1>
 
-      <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
-        <div className="flex items-center gap-0.5">
-          <Star className="w-3.5 h-3.5 fill-marketplace-yellow text-marketplace-yellow" />
-          <span className="font-semibold text-foreground">{rating}</span>
+      <div className="flex items-center gap-2 mt-2">
+        <div className="flex items-center gap-1 bg-marketplace-yellow/15 px-1.5 py-0.5 rounded">
+          <Star className="w-3 h-3 fill-marketplace-yellow text-marketplace-yellow" />
+          <span className="text-[11px] font-bold text-foreground">{rating}</span>
         </div>
-        <span>{formatCount(reviewCount)} avaliações</span>
-        <span>•</span>
-        {showSoldCount && <><span>•</span><span>{formatCount(soldCount)} vendidos</span></>}
+        <span className="text-[11px] text-muted-foreground">({formatCount(reviewCount)})</span>
+        {showSoldCount && (
+          <>
+            <span className="text-muted-foreground">·</span>
+            <span className="text-[11px] text-muted-foreground"><span className="font-semibold text-foreground">{formatCount(soldCount)}</span> vendidos</span>
+          </>
+        )}
       </div>
 
       {showUnitsAvailable && (
-        <p className="text-xs text-marketplace-orange font-medium mt-1.5">
-          {unitsAvailableText}
-        </p>
+        <div className="mt-2 flex items-center gap-2">
+          <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
+            <div className="h-full w-[35%] bg-gradient-to-r from-marketplace-orange to-marketplace-red" />
+          </div>
+          <span className="text-[10px] font-bold text-marketplace-red whitespace-nowrap">
+            {unitsAvailableText}
+          </span>
+        </div>
       )}
 
       {/* Variant groups */}
