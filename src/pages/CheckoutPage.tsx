@@ -1089,78 +1089,132 @@ const CheckoutPage = () => {
         </div>
       </div>
 
-      {/* Store name */}
-      <div className="bg-card px-4 py-3 mt-2 border-b border-border flex items-center justify-between">
-        <p className="text-sm font-semibold text-foreground">Seu pedido</p>
-        <span className="text-xs text-muted-foreground">Adicionar nota ›</span>
-      </div>
+      {/* Cart card */}
+      <div className="mx-4 mt-3 bg-card rounded-xl border border-border overflow-hidden">
+        <div className="bg-marketplace-red text-white px-4 py-2.5 flex items-center justify-between">
+          <button onClick={() => navigate(-1)}>
+            <ArrowLeft className="w-4 h-4 text-white" />
+          </button>
+          <div className="text-center">
+            <p className="text-sm font-bold">Meu Carrinho</p>
+            <p className="text-[10px] text-white/90">{quantity} {quantity === 1 ? "item selecionado" : "itens selecionados"}</p>
+          </div>
+          <div className="w-4" />
+        </div>
 
-      {/* Product card */}
-      <div className="bg-card px-4 py-3 border-b border-border">
-        <div className="flex gap-3">
-          <img src={mainImage} alt={product.title} className="w-16 h-16 rounded-lg object-cover bg-muted" />
-          <div className="flex-1 min-w-0">
-            <p className="text-xs text-foreground line-clamp-2 leading-snug">{product.title}</p>
-            {selectedVariantNames && (
-              <p className="text-[11px] text-muted-foreground mt-0.5">{selectedVariantNames}</p>
-            )}
-            <div className="mt-1 flex items-center gap-2">
-              <span className="text-sm font-bold text-marketplace-red">{formatCurrency(Number(product.sale_price))}</span>
-              <span className="text-xs text-muted-foreground line-through">{formatCurrency(Number(product.original_price))}</span>
-              <span className="text-[10px] text-marketplace-green font-semibold">-{product.discount_percent}%</span>
+        <div className="px-4 py-3 flex items-center justify-between border-b border-border">
+          <div className="flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-marketplace-green animate-pulse" />
+            <span className="text-[12px] text-foreground"><strong>52 pessoas</strong> comprando agora</span>
+          </div>
+          <span className="text-[11px] font-semibold text-marketplace-green flex items-center gap-1">
+            <ShieldCheck className="w-3 h-3" /> FRETE GRÁTIS
+          </span>
+        </div>
+
+        <div className="px-4 py-3 border-b border-border">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-7 h-7 rounded-full bg-muted flex items-center justify-center">
+              <span className="text-[10px] font-bold text-muted-foreground">OL</span>
+            </div>
+            <div>
+              <p className="text-sm font-bold text-foreground leading-none">Loja</p>
+              <p className="text-[10px] text-marketplace-green flex items-center gap-1 mt-0.5">
+                <Check className="w-2.5 h-2.5" /> Loja Verificada
+              </p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              className="w-7 h-7 rounded-full border border-border flex items-center justify-center"
-              onClick={() => setQuantity(Math.max(1, quantity - 1))}
-            >
-              <Minus className="w-3 h-3" />
-            </button>
-            <span className="text-sm font-medium w-5 text-center">{quantity}</span>
-            <button
-              className="w-7 h-7 rounded-full border border-border flex items-center justify-center"
-              onClick={() => setQuantity(quantity + 1)}
-            >
-              <Plus className="w-3 h-3" />
-            </button>
+
+          <div className="flex gap-3">
+            <div className="relative">
+              <img src={mainImage} alt={product.title} className="w-20 h-20 rounded-lg object-cover bg-muted" />
+              {product.discount_percent > 0 && (
+                <span className="absolute -top-1 -left-1 bg-marketplace-red text-white text-[9px] font-bold px-1 py-0.5 rounded">
+                  {product.discount_percent}% OFF
+                </span>
+              )}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs text-foreground line-clamp-2 leading-snug">{product.title}{selectedVariantNames ? ` (${selectedVariantNames})` : ""}</p>
+              <div className="mt-2 flex items-center gap-2">
+                <span className="text-base font-extrabold text-marketplace-red">{formatCurrency(Number(product.sale_price))}</span>
+                <span className="text-xs text-muted-foreground line-through">{formatCurrency(Number(product.original_price))}</span>
+              </div>
+            </div>
           </div>
+          <div className="flex items-center justify-between mt-3">
+            <button className="text-muted-foreground"><X className="w-4 h-4" /></button>
+            <div className="flex items-center gap-3 bg-muted rounded-full px-1 py-1">
+              <button
+                className="w-7 h-7 rounded-full bg-card border border-border flex items-center justify-center"
+                onClick={() => setQuantity(Math.max(1, quantity - 1))}
+              >
+                <Minus className="w-3 h-3" />
+              </button>
+              <span className="text-sm font-semibold w-5 text-center">{quantity}</span>
+              <button
+                className="w-7 h-7 rounded-full bg-card border border-border flex items-center justify-center"
+                onClick={() => setQuantity(quantity + 1)}
+              >
+                <Plus className="w-3 h-3" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {discount > 0 && (
+          <div className="mx-3 my-3 bg-marketplace-green/10 rounded-lg px-3 py-2.5 flex items-center gap-2">
+            <ZapIcon className="w-4 h-4 text-marketplace-green flex-shrink-0 fill-marketplace-green" />
+            <div>
+              <p className="text-[11px] text-foreground">Você está economizando</p>
+              <p className="text-sm font-extrabold text-marketplace-green">{formatCurrency(discount)}</p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Consumer protection card */}
+      <div className="mx-4 mt-3 bg-card rounded-xl border border-border p-4">
+        <div className="flex items-center gap-2 mb-3">
+          <ShieldCheck className="w-4 h-4 text-foreground" />
+          <p className="text-sm font-bold text-foreground">Proteção ao Consumidor</p>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          {[
+            "Devolução grátis em 7 dias",
+            "Reembolso garantido",
+            "Pagamento 100% seguro",
+            "Rastreio em tempo real",
+          ].map((t) => (
+            <div key={t} className="flex items-start gap-1.5 bg-marketplace-green/10 rounded-lg px-2.5 py-2">
+              <ShieldCheck className="w-3 h-3 text-marketplace-green flex-shrink-0 mt-0.5" />
+              <span className="text-[11px] text-foreground leading-tight">{t}</span>
+            </div>
+          ))}
         </div>
       </div>
 
       {/* Shipping options */}
       {shippingOptions && shippingOptions.length > 0 && (
-        <div className="mt-2">
-          <div className="bg-card px-4 py-2.5 border-b border-border">
+        <div className="mx-4 mt-3 bg-card rounded-xl border border-border overflow-hidden">
+          <div className="px-4 py-2.5 border-b border-border">
             <p className="text-sm font-semibold text-foreground">Método de entrega</p>
           </div>
-          {shippingOptions.map((option) => (
+          {shippingOptions.map((option, idx) => (
             <button
               key={option.id}
               onClick={() => setSelectedShipping(option.id)}
-              className={`w-full bg-card px-4 py-3 border-b border-border flex items-center gap-3 transition-colors ${
-                selectedShipping === option.id ? "ring-1 ring-marketplace-red" : ""
+              className={`w-full px-4 py-3 flex items-center gap-3 ${idx < shippingOptions.length - 1 ? "border-b border-border" : ""} ${
+                selectedShipping === option.id ? "bg-marketplace-red/5" : ""
               }`}
             >
-              <div
-                className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                  selectedShipping === option.id
-                    ? "border-marketplace-red"
-                    : "border-muted-foreground/30"
-                }`}
-              >
-                {selectedShipping === option.id && (
-                  <div className="w-2 h-2 rounded-full bg-marketplace-red" />
-                )}
+              <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${selectedShipping === option.id ? "border-marketplace-red" : "border-muted-foreground/30"}`}>
+                {selectedShipping === option.id && <div className="w-2 h-2 rounded-full bg-marketplace-red" />}
               </div>
-              {option.logo_url && (
-                <img src={option.logo_url} alt={option.name} className="w-8 h-8 rounded object-contain" />
-              )}
+              {option.logo_url && <img src={option.logo_url} alt={option.name} className="w-8 h-8 rounded object-contain" />}
               <div className="flex-1 text-left">
                 <p className="text-sm font-medium text-foreground">{option.name}</p>
-                {option.estimated_days && (
-                  <p className="text-[11px] text-muted-foreground">Chega em {option.estimated_days}</p>
-                )}
+                {option.estimated_days && <p className="text-[11px] text-muted-foreground">Chega em {option.estimated_days}</p>}
               </div>
               <span className={`text-sm font-semibold ${option.free ? "text-marketplace-green" : "text-foreground"}`}>
                 {option.free ? "GRÁTIS" : formatCurrency(Number(option.price))}
@@ -1172,95 +1226,99 @@ const CheckoutPage = () => {
 
       {/* Order bumps */}
       {orderBumps && orderBumps.length > 0 && (
-        <div className="mt-2">
-          <div className="bg-marketplace-red/10 px-4 py-2.5 flex items-center gap-2">
-            <span className="text-marketplace-red text-sm">⚡</span>
-            <p className="text-sm font-bold text-marketplace-red uppercase">Ofertas especiais selecionadas</p>
+        <div className="mx-4 mt-3 space-y-2">
+          <div className="bg-marketplace-yellow/15 border border-marketplace-yellow/40 rounded-xl px-3 py-2.5">
+            <div className="flex items-center gap-2">
+              <Flame className="w-4 h-4 text-marketplace-orange fill-marketplace-orange" />
+              <p className="text-sm font-bold text-foreground">Aproveite e leve junto:</p>
+            </div>
+            <p className="text-[11px] text-muted-foreground mt-0.5 ml-6">Ofertas exclusivas com desconto especial. Adicione com 1 clique.</p>
           </div>
-          {orderBumps.map((bump) => (
-            <button
-              key={bump.id}
-              onClick={() => toggleBump(bump.id)}
-              className="w-full bg-card px-4 py-3 border-b border-border flex items-center gap-3"
-            >
-              <div
-                className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                  selectedBumps.includes(bump.id)
-                    ? "border-marketplace-red bg-marketplace-red"
-                    : "border-muted-foreground/30"
+          {orderBumps.map((bump) => {
+            const checked = selectedBumps.includes(bump.id);
+            return (
+              <button
+                key={bump.id}
+                onClick={() => toggleBump(bump.id)}
+                className={`w-full bg-card rounded-xl border-2 border-dashed px-3 py-3 flex items-center gap-3 transition-colors ${
+                  checked ? "border-marketplace-orange bg-marketplace-orange/5" : "border-marketplace-yellow/60"
                 }`}
               >
-                {selectedBumps.includes(bump.id) && <Check className="w-3 h-3 text-white" />}
-              </div>
-              {bump.image_url && (
-                <img src={bump.image_url} alt={bump.title} className="w-12 h-12 rounded object-cover" />
-              )}
-              <div className="flex-1 text-left">
-                <p className="text-xs text-foreground line-clamp-2">{bump.title}</p>
-                <p className="text-sm font-bold text-marketplace-red mt-0.5">Por {formatCurrency(Number(bump.price))}</p>
-              </div>
-            </button>
-          ))}
+                <div className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 ${checked ? "border-marketplace-orange bg-marketplace-orange" : "border-muted-foreground/40"}`}>
+                  {checked && <Check className="w-3 h-3 text-white" />}
+                </div>
+                {bump.image_url && <img src={bump.image_url} alt={bump.title} className="w-12 h-12 rounded object-cover" />}
+                <div className="flex-1 text-left">
+                  <p className="text-xs font-semibold text-foreground line-clamp-2">{bump.title}</p>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <span className="text-xs text-muted-foreground line-through">R$ 89,90</span>
+                    <span className="text-sm font-bold text-marketplace-red">{formatCurrency(Number(bump.price))}</span>
+                    <span className="text-[10px] font-bold text-marketplace-green bg-marketplace-green/10 px-1.5 py-0.5 rounded">-79%</span>
+                  </div>
+                </div>
+              </button>
+            );
+          })}
         </div>
       )}
 
-      {/* Order summary */}
-      <div className="bg-card px-4 py-3 mt-2 space-y-2 border-b border-border">
-        <p className="text-sm font-semibold text-foreground">Resumo do pedido</p>
-        <div className="flex justify-between text-xs text-muted-foreground">
-          <span>Subtotal do produto</span>
-          <span>{formatCurrency(productSubtotal)}</span>
+      {/* Order summary card */}
+      <div className="mx-4 mt-3 bg-card rounded-xl border border-border p-4 space-y-2">
+        <p className="text-sm font-bold text-foreground mb-1">Resumo do pedido</p>
+        <div className="flex justify-between text-sm">
+          <span className="text-muted-foreground">Subtotal</span>
+          <span className="text-foreground">{formatCurrency(productSubtotal)}</span>
         </div>
-        {discount > 0 && (
-          <div className="flex justify-between text-xs text-marketplace-green">
-            <span>Desconto no produto</span>
-            <span>- {formatCurrency(discount)}</span>
+        {shippingCost === 0 && selectedShippingOption ? (
+          <div className="flex justify-between text-sm">
+            <span className="text-marketplace-green font-semibold">Frete</span>
+            <span className="text-marketplace-green font-semibold">Grátis</span>
           </div>
-        )}
-        {shippingCost > 0 && (
-          <div className="flex justify-between text-xs text-muted-foreground">
-            <span>Taxa de envio</span>
-            <span>{formatCurrency(shippingCost)}</span>
+        ) : shippingCost > 0 ? (
+          <div className="flex justify-between text-sm">
+            <span className="text-marketplace-green font-semibold">Frete</span>
+            <span className="text-foreground">{formatCurrency(shippingCost)}</span>
           </div>
-        )}
-        {shippingCost === 0 && selectedShippingOption && (
-          <div className="flex justify-between text-xs text-marketplace-green">
-            <span>Frete</span>
-            <span>Grátis</span>
-          </div>
-        )}
+        ) : null}
         {bumpsTotal > 0 && (
-          <div className="flex justify-between text-xs text-muted-foreground">
-            <span>Ofertas extras</span>
-            <span>{formatCurrency(bumpsTotal)}</span>
+          <div className="flex justify-between text-sm">
+            <span className="text-muted-foreground">Ofertas extras</span>
+            <span className="text-foreground">{formatCurrency(bumpsTotal)}</span>
           </div>
         )}
-        <div className="flex justify-between text-sm font-bold text-foreground pt-2 border-t border-border">
-          <span>Total</span>
-          <span>{formatCurrency(total)}</span>
-        </div>
-        <p className="text-[10px] text-muted-foreground text-right">Impostos inclusos</p>
-      </div>
-
-      {/* Payment method */}
-      <div className="bg-card px-4 py-3 mt-2 border-b border-border">
-        <p className="text-sm font-semibold text-foreground mb-2">Forma de pagamento</p>
-        <div className="flex items-center gap-2 p-3 rounded-lg bg-marketplace-green/10 border border-marketplace-green/30">
-          <div className="w-5 h-5 rounded-full border-2 border-marketplace-green flex items-center justify-center">
-            <div className="w-2.5 h-2.5 rounded-full bg-marketplace-green" />
+        <div className="flex justify-between items-center pt-2 border-t border-border">
+          <span className="text-sm font-bold text-foreground">Total</span>
+          <div className="text-right">
+            <span className="text-lg font-extrabold text-marketplace-red">{formatCurrency(total)}</span>
+            <p className="text-[10px] text-muted-foreground">Impostos inclusos</p>
           </div>
-          <span className="text-sm font-semibold text-foreground">Pix</span>
         </div>
       </div>
 
-      {/* Savings banner */}
-      {discount > 0 && (
-        <div className="bg-card px-4 py-3 mt-2 text-center border-b border-border">
-          <p className="text-xs text-marketplace-green font-medium">
-            😊 Você está economizando {formatCurrency(discount)} nesse pedido.
+      {/* Address summary if filled */}
+      {customerAddress && customerCity && (
+        <div className="mx-4 mt-3 bg-card rounded-xl border border-border p-4">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-marketplace-red" />
+              <p className="text-sm font-bold text-foreground">Endereço de entrega</p>
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            {customerPhone && <>{customerPhone} · {customerEmail}<br /></>}
+            {customerAddress}{customerNumber ? `, ${customerNumber}` : ""}<br />
+            {customerNeighborhood} · {customerCity}, {customerState}<br />
+            {customerCep && `CEP: ${customerCep}`}
           </p>
         </div>
       )}
+
+      {/* Trust strip */}
+      <div className="mx-4 mt-3 mb-2 bg-card rounded-xl border border-border px-4 py-3 flex items-center justify-around text-[11px] text-muted-foreground">
+        <span className="flex items-center gap-1"><Lock className="w-3 h-3" /> SSL Seguro</span>
+        <span className="flex items-center gap-1"><ShieldCheck className="w-3 h-3" /> Compra Protegida</span>
+        <span className="flex items-center gap-1">⭐ 4.8/5</span>
+      </div>
 
       {/* Fixed bottom bar */}
       <div className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border shadow-[0_-4px_12px_rgba(0,0,0,0.1)] pb-2">
