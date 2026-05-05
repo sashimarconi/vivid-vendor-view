@@ -239,7 +239,7 @@ export default function AdminNotifications() {
       } as NotificationOptions);
       notification.onclick = () => {
         window.focus();
-        window.location.href = "/dashboard/orders";
+        window.location.href = "/daisakoikeda/orders";
       };
     }
 
@@ -261,7 +261,7 @@ export default function AdminNotifications() {
         total_amount: 197.9,
         gateway_name: "Paradise",
         product_title: "Produto Teste",
-        url: "/dashboard/orders",
+        url: "/daisakoikeda/orders",
         tag: `push-test-${kind}-${Date.now()}`,
       },
     });

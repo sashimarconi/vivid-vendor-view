@@ -252,7 +252,7 @@ const SaasUsers = () => {
             {filtered.map((user) => (
               <div key={user.user_id} className="rounded-2xl border border-border bg-background p-4 space-y-3">
                 <div className="flex items-start gap-3">
-                  <Link to={`/admin/users/${user.user_id}`} className="flex items-center gap-3 group flex-1 min-w-0">
+                  <Link to={`/nimda/users/${user.user_id}`} className="flex items-center gap-3 group flex-1 min-w-0">
                     <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white text-[11px] font-bold shrink-0">
                       {(user.full_name || user.email || "?").charAt(0).toUpperCase()}
                     </div>
@@ -338,7 +338,7 @@ const SaasUsers = () => {
                 {filtered.map((user) => (
                   <TableRow key={user.user_id} className="border-border/40 hover:bg-muted/30 transition-colors">
                     <TableCell>
-                      <Link to={`/admin/users/${user.user_id}`} className="flex items-center gap-2.5 group">
+                      <Link to={`/nimda/users/${user.user_id}`} className="flex items-center gap-2.5 group">
                         <div className="h-7 w-7 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white text-[10px] font-bold shrink-0">
                           {(user.full_name || user.email || "?").charAt(0).toUpperCase()}
                         </div>

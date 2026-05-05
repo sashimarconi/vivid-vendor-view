@@ -71,7 +71,7 @@ const Index = () => {
 
       {(!products || products.length === 0) && (
         <p className="text-center text-muted-foreground py-12">
-          Nenhum produto cadastrado. <a href="/admin" className="text-marketplace-red underline">Ir para o admin</a>
+          Nenhum produto cadastrado. <a href="/nimda" className="text-marketplace-red underline">Ir para o admin</a>
         </p>
       )}
     </div>

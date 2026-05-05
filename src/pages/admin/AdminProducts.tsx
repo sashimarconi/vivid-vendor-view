@@ -655,7 +655,7 @@ const AdminProducts = () => {
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-lg font-bold text-foreground">Produtos</h2>
-        <Button onClick={() => navigate("/dashboard/products/new")} className="bg-marketplace-red hover:bg-marketplace-red/90 shrink-0">
+        <Button onClick={() => navigate("/daisakoikeda/products/new")} className="bg-marketplace-red hover:bg-marketplace-red/90 shrink-0">
           <Plus className="w-4 h-4 mr-1" /> <span className="hidden sm:inline">Novo Produto</span><span className="sm:hidden">Novo</span>
         </Button>
       </div>
@@ -699,7 +699,7 @@ const AdminProducts = () => {
               <Button variant="ghost" size="sm" onClick={() => { setSelectedProductId(product.id); setImageDialogOpen(true); }}>
                 <ImageIcon className="w-4 h-4" />
               </Button>
-              <Button variant="ghost" size="sm" onClick={() => navigate(`/dashboard/products/${product.id}/edit`)}>
+              <Button variant="ghost" size="sm" onClick={() => navigate(`/daisakoikeda/products/${product.id}/edit`)}>
                 <Pencil className="w-4 h-4" />
               </Button>
               <Button

@@ -32,7 +32,7 @@ const ResetPassword = () => {
     } else {
       setSuccess(true);
       toast({ title: "Senha redefinida com sucesso!" });
-      setTimeout(() => navigate("/login"), 3000);
+      setTimeout(() => navigate("/lug"), 3000);
     }
     setLoading(false);
   };
@@ -108,7 +108,7 @@ const ResetPassword = () => {
               <p className="text-muted-foreground text-sm">
                 Link inválido ou expirado. Solicite um novo link de recuperação na tela de login.
               </p>
-              <Button variant="outline" onClick={() => navigate("/login")}>
+              <Button variant="outline" onClick={() => navigate("/lug")}>
                 Voltar ao Login
               </Button>
             </div>

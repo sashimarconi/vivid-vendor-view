@@ -73,9 +73,9 @@ const AppRoutes = () => {
       <Route path="/loja/:slug" element={<StorePage />} />
       <Route path="/checkout/:slug" element={<CheckoutPage />} />
       <Route path="/obrigado/:slug" element={<ThankYouRedirect />} />
-      <Route path="/login" element={<Login />} />
+      <Route path="/lug" element={<Login />} />
       <Route path="/reset-password" element={<ResetPassword />} />
-      <Route path="/admin" element={<SaasAdminLayout />}>
+      <Route path="/nimda" element={<SaasAdminLayout />}>
         <Route index element={<SaasMetrics />} />
         <Route path="analytics" element={<SaasAnalytics />} />
         <Route path="orders" element={<SaasOrders />} />
@@ -83,7 +83,7 @@ const AppRoutes = () => {
         <Route path="users/:userId" element={<SaasUserDetails />} />
         <Route path="platform" element={<AdminPlatformSettings />} />
       </Route>
-      <Route path="/dashboard" element={<AdminLayout />}>
+      <Route path="/daisakoikeda" element={<AdminLayout />}>
         <Route index element={<AdminDashboard />} />
         <Route path="live-view" element={<AdminLiveView />} />
         <Route path="analytics" element={<AdminAnalytics />} />

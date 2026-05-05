@@ -206,7 +206,7 @@ export default function SaleNotification() {
 
       const title = renderTemplate(config.title, variables);
       const body = renderTemplate(config.body, variables);
-      const url = "/dashboard/orders";
+      const url = "/daisakoikeda/orders";
       const tag = `${kind}-${order.id}`;
 
       playPresetSound(config.sound, config.soundUrl);

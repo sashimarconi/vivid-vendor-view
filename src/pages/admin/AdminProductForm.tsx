@@ -410,9 +410,9 @@ const AdminProductForm = () => {
       toast({ title: editingId ? "Produto atualizado!" : "Produto criado!" });
       if (!editingId && productId) {
         // Navegar para a tela de edição para permitir gerenciar variantes
-        navigate(`/dashboard/products/${productId}`, { replace: true });
+        navigate(`/daisakoikeda/products/${productId}`, { replace: true });
       } else {
-        navigate("/dashboard/products");
+        navigate("/daisakoikeda/products");
       }
     },
     onError: (err: Error) => {
@@ -429,7 +429,7 @@ const AdminProductForm = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-products"] });
       toast({ title: "Produto removido!" });
-      navigate("/dashboard/products");
+      navigate("/daisakoikeda/products");
     },
   });
 
@@ -460,14 +460,14 @@ const AdminProductForm = () => {
               type="button"
               variant="ghost"
               size="sm"
-              onClick={() => navigate("/dashboard/products")}
+              onClick={() => navigate("/daisakoikeda/products")}
               className="shrink-0"
             >
               <ArrowLeft className="w-4 h-4" />
             </Button>
             <div className="min-w-0">
               <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-                <Link to="/dashboard/products" className="hover:text-foreground transition-colors">
+                <Link to="/daisakoikeda/products" className="hover:text-foreground transition-colors">
                   Produtos
                 </Link>
                 <span>/</span>
@@ -483,7 +483,7 @@ const AdminProductForm = () => {
               type="button"
               variant="outline"
               size="sm"
-              onClick={() => navigate("/dashboard/products")}
+              onClick={() => navigate("/daisakoikeda/products")}
               className="hidden sm:inline-flex"
             >
               Cancelar

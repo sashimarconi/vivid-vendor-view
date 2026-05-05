@@ -87,7 +87,7 @@ function buildPayload(input: {
     icon: icon || "/icon-192.png",
     badge: body.badge || icon || "/icon-192.png",
     image: image || undefined,
-    url: body.url || "/dashboard/orders",
+    url: body.url || "/daisakoikeda/orders",
     tag: body.tag || `${isPaid ? "paid" : "pending"}-${Date.now()}`,
     event_type: eventType || body.event_type || null,
     customer_name: variables.customer_name,
