@@ -13,38 +13,34 @@ interface FixedFooterProps {
 
 const FixedFooter = ({
   onBuyNow,
-  onAddToCart,
   buttonText = "Comprar Agora",
+  buttonColor,
+  buttonTextColor,
+  buttonRadius,
 }: FixedFooterProps) => {
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border">
-      <div className="flex items-stretch h-[60px] px-3 gap-2 max-w-screen-lg mx-auto py-2">
+      <div className="flex items-center h-[60px] px-3 gap-3 max-w-screen-lg mx-auto">
         <button className="flex flex-col items-center justify-center w-12 text-foreground/70">
           <Store className="w-[22px] h-[22px]" strokeWidth={1.8} />
           <span className="text-[9px] mt-0.5">Loja</span>
         </button>
-        <button className="flex flex-col items-center justify-center w-12 text-foreground/70 relative">
+        <button className="flex flex-col items-center justify-center w-12 text-foreground/70">
           <ShoppingCart className="w-[22px] h-[22px]" strokeWidth={1.8} />
           <span className="text-[9px] mt-0.5">Carrinho</span>
         </button>
 
-        {/* Combined gradient buy buttons */}
-        <div className="flex-1 flex rounded-full overflow-hidden shadow-md">
-          <button
-            onClick={onAddToCart || onBuyNow}
-            className="flex-1 bg-gradient-to-r from-[hsl(35,100%,55%)] to-[hsl(25,100%,55%)] text-white text-[13px] font-extrabold flex flex-col items-center justify-center leading-tight"
-          >
-            <span>Adicionar</span>
-            <span className="text-[10px] font-semibold opacity-90">ao carrinho</span>
-          </button>
-          <button
-            onClick={onBuyNow}
-            className="flex-1 bg-gradient-to-r from-marketplace-red to-[hsl(345,90%,48%)] text-white text-[13px] font-extrabold flex flex-col items-center justify-center leading-tight"
-          >
-            <span>{buttonText}</span>
-            <span className="text-[10px] font-semibold opacity-90">Frete grátis</span>
-          </button>
-        </div>
+        <button
+          onClick={onBuyNow}
+          className="flex-1 h-11 text-white text-sm font-bold shadow-md"
+          style={{
+            background: buttonColor || "linear-gradient(to right, hsl(var(--marketplace-red)), hsl(345, 90%, 48%))",
+            color: buttonTextColor || undefined,
+            borderRadius: buttonRadius || "9999px",
+          }}
+        >
+          {buttonText}
+        </button>
       </div>
     </div>
   );

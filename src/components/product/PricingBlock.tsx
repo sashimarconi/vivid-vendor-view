@@ -1,4 +1,4 @@
-import { Zap, Ticket, TrendingDown } from "lucide-react";
+import { Zap } from "lucide-react";
 import { formatCurrency } from "@/data/mockData";
 import { useState, useEffect } from "react";
 
@@ -35,67 +35,37 @@ const PricingBlock = ({ originalPrice, salePrice, discountPercent, flashSale, fl
   const m = Math.floor((secondsLeft % 3600) / 60);
   const s = secondsLeft % 60;
 
-  const couponDiscount = Math.max(5, Math.min(50, Math.round((originalPrice - salePrice) * 0.05)));
-
   return (
-    <div>
-      {/* Bold red TikTok price banner */}
-      <div className="bg-gradient-to-br from-marketplace-red via-[hsl(0,85%,52%)] to-[hsl(345,90%,48%)] px-4 pt-3.5 pb-3 relative overflow-hidden">
-        {/* Decorative blur circles */}
-        <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-white/10 blur-2xl" />
-        <div className="absolute -bottom-10 left-1/2 w-40 h-20 rounded-full bg-white/5 blur-2xl" />
-
-        <div className="relative flex items-end justify-between">
-          <div className="flex items-end gap-1.5">
-            <span className="text-[13px] font-bold text-white pb-[6px]">R$</span>
-            <span className="text-[34px] leading-none font-black text-white tracking-tight">
-              {Math.floor(salePrice).toLocaleString("pt-BR")}
-            </span>
-            <span className="text-[16px] font-black text-white pb-1.5">
-              ,{(salePrice % 1).toFixed(2).slice(2)}
-            </span>
-            <span className="text-[12px] text-white/80 line-through pb-1.5 ml-1">
-              {formatCurrency(originalPrice)}
-            </span>
-          </div>
-          {showDiscountBadge && (
-            <div className="bg-white text-marketplace-red text-[12px] font-black px-2 py-1 rounded-md shadow-md">
-              -{discountPercent}%
-            </div>
-          )}
-        </div>
-
-        <div className="relative flex items-center gap-2 mt-2">
-          <span className="inline-flex items-center gap-1 bg-white/20 backdrop-blur text-white text-[10px] font-bold px-2 py-0.5 rounded">
-            <TrendingDown className="w-3 h-3" />
-            Menor preço em 30 dias
+    <div className="bg-card px-4 pt-3 pb-3">
+      <div className="flex items-end gap-2">
+        <span className="text-[14px] font-bold text-marketplace-red pb-1">R$</span>
+        <span className="text-[30px] leading-none font-black text-marketplace-red tracking-tight">
+          {Math.floor(salePrice).toLocaleString("pt-BR")}
+        </span>
+        <span className="text-[15px] font-bold text-marketplace-red pb-1">
+          ,{(salePrice % 1).toFixed(2).slice(2)}
+        </span>
+        <span className="text-[12px] text-muted-foreground line-through pb-1.5 ml-1">
+          {formatCurrency(originalPrice)}
+        </span>
+        {showDiscountBadge && (
+          <span className="text-[11px] font-bold text-marketplace-red pb-1.5">
+            -{discountPercent}%
           </span>
-          {flashSale && showFlashSale && (
-            <span className="inline-flex items-center gap-1 text-white text-[10px] font-bold">
-              <Zap className="w-3 h-3 fill-current" />
-              Termina em
-              <span className="bg-black/40 rounded px-1 py-0.5 font-mono ml-0.5">{pad(h)}</span>
-              <span>:</span>
-              <span className="bg-black/40 rounded px-1 py-0.5 font-mono">{pad(m)}</span>
-              <span>:</span>
-              <span className="bg-black/40 rounded px-1 py-0.5 font-mono">{pad(s)}</span>
-            </span>
-          )}
-        </div>
+        )}
       </div>
 
-      {/* Coupon strip */}
-      <div className="bg-marketplace-red-light/40 px-4 py-2 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Ticket className="w-3.5 h-3.5 text-marketplace-red" />
-          <p className="text-[11px] text-foreground">
-            Cupom de <span className="font-bold text-marketplace-red">15% OFF</span>, até <span className="font-bold">R${couponDiscount}</span>
-          </p>
+      {flashSale && showFlashSale && (
+        <div className="flex items-center gap-1.5 mt-2 text-marketplace-red">
+          <Zap className="w-3 h-3 fill-current" />
+          <span className="text-[11px] font-semibold">Termina em</span>
+          <span className="bg-marketplace-red text-white rounded px-1 py-0.5 font-mono text-[10px]">{pad(h)}</span>
+          <span className="text-[10px]">:</span>
+          <span className="bg-marketplace-red text-white rounded px-1 py-0.5 font-mono text-[10px]">{pad(m)}</span>
+          <span className="text-[10px]">:</span>
+          <span className="bg-marketplace-red text-white rounded px-1 py-0.5 font-mono text-[10px]">{pad(s)}</span>
         </div>
-        <button className="text-[11px] font-bold text-marketplace-red bg-white px-2.5 py-0.5 rounded-full border border-marketplace-red">
-          Coletar
-        </button>
-      </div>
+      )}
     </div>
   );
 };
