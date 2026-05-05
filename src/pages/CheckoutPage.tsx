@@ -1218,7 +1218,11 @@ const CheckoutPage = () => {
           ))}
         </div>
       </div>
+      </>
+      )}
 
+      {checkoutStep === "review" && (
+      <>
       {/* Shipping options */}
       {shippingOptions && shippingOptions.length > 0 && (
         <div className="mx-4 mt-3 bg-card rounded-xl border border-border overflow-hidden">
