@@ -151,13 +151,6 @@ const ProductInfo = ({ title, promoTag, rating, reviewCount, soldCount, variants
       {/* Ungrouped variants */}
       {ungroupedVariants.length > 0 && renderGroup("_ungrouped", "Opções", ungroupedVariants)}
 
-      {promoTag && (
-        <div className="mt-3">
-          <span className="inline-block bg-marketplace-orange text-primary-foreground text-[10px] font-bold px-2 py-0.5 rounded">
-            {promoTag}
-          </span>
-        </div>
-      )}
     </div>
   );
 };
