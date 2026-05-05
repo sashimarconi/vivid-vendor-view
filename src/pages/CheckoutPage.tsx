@@ -165,6 +165,7 @@ const CheckoutPage = () => {
   const [paymentConfirmed, setPaymentConfirmed] = useState(false);
   const [showEmailSuggestions, setShowEmailSuggestions] = useState(false);
   const [pixCopiedRegistered, setPixCopiedRegistered] = useState(false);
+  const [pixJustCopied, setPixJustCopied] = useState(false);
 
   useEffect(() => {
     if (!slug || pixData) return;
