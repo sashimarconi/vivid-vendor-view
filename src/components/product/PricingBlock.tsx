@@ -36,34 +36,36 @@ const PricingBlock = ({ originalPrice, salePrice, discountPercent, flashSale, fl
   const s = secondsLeft % 60;
 
   return (
-    <div className="bg-card px-4 pt-3 pb-3">
-      <div className="flex items-end gap-2">
-        <span className="text-[14px] font-bold text-marketplace-red pb-1">R$</span>
-        <span className="text-[30px] leading-none font-black text-marketplace-red tracking-tight">
-          {Math.floor(salePrice).toLocaleString("pt-BR")}
-        </span>
-        <span className="text-[15px] font-bold text-marketplace-red pb-1">
-          ,{(salePrice % 1).toFixed(2).slice(2)}
-        </span>
-        <span className="text-[12px] text-muted-foreground line-through pb-1.5 ml-1">
-          {formatCurrency(originalPrice)}
-        </span>
+    <div className="bg-gradient-to-r from-[hsl(28,100%,55%)] via-[hsl(20,100%,52%)] to-[hsl(12,95%,52%)] px-4 pt-3 pb-3">
+      <div className="flex items-end justify-between">
+        <div className="flex items-end gap-1.5">
+          <span className="text-[13px] font-bold text-white pb-1">R$</span>
+          <span className="text-[30px] leading-none font-black text-white tracking-tight">
+            {Math.floor(salePrice).toLocaleString("pt-BR")}
+          </span>
+          <span className="text-[14px] font-bold text-white pb-1">
+            ,{(salePrice % 1).toFixed(2).slice(2)}
+          </span>
+          <span className="text-[12px] text-white/80 line-through pb-1.5 ml-1">
+            {formatCurrency(originalPrice)}
+          </span>
+        </div>
         {showDiscountBadge && (
-          <span className="text-[11px] font-bold text-marketplace-red pb-1.5">
+          <span className="bg-white/95 text-[hsl(20,100%,48%)] text-[11px] font-black px-2 py-0.5 rounded">
             -{discountPercent}%
           </span>
         )}
       </div>
 
       {flashSale && showFlashSale && (
-        <div className="flex items-center gap-1.5 mt-2 text-marketplace-red">
+        <div className="flex items-center gap-1.5 mt-2 text-white">
           <Zap className="w-3 h-3 fill-current" />
           <span className="text-[11px] font-semibold">Termina em</span>
-          <span className="bg-marketplace-red text-white rounded px-1 py-0.5 font-mono text-[10px]">{pad(h)}</span>
+          <span className="bg-black/30 rounded px-1 py-0.5 font-mono text-[10px]">{pad(h)}</span>
           <span className="text-[10px]">:</span>
-          <span className="bg-marketplace-red text-white rounded px-1 py-0.5 font-mono text-[10px]">{pad(m)}</span>
+          <span className="bg-black/30 rounded px-1 py-0.5 font-mono text-[10px]">{pad(m)}</span>
           <span className="text-[10px]">:</span>
-          <span className="bg-marketplace-red text-white rounded px-1 py-0.5 font-mono text-[10px]">{pad(s)}</span>
+          <span className="bg-black/30 rounded px-1 py-0.5 font-mono text-[10px]">{pad(s)}</span>
         </div>
       )}
     </div>
