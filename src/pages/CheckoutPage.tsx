@@ -1266,22 +1266,28 @@ const CheckoutPage = () => {
       )}
 
       {/* Fixed bottom bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border shadow-[0_-4px_12px_rgba(0,0,0,0.1)]">
-        <div className="max-w-screen-lg mx-auto px-4 py-2.5 flex items-center justify-between">
-          <div>
-            <p className="text-[11px] text-muted-foreground">Total ({quantity} {quantity === 1 ? "item" : "itens"})</p>
-            <p className="text-lg font-bold text-marketplace-red">{formatCurrency(total)}</p>
-          </div>
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border shadow-[0_-4px_12px_rgba(0,0,0,0.1)] pb-2">
+        <div className="max-w-screen-lg mx-auto px-4 pt-3 pb-1 flex items-center justify-between">
+          <p className="text-sm text-foreground">Total ({quantity} {quantity === 1 ? "item" : "itens"}):</p>
+          <p className="text-xl font-extrabold text-marketplace-red">{formatCurrency(total)}</p>
+        </div>
+        <div className="px-4 pb-2">
           <button
             onClick={handleSubmitOrder}
             disabled={submitting}
-            className="flex-1 ml-4 py-3 rounded-full bg-marketplace-red text-white text-sm font-bold disabled:opacity-50 flex flex-col items-center"
+            className="w-full py-3.5 rounded-full bg-marketplace-red text-white text-sm font-extrabold disabled:opacity-50 flex items-center justify-center gap-2 shadow-md active:scale-[0.99] transition-transform"
           >
-            <span>{submitting ? "Processando..." : (checkoutSettings?.checkout_button_text || "Fazer pedido")}</span>
-            {product.flash_sale && (
-              <span className="text-[9px] font-normal opacity-90">Oferta Relâmpago termina em breve</span>
-            )}
+            <Lock className="w-4 h-4" />
+            {submitting ? "Processando..." : (checkoutSettings?.checkout_button_text || "Continuar para pagamento")}
           </button>
+        </div>
+        <div className="text-center space-y-0.5">
+          <p className="text-[11px] text-marketplace-red flex items-center justify-center gap-1">
+            <Clock className="w-3 h-3" /> Cupom expira em 09:35
+          </p>
+          <p className="text-[11px] text-marketplace-green flex items-center justify-center gap-1">
+            <Lock className="w-3 h-3" /> Seus dados estão protegidos com criptografia SSL
+          </p>
         </div>
       </div>
     </div>
