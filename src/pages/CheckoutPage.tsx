@@ -889,25 +889,43 @@ const CheckoutPage = () => {
       {/* Section title + stepper */}
       <div className="bg-card pt-4 pb-3 border-b border-border">
         <div className="flex items-center justify-center mb-3 relative">
-          <button onClick={() => navigate(-1)} className="absolute left-4 top-0">
+          <button
+            onClick={() => {
+              if (checkoutStep === "review") setCheckoutStep("info");
+              else if (checkoutStep === "info") setCheckoutStep("cart");
+              else navigate(-1);
+            }}
+            className="absolute left-4 top-0"
+          >
             <ArrowLeft className="w-5 h-5 text-foreground" />
           </button>
-          <p className="text-base font-semibold text-foreground">{pixData ? "Pagamento" : "Informações"}</p>
+          <p className="text-base font-semibold text-foreground">
+            {checkoutStep === "cart" ? "Carrinho" : checkoutStep === "info" ? "Informações" : "Revisão do pedido"}
+          </p>
         </div>
-        <div className="flex items-center justify-center gap-2 max-w-[260px] mx-auto px-4">
-          <div className="flex flex-col items-center gap-1">
-            <div className="w-7 h-7 rounded-full bg-marketplace-red flex items-center justify-center">
-              <span className="text-[12px] font-bold text-white">1</span>
-            </div>
-            <span className="text-[10px] font-medium text-foreground">Dados</span>
-          </div>
-          <div className="flex-1 h-[2px] bg-border -mt-4" />
-          <div className="flex flex-col items-center gap-1">
-            <div className="w-7 h-7 rounded-full bg-muted border border-border flex items-center justify-center">
-              <span className="text-[12px] font-bold text-muted-foreground">2</span>
-            </div>
-            <span className="text-[10px] font-medium text-muted-foreground">Pagamento</span>
-          </div>
+        <div className="flex items-center justify-center gap-2 max-w-[320px] mx-auto px-4">
+          {[
+            { id: "cart", label: "Carrinho", n: 1 },
+            { id: "info", label: "Dados", n: 2 },
+            { id: "review", label: "Pagamento", n: 3 },
+          ].map((s, i, arr) => {
+            const order = ["cart", "info", "review"];
+            const currentIdx = order.indexOf(checkoutStep);
+            const stepIdx = order.indexOf(s.id);
+            const done = stepIdx < currentIdx;
+            const active = stepIdx === currentIdx;
+            return (
+              <>
+                <div key={s.id} className="flex flex-col items-center gap-1">
+                  <div className={`w-7 h-7 rounded-full flex items-center justify-center ${done || active ? "bg-marketplace-red" : "bg-muted border border-border"}`}>
+                    {done ? <Check className="w-4 h-4 text-white" strokeWidth={3} /> : <span className={`text-[12px] font-bold ${active ? "text-white" : "text-muted-foreground"}`}>{s.n}</span>}
+                  </div>
+                  <span className={`text-[10px] font-medium ${active || done ? "text-foreground" : "text-muted-foreground"}`}>{s.label}</span>
+                </div>
+                {i < arr.length - 1 && <div key={`sep-${s.id}`} className={`flex-1 h-[2px] -mt-4 ${stepIdx < currentIdx ? "bg-marketplace-red" : "bg-border"}`} />}
+              </>
+            );
+          })}
         </div>
       </div>
 
