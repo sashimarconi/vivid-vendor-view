@@ -11,7 +11,7 @@ import { clearPendingPixOrder, readPendingPixOrder, readStoredThankYouUrl, saveP
 import { formatCurrency } from "@/data/mockData";
 import { ArrowLeft, Minus, Plus, Check, ShieldCheck, Clock, X, User, Hash, Mail, Phone, MapPin, Lock, Flame, Users, Zap as ZapIcon } from "lucide-react";
 import { toast } from "sonner";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+
 
 interface ShippingOption {
   id: string;
@@ -137,7 +137,7 @@ const CheckoutPage = () => {
   const [customerCity, setCustomerCity] = useState("");
   const [customerState, setCustomerState] = useState("");
   const [cepLoading, setCepLoading] = useState(false);
-  const [showForm, setShowForm] = useState(false);
+  const [, setShowForm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [pixData, setPixData] = useState<PixDataState | null>(() => {
     if (!slug) return null;
@@ -562,7 +562,7 @@ const CheckoutPage = () => {
 
   const handleSubmitOrder = async () => {
     if (!customerName || !customerEmail || !customerPhone || !customerDocument) {
-      setShowForm(true);
+      // form is inline; just notify
       toast.error("Preencha todos os campos obrigatórios");
       return;
     }
@@ -858,7 +858,7 @@ const CheckoutPage = () => {
   const mainImage = selectedVariantImage || product.product_images?.[0]?.url || "/placeholder.svg";
 
   return (
-    <div className="min-h-screen bg-background pb-44">
+    <div className="min-h-screen bg-muted/30 pb-44">
       {/* Header */}
       <header className="sticky top-0 z-40 bg-card border-b border-border">
         <div className="flex items-center h-12 px-4">
