@@ -858,7 +858,7 @@ const CheckoutPage = () => {
   const mainImage = selectedVariantImage || product.product_images?.[0]?.url || "/placeholder.svg";
 
   return (
-    <div className="min-h-screen bg-background pb-28">
+    <div className="min-h-screen bg-background pb-44">
       {/* Header */}
       <header className="sticky top-0 z-40 bg-card border-b border-border">
         <div className="flex items-center h-12 px-4">
