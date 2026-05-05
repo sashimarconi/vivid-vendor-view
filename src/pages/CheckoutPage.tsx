@@ -898,15 +898,6 @@ const CheckoutPage = () => {
         </div>
       </header>
 
-      {/* Social proof */}
-      <div className="bg-marketplace-green/10 mx-4 mt-3 rounded-lg px-3 py-2 flex items-center gap-2">
-        <Check className="w-3.5 h-3.5 text-marketplace-green flex-shrink-0" />
-        <span className="text-[12px] text-foreground">
-          <strong>Juliana de Recife/PE</strong> acabou de comprar
-        </span>
-      </div>
-
-
       {/* Cart item card — shows what's being bought up front */}
       <div className="mx-4 mt-3 bg-card rounded-xl border border-border p-3">
         <div className="flex gap-3">
