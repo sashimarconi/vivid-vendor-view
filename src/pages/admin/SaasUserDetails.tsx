@@ -78,7 +78,7 @@ const SaasUserDetails = () => {
   if (!details) {
     return (
       <div className="space-y-4">
-        <Link to="/admin/users" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+        <Link to="/nimda/users" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
           <ArrowLeft className="w-4 h-4" /> Voltar
         </Link>
         <p className="text-sm text-muted-foreground">Usuário não encontrado.</p>
@@ -101,7 +101,7 @@ const SaasUserDetails = () => {
   return (
     <div className="space-y-8">
       <div>
-        <Link to="/admin/users" className="inline-flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground mb-4">
+        <Link to="/nimda/users" className="inline-flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground mb-4">
           <ArrowLeft className="w-3.5 h-3.5" /> Voltar para usuários
         </Link>
 

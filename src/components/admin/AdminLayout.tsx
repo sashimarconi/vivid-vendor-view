@@ -18,54 +18,54 @@ const navSections = [
   {
     title: "Central de Comando",
     items: [
-      { label: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
-      { label: "Live View", path: "/dashboard/live-view", icon: Radio },
-      { label: "Análises", path: "/dashboard/analytics", icon: BarChart3 },
-      { label: "Funil", path: "/dashboard/funnel", icon: Filter },
-      { label: "Saúde do Pagamento", path: "/dashboard/payment-health", icon: Activity },
-      { label: "Financeiro", path: "/dashboard/financial", icon: Wallet },
+      { label: "Dashboard", path: "/daisakoikeda", icon: LayoutDashboard },
+      { label: "Live View", path: "/daisakoikeda/live-view", icon: Radio },
+      { label: "Análises", path: "/daisakoikeda/analytics", icon: BarChart3 },
+      { label: "Funil", path: "/daisakoikeda/funnel", icon: Filter },
+      { label: "Saúde do Pagamento", path: "/daisakoikeda/payment-health", icon: Activity },
+      { label: "Financeiro", path: "/daisakoikeda/financial", icon: Wallet },
     ],
   },
   {
     title: "Vendas",
     items: [
-      { label: "Pedidos", path: "/dashboard/orders", icon: ClipboardList },
-      { label: "Carrinhos Abandonados", path: "/dashboard/abandoned-carts", icon: ShoppingCart },
+      { label: "Pedidos", path: "/daisakoikeda/orders", icon: ClipboardList },
+      { label: "Carrinhos Abandonados", path: "/daisakoikeda/abandoned-carts", icon: ShoppingCart },
     ],
   },
   {
     title: "Construtor de Loja",
     items: [
-      { label: "Produtos", path: "/dashboard/products", icon: Package },
-      { label: "Editor de Produto", path: "/dashboard/product-builder", icon: PenTool },
-      { label: "Avaliações", path: "/dashboard/reviews", icon: Star },
-      { label: "Lojas", path: "/dashboard/stores", icon: Store },
+      { label: "Produtos", path: "/daisakoikeda/products", icon: Package },
+      { label: "Editor de Produto", path: "/daisakoikeda/product-builder", icon: PenTool },
+      { label: "Avaliações", path: "/daisakoikeda/reviews", icon: Star },
+      { label: "Lojas", path: "/daisakoikeda/stores", icon: Store },
     ],
   },
   {
     title: "Checkout",
     items: [
-      { label: "Builder", path: "/dashboard/checkout-builder", icon: PenTool },
-      { label: "Gateways", path: "/dashboard/gateways", icon: CreditCard },
-      { label: "Fretes", path: "/dashboard/shipping", icon: Truck },
-      { label: "Order Bumps", path: "/dashboard/order-bumps", icon: Tag },
+      { label: "Builder", path: "/daisakoikeda/checkout-builder", icon: PenTool },
+      { label: "Gateways", path: "/daisakoikeda/gateways", icon: CreditCard },
+      { label: "Fretes", path: "/daisakoikeda/shipping", icon: Truck },
+      { label: "Order Bumps", path: "/daisakoikeda/order-bumps", icon: Tag },
     ],
   },
   {
     title: "Marketing",
     items: [
-      { label: "Integrações", path: "/dashboard/pixels", icon: Zap },
-      { label: "Webhooks", path: "/dashboard/webhooks", icon: Webhook },
+      { label: "Integrações", path: "/daisakoikeda/pixels", icon: Zap },
+      { label: "Webhooks", path: "/daisakoikeda/webhooks", icon: Webhook },
     ],
   },
   {
     title: "Configurações",
     items: [
-      { label: "Domínios", path: "/dashboard/domains", icon: Globe },
-      { label: "Notificações", path: "/dashboard/notifications", icon: Bell },
-      { label: "Plano & Limites", path: "/dashboard/plans", icon: Crown },
-      { label: "Segurança", path: "/dashboard/security", icon: ShieldCheck },
-      { label: "Meu Perfil", path: "/dashboard/profile", icon: User },
+      { label: "Domínios", path: "/daisakoikeda/domains", icon: Globe },
+      { label: "Notificações", path: "/daisakoikeda/notifications", icon: Bell },
+      { label: "Plano & Limites", path: "/daisakoikeda/plans", icon: Crown },
+      { label: "Segurança", path: "/daisakoikeda/security", icon: ShieldCheck },
+      { label: "Meu Perfil", path: "/daisakoikeda/profile", icon: User },
     ],
   },
 ];
@@ -118,12 +118,12 @@ const AdminLayout = () => {
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) navigate("/login");
+      if (!session) navigate("/lug");
       setLoading(false);
     };
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!session) navigate("/login");
+      if (!session) navigate("/lug");
     });
 
     checkAuth();
@@ -133,7 +133,7 @@ const AdminLayout = () => {
   // Auto-expand section containing active route
   useEffect(() => {
     const idx = navSections.findIndex(s => s.items.some(i => {
-      if (i.path === "/dashboard") return location.pathname === "/dashboard";
+      if (i.path === "/daisakoikeda") return location.pathname === "/daisakoikeda";
       return location.pathname.startsWith(i.path);
     }));
     if (idx >= 0) {
@@ -143,7 +143,7 @@ const AdminLayout = () => {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    navigate("/login");
+    navigate("/lug");
   };
 
   if (loading) {
@@ -155,7 +155,7 @@ const AdminLayout = () => {
   }
 
   const isActive = (path: string) => {
-    if (path === "/dashboard") return location.pathname === "/dashboard";
+    if (path === "/daisakoikeda") return location.pathname === "/daisakoikeda";
     return location.pathname.startsWith(path);
   };
 
@@ -183,7 +183,7 @@ const AdminLayout = () => {
         sidebarOpen ? "h-14 px-4 justify-between" : "relative h-[76px] px-2 justify-center"
       )}>
         <Link
-          to="/dashboard"
+          to="/daisakoikeda"
           className={cn(
             "group flex items-center",
             sidebarOpen ? "gap-2.5" : "w-full justify-center"
@@ -373,7 +373,7 @@ const AdminLayout = () => {
             </button>
             <PushNotificationToggle />
             <Link
-              to="/dashboard/profile"
+              to="/daisakoikeda/profile"
               className="h-7 w-7 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center hover:ring-2 hover:ring-primary/40 transition-all"
             >
               <span className="text-white text-[10px] font-bold">VT</span>

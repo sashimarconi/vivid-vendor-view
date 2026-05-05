@@ -6,11 +6,11 @@ import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 
 const navItems = [
-  { label: "Métricas", path: "/admin", icon: BarChart3 },
-  { label: "Análises", path: "/admin/analytics", icon: TrendingUp },
-  { label: "Pedidos", path: "/admin/orders", icon: ClipboardList },
-  { label: "Usuários", path: "/admin/users", icon: Users },
-  { label: "Plataforma", path: "/admin/platform", icon: Settings },
+  { label: "Métricas", path: "/nimda", icon: BarChart3 },
+  { label: "Análises", path: "/nimda/analytics", icon: TrendingUp },
+  { label: "Pedidos", path: "/nimda/orders", icon: ClipboardList },
+  { label: "Usuários", path: "/nimda/users", icon: Users },
+  { label: "Plataforma", path: "/nimda/platform", icon: Settings },
 ];
 
 const SaasAdminLayout = () => {
@@ -40,14 +40,14 @@ const SaasAdminLayout = () => {
   useEffect(() => {
     const check = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) { navigate("/login"); return; }
+      if (!session) { navigate("/lug"); return; }
 
       const { data } = await supabase.rpc("has_role", {
         _user_id: session.user.id,
         _role: "admin",
       });
 
-      if (!data) { navigate("/dashboard"); return; }
+      if (!data) { navigate("/daisakoikeda"); return; }
       setLoading(false);
     };
 
@@ -56,7 +56,7 @@ const SaasAdminLayout = () => {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    navigate("/login");
+    navigate("/lug");
   };
 
   if (loading) {
@@ -68,7 +68,7 @@ const SaasAdminLayout = () => {
   }
 
   const isActive = (path: string) => {
-    if (path === "/admin") return location.pathname === "/admin";
+    if (path === "/nimda") return location.pathname === "/nimda";
     return location.pathname.startsWith(path);
   };
 
@@ -80,7 +80,7 @@ const SaasAdminLayout = () => {
         sidebarOpen ? "w-[220px]" : "w-16"
       )} style={{ background: 'hsl(240 6% 7% / 0.95)', backdropFilter: 'blur(20px)' }}>
         <div className="h-14 px-4 flex items-center justify-between border-b border-border/60">
-          <Link to="/admin" className="flex items-center gap-2.5 group">
+          <Link to="/nimda" className="flex items-center gap-2.5 group">
             {logoClosed ? (
               <img src={logoClosed} alt="Logo" className="w-14 h-14 object-contain" />
             ) : (
@@ -118,7 +118,7 @@ const SaasAdminLayout = () => {
         </nav>
 
         <div className="p-3 border-t border-border/60 space-y-0.5">
-          <Link to="/dashboard" className="flex items-center gap-3 px-2.5 py-[7px] rounded-lg text-[13px] text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors group">
+          <Link to="/daisakoikeda" className="flex items-center gap-3 px-2.5 py-[7px] rounded-lg text-[13px] text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors group">
             <BarChart3 className="w-[15px] h-[15px] shrink-0" />
             {sidebarOpen && <span>Voltar ao Dashboard</span>}
           </Link>

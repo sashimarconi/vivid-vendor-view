@@ -119,7 +119,7 @@ async function dispatchTikTokPixGenerated(supabase: any, params: {
         continue;
       }
       if (!pixel.access_token) {
-        console.warn(`[TikTok S2S PIX] Pixel ${pixel.pixel_id} sem access_token (cadastre o token em /admin/pixels para enviar via S2S).`);
+        console.warn(`[TikTok S2S PIX] Pixel ${pixel.pixel_id} sem access_token (cadastre o token em /nimda/pixels para enviar via S2S).`);
         continue;
       }
 
@@ -793,7 +793,7 @@ Deno.serve(async (req) => {
             total_amount: body.amount / 100,
             gateway_name: gateway.display_name || gateway.gateway_name,
             product_title: body.productTitle,
-             url: "/dashboard/orders",
+             url: "/daisakoikeda/orders",
             event_type: "order_pending",
             owner_user_id: product.user_id,
             tag: `order-pending-${orderData?.id || Date.now()}`,

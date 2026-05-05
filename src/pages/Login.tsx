@@ -53,18 +53,18 @@ const Login = () => {
       }
     } catch {
       // If MFA check fails, just proceed
-      navigate("/dashboard");
+      navigate("/daisakoikeda");
     }
 
     setLoading(false);
   };
 
   const handleMfaSuccess = () => {
-    navigate("/dashboard");
+    navigate("/daisakoikeda");
   };
 
   const handleMfaSkip = () => {
-    navigate("/dashboard");
+    navigate("/daisakoikeda");
   };
 
   if (step === "mfa-verify") {
