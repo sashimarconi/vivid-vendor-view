@@ -37,11 +37,7 @@ const ProductHeader = ({ logoUrl, logoHeight = 28, headerBgColor }: ProductHeade
         {logoUrl ? (
           <img src={logoUrl} alt="Logo" className="object-contain max-w-[140px]" style={{ height: logoHeight }} />
         ) : (
-          <div className="flex items-center gap-1">
-            <TikTokIcon className="w-5 h-5 text-foreground" />
-            <span className="text-[15px] font-bold tracking-tight">TikTok</span>
-            <span className="text-[15px] font-medium tracking-tight">Shop</span>
-          </div>
+          <div />
         )}
 
         <div className="flex items-center gap-1.5">
