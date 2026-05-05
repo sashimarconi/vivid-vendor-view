@@ -138,8 +138,14 @@ const CheckoutPage = () => {
   const [customerState, setCustomerState] = useState("");
   const [cepLoading, setCepLoading] = useState(false);
   const [, setShowForm] = useState(false);
-  const [checkoutStep, setCheckoutStep] = useState<"cart" | "info" | "review">("cart");
   const [submitting, setSubmitting] = useState(false);
+  const [couponSecondsLeft, setCouponSecondsLeft] = useState(15 * 60);
+
+  useEffect(() => {
+    const t = setInterval(() => setCouponSecondsLeft((s) => (s > 0 ? s - 1 : 0)), 1000);
+    return () => clearInterval(t);
+  }, []);
+  const couponMmSs = `${String(Math.floor(couponSecondsLeft / 60)).padStart(2, "0")}:${String(couponSecondsLeft % 60).padStart(2, "0")}`;
   const [pixData, setPixData] = useState<PixDataState | null>(() => {
     if (!slug) return null;
     const pendingOrder = readPendingPixOrder(slug);
