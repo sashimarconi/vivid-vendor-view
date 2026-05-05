@@ -10,16 +10,6 @@ interface ShippingInfoProps {
 const ShippingInfo = ({ freeShipping, shippingCost, estimatedDelivery, shippingLabel = "Frete Grátis" }: ShippingInfoProps) => {
   return (
     <div className="bg-card mt-2 px-4 py-3">
-      {/* Address row */}
-      <button className="w-full flex items-center justify-between pb-3 border-b border-border">
-        <div className="flex items-center gap-2">
-          <MapPin className="w-4 h-4 text-marketplace-red" />
-          <span className="text-[12px] text-muted-foreground">Enviar para</span>
-          <span className="text-[12px] font-semibold text-foreground">São Paulo, SP</span>
-        </div>
-        <ChevronRight className="w-4 h-4 text-muted-foreground" />
-      </button>
-
       {/* Free shipping highlight */}
       <div className="flex items-start gap-2.5 pt-3">
         <div className="w-7 h-7 rounded-full bg-marketplace-green/15 flex items-center justify-center flex-shrink-0">
