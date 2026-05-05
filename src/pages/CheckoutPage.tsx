@@ -720,7 +720,7 @@ const CheckoutPage = () => {
 
   if (pixData) {
     return (
-      <div className="min-h-screen bg-muted/30">
+      <div className="min-h-screen bg-background pb-8">
         {/* Header */}
         <header className="sticky top-0 z-40 bg-card border-b border-border">
           <div className="flex items-center h-12 px-4">
@@ -733,105 +733,97 @@ const CheckoutPage = () => {
               <ArrowLeft className="w-5 h-5 text-foreground" />
             </button>
             {checkoutLogoUrl ? (
-              <img src={checkoutLogoUrl} alt="Logo" style={{ height: checkoutLogoHeight }} className="object-contain max-w-[180px]" />
+              <img src={checkoutLogoUrl} alt="Logo" style={{ height: checkoutLogoHeight }} className="object-contain max-w-[180px] mx-auto" />
             ) : (
               <p className="flex-1 text-center text-sm font-semibold text-foreground">Pagamento</p>
             )}
-            <div className="w-5" />
+            <button onClick={() => navigate(-1)}><X className="w-5 h-5 text-foreground" /></button>
           </div>
         </header>
 
-        {/* Progress steps */}
-        <div className="bg-card border-b border-border px-6 py-4">
-          <div className="flex items-center justify-between max-w-xs mx-auto">
+        {/* Stepper */}
+        <div className="bg-card px-6 pt-4 pb-3">
+          <div className="flex items-center justify-center gap-2 max-w-[260px] mx-auto">
             <div className="flex flex-col items-center gap-1">
               <div className="w-7 h-7 rounded-full bg-marketplace-red flex items-center justify-center">
-                <Check className="w-4 h-4 text-white" />
+                <Check className="w-4 h-4 text-white" strokeWidth={3} />
               </div>
-              <span className="text-[10px] font-medium text-marketplace-red">Revisão</span>
+              <span className="text-[10px] font-medium text-foreground">Dados</span>
             </div>
-            <div className="flex-1 h-0.5 bg-marketplace-red mx-1 -mt-4" />
+            <div className="flex-1 h-[2px] bg-marketplace-red -mt-4" />
             <div className="flex flex-col items-center gap-1">
               <div className="w-7 h-7 rounded-full bg-marketplace-red flex items-center justify-center">
-                <Check className="w-4 h-4 text-white" />
+                <Check className="w-4 h-4 text-white" strokeWidth={3} />
               </div>
-              <span className="text-[10px] font-medium text-marketplace-red">Dados</span>
-            </div>
-            <div className="flex-1 h-0.5 bg-marketplace-red mx-1 -mt-4" />
-            <div className="flex flex-col items-center gap-1">
-              <div className="w-7 h-7 rounded-full bg-marketplace-red/20 border-2 border-marketplace-red flex items-center justify-center">
-                <span className="text-[10px] font-bold text-marketplace-red">3</span>
-              </div>
-              <span className="text-[10px] font-medium text-marketplace-red">Pagamento</span>
+              <span className="text-[10px] font-medium text-foreground">Pagamento</span>
             </div>
           </div>
         </div>
 
-        <div className="max-w-lg mx-auto p-4 space-y-4">
+        <div className="max-w-lg mx-auto px-4 space-y-3">
+          {/* Social proof bar */}
+          <div className="flex items-center justify-between bg-marketplace-green/10 rounded-lg px-3 py-2">
+            <div className="flex items-center gap-1.5">
+              <div className="w-2 h-2 rounded-full bg-marketplace-green animate-pulse" />
+              <span className="text-[12px] text-foreground"><strong>75 pessoas</strong> pagaram hoje</span>
+            </div>
+            <div className="flex items-center gap-1 text-[12px] text-marketplace-green font-semibold">
+              <Users className="w-3.5 h-3.5" /> 29 online
+            </div>
+          </div>
+
+          {/* Recent purchase notification */}
+          <div className="flex items-center gap-2 text-[12px] text-foreground px-1">
+            <Check className="w-3.5 h-3.5 text-marketplace-green flex-shrink-0" />
+            <span>Camila F. de Campinas/SP pagou via PIX <span className="text-marketplace-red font-semibold">há 2 min</span></span>
+          </div>
+
           {/* Timer banner */}
-          <div className="bg-marketplace-red rounded-xl py-3 px-4 flex items-center justify-center gap-2">
-            <Clock className="w-4 h-4 text-white" />
-            <span className="text-white text-sm font-bold">{pixTimeLeft}</span>
-            <span className="text-white/80 text-sm">para pagar</span>
+          <div className="bg-marketplace-red rounded-xl py-3.5 px-5 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Clock className="w-4 h-4 text-white" />
+              <span className="text-white text-xl font-extrabold tracking-wider">{pixTimeLeft}</span>
+            </div>
+            <span className="text-white/95 text-sm font-semibold">para pagar</span>
+          </div>
+
+          {/* Reservation notice */}
+          <div className="flex items-start gap-2 bg-marketplace-yellow/15 border border-marketplace-yellow/30 rounded-lg px-3 py-2.5">
+            <ZapIcon className="w-4 h-4 text-marketplace-orange flex-shrink-0 mt-0.5 fill-marketplace-orange" />
+            <p className="text-[12px] text-foreground leading-snug">
+              <strong>Seu estoque está reservado!</strong> Pague dentro do prazo para garantir.
+            </p>
           </div>
 
           {/* QR Code section */}
-          <div className="bg-card rounded-xl border border-border overflow-hidden">
-            <div className="p-5 text-center space-y-4">
-              <p className="text-sm text-muted-foreground">
-                {checkoutSettings?.pix_instruction_text || "Efetue o pagamento agora mesmo"}<br />escaneando o QR Code
-              </p>
-              <p className="text-[11px] text-muted-foreground flex items-center justify-center gap-1">
-                📱 Aponte a câmera do seu celular
-              </p>
-              <p className="text-sm font-semibold text-foreground">
-                Valor no pix: <span className="text-marketplace-red">{formatCurrency(total)}</span>
-              </p>
-              <div className="flex justify-center py-2">
-                {pixQrImageSrc ? (
-                  <img src={pixQrImageSrc} alt="QR Code PIX" className="w-44 h-44" />
-                ) : (
-                  <p className="text-sm text-muted-foreground">QR Code indisponível</p>
-                )}
-              </div>
-            </div>
-
-            {/* Destination info */}
-            <div className="bg-muted/50 border-t border-border px-5 py-3 text-center">
-              <p className="text-[11px] text-muted-foreground">
-                O Pix será destinado à empresa que realiza o<br />processamento seguro dos nossos pagamentos:
-              </p>
-              <p className="text-sm font-semibold text-foreground mt-1">{checkoutSettings?.pix_payment_title || "Pagamento Seguro"}</p>
-            </div>
+          <div className="text-center pt-2">
+            <p className="text-sm text-muted-foreground">Valor a pagar</p>
+            <p className="text-3xl font-extrabold text-marketplace-green mt-1">{formatCurrency(total)}</p>
           </div>
 
-          {/* Instructions */}
-          <div className="bg-card rounded-xl border border-border p-5 space-y-3">
-            <p className="text-sm font-semibold text-foreground text-center">Como pagar o seu pedido</p>
-            <div className="space-y-3">
-              <div className="flex gap-3 items-start">
-                <span className="text-muted-foreground text-xs mt-0.5">📱</span>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  Abra o aplicativo do seu banco e selecione <strong className="text-foreground">QR Code</strong> na opção de pagamento por <strong className="text-foreground">PIX</strong>.
-                </p>
-              </div>
-              <div className="flex gap-3 items-start">
-                <span className="text-muted-foreground text-xs mt-0.5">📷</span>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  Utilize a câmera do celular para <strong className="text-foreground">escanear o QR Code</strong>, certifique-se que os dados estão corretos e finalize o pagamento.
-                </p>
-              </div>
+          <div className="bg-card rounded-2xl border border-border p-5 flex justify-center">
+            {pixQrImageSrc ? (
+              <img src={pixQrImageSrc} alt="QR Code PIX" className="w-56 h-56" />
+            ) : (
+              <p className="text-sm text-muted-foreground py-20">QR Code indisponível</p>
+            )}
+          </div>
+
+          {/* Toggle copy paste view */}
+          <button
+            onClick={() => setShowCopyPaste((v) => !v)}
+            className="w-full text-center text-[12px] font-medium text-muted-foreground tracking-wide uppercase py-1"
+          >
+            Código PIX copia e cola
+          </button>
+
+          {showCopyPaste && (
+            <div className="bg-muted/50 rounded-lg p-3">
+              <p className="text-[10px] text-foreground break-all font-mono">{pixData.copyPaste?.trim()}</p>
             </div>
-          </div>
+          )}
 
-          {/* Divider */}
-          <div className="flex items-center gap-3 px-4">
-            <div className="flex-1 border-t border-border" />
-            <span className="text-xs text-muted-foreground">ou</span>
-            <div className="flex-1 border-t border-border" />
-          </div>
-
-          {/* Copy paste button */}
+          {/* Copy button */}
           <button
             onClick={async () => {
               try {
@@ -840,40 +832,22 @@ const CheckoutPage = () => {
                   toast.error("Código PIX indisponível no momento");
                   return;
                 }
-
-                setShowCopyPaste(true);
                 const registerPromise = registerPixCopiedClick(pixData.orderId);
                 const copied = await copyTextToClipboard(pixCode);
                 const registered = await registerPromise;
-
-                if (!registered) {
-                  toast.error("Não foi possível registrar o clique do PIX");
-                }
-
-                if (copied) {
-                  toast.success("Código PIX copiado!");
-                } else {
-                  toast.success("Código PIX exibido abaixo!");
-                }
-              } catch (e) {
-                console.error("Copy error:", e);
-              }
+                if (!registered) toast.error("Não foi possível registrar o clique do PIX");
+                if (copied) toast.success("Código PIX copiado!");
+                else { setShowCopyPaste(true); toast.success("Código PIX exibido abaixo!"); }
+              } catch (e) { console.error("Copy error:", e); }
             }}
-            className="w-full py-4 rounded-xl bg-marketplace-red text-white text-sm font-bold flex items-center justify-center gap-2 shadow-lg"
+            className="w-full py-4 rounded-full bg-marketplace-red text-white text-sm font-extrabold flex items-center justify-center gap-2 shadow-lg active:scale-[0.99] transition-transform"
           >
-            📋 UTILIZAR PIX COPIA E COLA
+            <span className="text-base">📋</span> COPIAR CÓDIGO PIX
           </button>
 
-          {showCopyPaste && (
-            <div className="bg-card rounded-xl border border-border p-4">
-              <p className="text-xs text-muted-foreground mb-2">Código PIX copiado:</p>
-              <p className="text-[10px] text-foreground break-all font-mono bg-muted p-2 rounded-lg">{pixData.copyPaste?.trim()}</p>
-            </div>
-          )}
-
           {/* Awaiting payment */}
-          <div className="flex items-center justify-center gap-2 py-4">
-            <div className="w-4 h-4 border-2 border-marketplace-red border-t-transparent rounded-full animate-spin" />
+          <div className="flex items-center justify-center gap-2 py-3">
+            <div className="w-3.5 h-3.5 border-2 border-marketplace-red border-t-transparent rounded-full animate-spin" />
             <span className="text-xs text-muted-foreground">Aguardando confirmação do pagamento...</span>
           </div>
         </div>
