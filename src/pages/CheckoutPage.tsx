@@ -1109,7 +1109,11 @@ const CheckoutPage = () => {
           </div>
         </div>
       </div>
+      </>
+      )}
 
+      {checkoutStep === "cart" && (
+      <>
       {/* Cart card */}
       <div className="mx-4 mt-3 bg-card rounded-xl border border-border overflow-hidden">
         <div className="bg-marketplace-red text-white px-4 py-2.5 flex items-center justify-between">
