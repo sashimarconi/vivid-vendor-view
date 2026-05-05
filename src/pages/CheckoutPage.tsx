@@ -1114,109 +1114,63 @@ const CheckoutPage = () => {
 
       {checkoutStep === "cart" && (
       <>
-      {/* Cart card */}
-      <div className="mx-4 mt-3 bg-card rounded-xl border border-border overflow-hidden">
-        <div className="bg-marketplace-red text-white px-4 py-2.5 flex items-center justify-between">
-          <button onClick={() => navigate(-1)}>
-            <ArrowLeft className="w-4 h-4 text-white" />
-          </button>
-          <div className="text-center">
-            <p className="text-sm font-bold">Meu Carrinho</p>
-            <p className="text-[10px] text-white/90">{quantity} {quantity === 1 ? "item selecionado" : "itens selecionados"}</p>
+      {/* Cart item card */}
+      <div className="mx-4 mt-3 bg-card rounded-xl border border-border p-4">
+        <div className="flex gap-3">
+          <div className="relative">
+            <img src={mainImage} alt={product.title} className="w-20 h-20 rounded-lg object-cover bg-muted" />
+            {product.discount_percent > 0 && (
+              <span className="absolute -top-1 -left-1 bg-marketplace-red text-white text-[9px] font-bold px-1 py-0.5 rounded">
+                {product.discount_percent}% OFF
+              </span>
+            )}
           </div>
-          <div className="w-4" />
-        </div>
-
-        <div className="px-4 py-3 flex items-center justify-between border-b border-border">
-          <div className="flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-marketplace-green animate-pulse" />
-            <span className="text-[12px] text-foreground"><strong>52 pessoas</strong> comprando agora</span>
-          </div>
-          <span className="text-[11px] font-semibold text-marketplace-green flex items-center gap-1">
-            <ShieldCheck className="w-3 h-3" /> FRETE GRÁTIS
-          </span>
-        </div>
-
-        <div className="px-4 py-3 border-b border-border">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-7 h-7 rounded-full bg-muted flex items-center justify-center">
-              <span className="text-[10px] font-bold text-muted-foreground">OL</span>
-            </div>
-            <div>
-              <p className="text-sm font-bold text-foreground leading-none">Loja</p>
-              <p className="text-[10px] text-marketplace-green flex items-center gap-1 mt-0.5">
-                <Check className="w-2.5 h-2.5" /> Loja Verificada
-              </p>
-            </div>
-          </div>
-
-          <div className="flex gap-3">
-            <div className="relative">
-              <img src={mainImage} alt={product.title} className="w-20 h-20 rounded-lg object-cover bg-muted" />
-              {product.discount_percent > 0 && (
-                <span className="absolute -top-1 -left-1 bg-marketplace-red text-white text-[9px] font-bold px-1 py-0.5 rounded">
-                  {product.discount_percent}% OFF
-                </span>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm text-foreground line-clamp-2 leading-snug">{product.title}{selectedVariantNames ? ` (${selectedVariantNames})` : ""}</p>
+            <div className="mt-1.5 flex items-center gap-2">
+              <span className="text-base font-extrabold text-marketplace-red">{formatCurrency(Number(product.sale_price))}</span>
+              {Number(product.original_price) > Number(product.sale_price) && (
+                <span className="text-xs text-muted-foreground line-through">{formatCurrency(Number(product.original_price))}</span>
               )}
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-xs text-foreground line-clamp-2 leading-snug">{product.title}{selectedVariantNames ? ` (${selectedVariantNames})` : ""}</p>
-              <div className="mt-2 flex items-center gap-2">
-                <span className="text-base font-extrabold text-marketplace-red">{formatCurrency(Number(product.sale_price))}</span>
-                <span className="text-xs text-muted-foreground line-through">{formatCurrency(Number(product.original_price))}</span>
+            <div className="mt-2 flex items-center justify-between">
+              <span className="text-[11px] font-semibold text-marketplace-green flex items-center gap-1">
+                <ShieldCheck className="w-3 h-3" /> Frete grátis
+              </span>
+              <div className="flex items-center gap-2 bg-muted rounded-full px-1 py-0.5">
+                <button
+                  className="w-6 h-6 rounded-full bg-card border border-border flex items-center justify-center"
+                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                >
+                  <Minus className="w-3 h-3" />
+                </button>
+                <span className="text-sm font-semibold w-5 text-center">{quantity}</span>
+                <button
+                  className="w-6 h-6 rounded-full bg-card border border-border flex items-center justify-center"
+                  onClick={() => setQuantity(quantity + 1)}
+                >
+                  <Plus className="w-3 h-3" />
+                </button>
               </div>
-            </div>
-          </div>
-          <div className="flex items-center justify-between mt-3">
-            <button className="text-muted-foreground"><X className="w-4 h-4" /></button>
-            <div className="flex items-center gap-3 bg-muted rounded-full px-1 py-1">
-              <button
-                className="w-7 h-7 rounded-full bg-card border border-border flex items-center justify-center"
-                onClick={() => setQuantity(Math.max(1, quantity - 1))}
-              >
-                <Minus className="w-3 h-3" />
-              </button>
-              <span className="text-sm font-semibold w-5 text-center">{quantity}</span>
-              <button
-                className="w-7 h-7 rounded-full bg-card border border-border flex items-center justify-center"
-                onClick={() => setQuantity(quantity + 1)}
-              >
-                <Plus className="w-3 h-3" />
-              </button>
             </div>
           </div>
         </div>
 
         {discount > 0 && (
-          <div className="mx-3 my-3 bg-marketplace-green/10 rounded-lg px-3 py-2.5 flex items-center gap-2">
-            <ZapIcon className="w-4 h-4 text-marketplace-green flex-shrink-0 fill-marketplace-green" />
-            <div>
-              <p className="text-[11px] text-foreground">Você está economizando</p>
-              <p className="text-sm font-extrabold text-marketplace-green">{formatCurrency(discount)}</p>
-            </div>
+          <div className="mt-3 bg-marketplace-green/10 rounded-lg px-3 py-2 flex items-center gap-2">
+            <ZapIcon className="w-3.5 h-3.5 text-marketplace-green flex-shrink-0 fill-marketplace-green" />
+            <p className="text-[12px] text-foreground">
+              Você está economizando <strong className="text-marketplace-green">{formatCurrency(discount)}</strong>
+            </p>
           </div>
         )}
       </div>
 
-      {/* Consumer protection card */}
-      <div className="mx-4 mt-3 bg-card rounded-xl border border-border p-4">
-        <div className="flex items-center gap-2 mb-3">
-          <ShieldCheck className="w-4 h-4 text-foreground" />
-          <p className="text-sm font-bold text-foreground">Proteção ao Consumidor</p>
-        </div>
-        <div className="grid grid-cols-2 gap-2">
-          {[
-            "Devolução grátis em 7 dias",
-            "Reembolso garantido",
-            "Pagamento 100% seguro",
-            "Rastreio em tempo real",
-          ].map((t) => (
-            <div key={t} className="flex items-start gap-1.5 bg-marketplace-green/10 rounded-lg px-2.5 py-2">
-              <ShieldCheck className="w-3 h-3 text-marketplace-green flex-shrink-0 mt-0.5" />
-              <span className="text-[11px] text-foreground leading-tight">{t}</span>
-            </div>
-          ))}
-        </div>
+      {/* Consumer protection — minimal strip */}
+      <div className="mx-4 mt-3 bg-card rounded-xl border border-border px-3 py-2.5 flex items-center justify-around text-[11px] text-muted-foreground">
+        <span className="flex items-center gap-1"><ShieldCheck className="w-3 h-3 text-marketplace-green" /> Devolução 7 dias</span>
+        <span className="flex items-center gap-1"><ShieldCheck className="w-3 h-3 text-marketplace-green" /> Reembolso</span>
+        <span className="flex items-center gap-1"><Lock className="w-3 h-3 text-marketplace-green" /> 100% seguro</span>
       </div>
       </>
       )}
