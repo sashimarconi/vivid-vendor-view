@@ -11,7 +11,7 @@ import { clearPendingPixOrder, readPendingPixOrder, readStoredThankYouUrl, saveP
 import { formatCurrency } from "@/data/mockData";
 import { ArrowLeft, Minus, Plus, Check, ShieldCheck, Clock, X, User, Hash, Mail, Phone, MapPin, Lock, Flame, Users, Zap as ZapIcon } from "lucide-react";
 import { toast } from "sonner";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+
 
 interface ShippingOption {
   id: string;
@@ -137,7 +137,7 @@ const CheckoutPage = () => {
   const [customerCity, setCustomerCity] = useState("");
   const [customerState, setCustomerState] = useState("");
   const [cepLoading, setCepLoading] = useState(false);
-  const [showForm, setShowForm] = useState(false);
+  const [, setShowForm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [pixData, setPixData] = useState<PixDataState | null>(() => {
     if (!slug) return null;
@@ -562,7 +562,7 @@ const CheckoutPage = () => {
 
   const handleSubmitOrder = async () => {
     if (!customerName || !customerEmail || !customerPhone || !customerDocument) {
-      setShowForm(true);
+      // form is inline; just notify
       toast.error("Preencha todos os campos obrigatórios");
       return;
     }
@@ -858,7 +858,7 @@ const CheckoutPage = () => {
   const mainImage = selectedVariantImage || product.product_images?.[0]?.url || "/placeholder.svg";
 
   return (
-    <div className="min-h-screen bg-background pb-44">
+    <div className="min-h-screen bg-muted/30 pb-44">
       {/* Header */}
       <header className="sticky top-0 z-40 bg-card border-b border-border">
         <div className="flex items-center h-12 px-4">
@@ -918,33 +918,31 @@ const CheckoutPage = () => {
         </span>
       </div>
 
-      {/* Customer info toggle */}
-      <button
-        onClick={() => setShowForm(true)}
-        className="w-full bg-card border-b border-border px-4 py-3 flex items-center justify-between"
-      >
-        <div className="flex items-center gap-2">
-          <div className="w-5 h-5 rounded-full bg-muted flex items-center justify-center">
-            <span className="text-[10px]">📍</span>
-          </div>
-          <span className="text-sm text-foreground">
-            {customerName ? `${customerName} — ${customerDocument}` : "Adicionar informações do pedido"}
-          </span>
+      {/* Personal info card */}
+      <div className="mx-4 mt-3 bg-card rounded-xl border border-border p-4">
+        <div className="flex items-center gap-2 mb-3 pb-3 border-b border-border">
+          <User className="w-4 h-4 text-foreground" />
+          <p className="text-sm font-semibold text-foreground">Informações pessoais</p>
         </div>
-        <span className="text-muted-foreground text-lg">›</span>
-      </button>
-
-      {/* Customer info sheet */}
-      <Sheet open={showForm} onOpenChange={setShowForm}>
-        <SheetContent side="bottom" className="rounded-t-2xl max-h-[85vh] overflow-y-auto p-0">
-          <div className="px-5 py-4 border-b border-border">
-            <h2 className="text-base font-semibold text-foreground">Informações do pedido</h2>
-          </div>
-          <div className="px-5 py-5 space-y-4">
-            <div>
-              <label className="text-xs font-medium text-muted-foreground mb-1 block">CPF</label>
+        <div className="space-y-3">
+          <div>
+            <label className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase mb-1 block">Nome completo</label>
+            <div className="relative">
+              <User className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
               <input
-                className="w-full border-b border-border pb-2 text-sm bg-transparent text-foreground placeholder:text-muted-foreground/50 outline-none"
+                className="w-full bg-muted/40 border border-border rounded-lg pl-9 pr-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-marketplace-red focus:ring-1 focus:ring-marketplace-red/30"
+                placeholder="João da Silva"
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
+              />
+            </div>
+          </div>
+          <div>
+            <label className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase mb-1 block">CPF</label>
+            <div className="relative">
+              <Hash className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                className="w-full bg-muted/40 border border-border rounded-lg pl-9 pr-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-marketplace-red focus:ring-1 focus:ring-marketplace-red/30"
                 placeholder="000.000.000-00"
                 value={customerDocument}
                 onChange={(e) => setCustomerDocument(formatCpf(e.target.value))}
@@ -952,10 +950,13 @@ const CheckoutPage = () => {
                 inputMode="numeric"
               />
             </div>
+          </div>
+          <div className="relative">
+            <label className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase mb-1 block">Email</label>
             <div className="relative">
-              <label className="text-xs font-medium text-muted-foreground mb-1 block">E-mail</label>
+              <Mail className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
               <input
-                className="w-full border-b border-border pb-2 text-sm bg-transparent text-foreground placeholder:text-muted-foreground/50 outline-none"
+                className="w-full bg-muted/40 border border-border rounded-lg pl-9 pr-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-marketplace-red focus:ring-1 focus:ring-marketplace-red/30"
                 placeholder="seu@email.com"
                 type="email"
                 value={customerEmail}
@@ -963,207 +964,257 @@ const CheckoutPage = () => {
                   setCustomerEmail(e.target.value);
                   setShowEmailSuggestions(!e.target.value.includes("@") && e.target.value.length > 2);
                 }}
-                onFocus={() => {
-                  if (!customerEmail.includes("@") && customerEmail.length > 2) setShowEmailSuggestions(true);
-                }}
+                onFocus={() => { if (!customerEmail.includes("@") && customerEmail.length > 2) setShowEmailSuggestions(true); }}
                 onBlur={() => setTimeout(() => setShowEmailSuggestions(false), 200)}
               />
-              {showEmailSuggestions && customerEmail.length > 2 && !customerEmail.includes("@") && (
-                <div className="absolute left-0 right-0 top-full z-10 bg-card border border-border rounded-lg shadow-lg mt-1 max-h-48 overflow-y-auto">
-                  {EMAIL_DOMAINS.map((domain) => (
-                    <button
-                      key={domain}
-                      type="button"
-                      className="w-full text-left px-3 py-2 text-sm text-foreground hover:bg-muted/50 transition-colors"
-                      onMouseDown={(e) => {
-                        e.preventDefault();
-                        setCustomerEmail(customerEmail + domain);
-                        setShowEmailSuggestions(false);
-                      }}
-                    >
-                      {customerEmail}{domain}
-                    </button>
-                  ))}
-                </div>
-              )}
             </div>
-            <div>
-              <label className="text-xs font-medium text-muted-foreground mb-1 block">Nome completo</label>
+            {showEmailSuggestions && customerEmail.length > 2 && !customerEmail.includes("@") && (
+              <div className="absolute left-0 right-0 top-full z-10 bg-card border border-border rounded-lg shadow-lg mt-1 max-h-48 overflow-y-auto">
+                {EMAIL_DOMAINS.map((domain) => (
+                  <button
+                    key={domain}
+                    type="button"
+                    className="w-full text-left px-3 py-2 text-sm text-foreground hover:bg-muted/50"
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      setCustomerEmail(customerEmail + domain);
+                      setShowEmailSuggestions(false);
+                    }}
+                  >
+                    {customerEmail}{domain}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          <div>
+            <label className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase mb-1 block">Telefone</label>
+            <div className="relative">
+              <Phone className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
               <input
-                className="w-full border-b border-border pb-2 text-sm bg-transparent text-foreground placeholder:text-muted-foreground/50 outline-none"
-                placeholder="Seu nome"
-                value={customerName}
-                onChange={(e) => setCustomerName(e.target.value)}
-              />
-            </div>
-            <div>
-              <label className="text-xs font-medium text-muted-foreground mb-1 block">Telefone</label>
-              <input
-                className="w-full border-b border-border pb-2 text-sm bg-transparent text-foreground placeholder:text-muted-foreground/50 outline-none"
-                placeholder="(99) 99999-9999"
+                className="w-full bg-muted/40 border border-border rounded-lg pl-9 pr-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-marketplace-red focus:ring-1 focus:ring-marketplace-red/30"
+                placeholder="(00) 00000-0000"
                 value={customerPhone}
                 onChange={(e) => setCustomerPhone(formatPhone(e.target.value))}
                 maxLength={15}
                 inputMode="numeric"
               />
             </div>
-            <div>
-              <label className="text-xs font-medium text-muted-foreground mb-1 block">CEP</label>
-              <div className="relative">
-                <input
-                  className="w-full border-b border-border pb-2 text-sm bg-transparent text-foreground placeholder:text-muted-foreground/50 outline-none"
-                  placeholder="00000-000"
-                  maxLength={9}
-                  value={customerCep}
-                  onChange={(e) => handleCepChange(e.target.value)}
-                  inputMode="numeric"
-                />
-                {cepLoading && (
-                  <span className="absolute right-0 top-0 text-xs text-muted-foreground animate-pulse">Buscando...</span>
-                )}
-              </div>
-            </div>
-            <div>
-              <label className="text-xs font-medium text-muted-foreground mb-1 block">Endereço</label>
-              <input
-                className="w-full border-b border-border pb-2 text-sm bg-transparent text-foreground placeholder:text-muted-foreground/50 outline-none"
-                placeholder="Rua, Avenida..."
-                value={customerAddress}
-                onChange={(e) => setCustomerAddress(e.target.value)}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1 block">Número</label>
-                <input
-                  className="w-full border-b border-border pb-2 text-sm bg-transparent text-foreground placeholder:text-muted-foreground/50 outline-none"
-                  placeholder="123"
-                  value={customerNumber}
-                  onChange={(e) => setCustomerNumber(e.target.value)}
-                />
-              </div>
-              <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1 block">Complemento (opcional)</label>
-                <input
-                  className="w-full border-b border-border pb-2 text-sm bg-transparent text-foreground placeholder:text-muted-foreground/50 outline-none"
-                  placeholder="Apto, Bloco..."
-                  value={customerComplement}
-                  onChange={(e) => setCustomerComplement(e.target.value)}
-                />
-              </div>
-            </div>
-            <div>
-              <label className="text-xs font-medium text-muted-foreground mb-1 block">Bairro</label>
-              <input
-                className="w-full border-b border-border pb-2 text-sm bg-transparent text-foreground placeholder:text-muted-foreground/50 outline-none"
-                placeholder="Centro"
-                value={customerNeighborhood}
-                onChange={(e) => setCustomerNeighborhood(e.target.value)}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1 block">Cidade</label>
-                <input
-                  className="w-full border-b border-border pb-2 text-sm bg-transparent text-foreground placeholder:text-muted-foreground/50 outline-none"
-                  placeholder="São Paulo"
-                  value={customerCity}
-                  onChange={(e) => setCustomerCity(e.target.value)}
-                />
-              </div>
-              <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1 block">Estado</label>
-                <input
-                  className="w-full border-b border-border pb-2 text-sm bg-transparent text-foreground placeholder:text-muted-foreground/50 outline-none"
-                  placeholder="SP"
-                  maxLength={2}
-                  value={customerState}
-                  onChange={(e) => setCustomerState(e.target.value)}
-                />
-              </div>
-            </div>
-            <button
-              onClick={() => setShowForm(false)}
-              className="w-full py-3 rounded-full bg-marketplace-red text-white text-sm font-bold mt-4"
-            >
-              Salvar informações
-            </button>
           </div>
-        </SheetContent>
-      </Sheet>
-
-      {/* Store name */}
-      <div className="bg-card px-4 py-3 mt-2 border-b border-border flex items-center justify-between">
-        <p className="text-sm font-semibold text-foreground">Seu pedido</p>
-        <span className="text-xs text-muted-foreground">Adicionar nota ›</span>
+        </div>
       </div>
 
-      {/* Product card */}
-      <div className="bg-card px-4 py-3 border-b border-border">
-        <div className="flex gap-3">
-          <img src={mainImage} alt={product.title} className="w-16 h-16 rounded-lg object-cover bg-muted" />
-          <div className="flex-1 min-w-0">
-            <p className="text-xs text-foreground line-clamp-2 leading-snug">{product.title}</p>
-            {selectedVariantNames && (
-              <p className="text-[11px] text-muted-foreground mt-0.5">{selectedVariantNames}</p>
-            )}
-            <div className="mt-1 flex items-center gap-2">
-              <span className="text-sm font-bold text-marketplace-red">{formatCurrency(Number(product.sale_price))}</span>
-              <span className="text-xs text-muted-foreground line-through">{formatCurrency(Number(product.original_price))}</span>
-              <span className="text-[10px] text-marketplace-green font-semibold">-{product.discount_percent}%</span>
+      {/* Address card */}
+      <div className="mx-4 mt-3 bg-card rounded-xl border border-border p-4">
+        <div className="flex items-center gap-2 mb-3 pb-3 border-b border-border">
+          <MapPin className="w-4 h-4 text-marketplace-red" />
+          <p className="text-sm font-semibold text-foreground">Endereço de entrega</p>
+        </div>
+        <div className="space-y-3">
+          <div>
+            <label className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase mb-1 block">CEP</label>
+            <div className="relative">
+              <input
+                className="w-full bg-muted/40 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-marketplace-red focus:ring-1 focus:ring-marketplace-red/30"
+                placeholder="00000-000"
+                maxLength={9}
+                value={customerCep}
+                onChange={(e) => handleCepChange(e.target.value)}
+                inputMode="numeric"
+              />
+              {cepLoading && (
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground animate-pulse">Buscando...</span>
+              )}
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              className="w-7 h-7 rounded-full border border-border flex items-center justify-center"
-              onClick={() => setQuantity(Math.max(1, quantity - 1))}
-            >
-              <Minus className="w-3 h-3" />
-            </button>
-            <span className="text-sm font-medium w-5 text-center">{quantity}</span>
-            <button
-              className="w-7 h-7 rounded-full border border-border flex items-center justify-center"
-              onClick={() => setQuantity(quantity + 1)}
-            >
-              <Plus className="w-3 h-3" />
-            </button>
+          <div>
+            <label className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase mb-1 block">Rua</label>
+            <input
+              className="w-full bg-muted/40 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-marketplace-red focus:ring-1 focus:ring-marketplace-red/30"
+              placeholder="Rua, Avenida..."
+              value={customerAddress}
+              onChange={(e) => setCustomerAddress(e.target.value)}
+            />
           </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase mb-1 block">Número</label>
+              <input
+                className="w-full bg-muted/40 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-marketplace-red focus:ring-1 focus:ring-marketplace-red/30"
+                placeholder="Nº"
+                value={customerNumber}
+                onChange={(e) => setCustomerNumber(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase mb-1 block">Complemento</label>
+              <input
+                className="w-full bg-muted/40 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-marketplace-red focus:ring-1 focus:ring-marketplace-red/30"
+                placeholder="Apto, bloco..."
+                value={customerComplement}
+                onChange={(e) => setCustomerComplement(e.target.value)}
+              />
+            </div>
+          </div>
+          <div>
+            <label className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase mb-1 block">Bairro</label>
+            <input
+              className="w-full bg-muted/40 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-marketplace-red focus:ring-1 focus:ring-marketplace-red/30"
+              placeholder="Bairro"
+              value={customerNeighborhood}
+              onChange={(e) => setCustomerNeighborhood(e.target.value)}
+            />
+          </div>
+          <div className="grid grid-cols-[1fr_80px] gap-3">
+            <div>
+              <label className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase mb-1 block">Cidade</label>
+              <input
+                className="w-full bg-muted/40 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-marketplace-red focus:ring-1 focus:ring-marketplace-red/30"
+                placeholder="São Paulo"
+                value={customerCity}
+                onChange={(e) => setCustomerCity(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="text-[10px] font-semibold text-muted-foreground tracking-wider uppercase mb-1 block">UF</label>
+              <input
+                className="w-full bg-muted/40 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-marketplace-red focus:ring-1 focus:ring-marketplace-red/30"
+                placeholder="SP"
+                maxLength={2}
+                value={customerState}
+                onChange={(e) => setCustomerState(e.target.value.toUpperCase())}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Cart card */}
+      <div className="mx-4 mt-3 bg-card rounded-xl border border-border overflow-hidden">
+        <div className="bg-marketplace-red text-white px-4 py-2.5 flex items-center justify-between">
+          <button onClick={() => navigate(-1)}>
+            <ArrowLeft className="w-4 h-4 text-white" />
+          </button>
+          <div className="text-center">
+            <p className="text-sm font-bold">Meu Carrinho</p>
+            <p className="text-[10px] text-white/90">{quantity} {quantity === 1 ? "item selecionado" : "itens selecionados"}</p>
+          </div>
+          <div className="w-4" />
+        </div>
+
+        <div className="px-4 py-3 flex items-center justify-between border-b border-border">
+          <div className="flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-marketplace-green animate-pulse" />
+            <span className="text-[12px] text-foreground"><strong>52 pessoas</strong> comprando agora</span>
+          </div>
+          <span className="text-[11px] font-semibold text-marketplace-green flex items-center gap-1">
+            <ShieldCheck className="w-3 h-3" /> FRETE GRÁTIS
+          </span>
+        </div>
+
+        <div className="px-4 py-3 border-b border-border">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-7 h-7 rounded-full bg-muted flex items-center justify-center">
+              <span className="text-[10px] font-bold text-muted-foreground">OL</span>
+            </div>
+            <div>
+              <p className="text-sm font-bold text-foreground leading-none">Loja</p>
+              <p className="text-[10px] text-marketplace-green flex items-center gap-1 mt-0.5">
+                <Check className="w-2.5 h-2.5" /> Loja Verificada
+              </p>
+            </div>
+          </div>
+
+          <div className="flex gap-3">
+            <div className="relative">
+              <img src={mainImage} alt={product.title} className="w-20 h-20 rounded-lg object-cover bg-muted" />
+              {product.discount_percent > 0 && (
+                <span className="absolute -top-1 -left-1 bg-marketplace-red text-white text-[9px] font-bold px-1 py-0.5 rounded">
+                  {product.discount_percent}% OFF
+                </span>
+              )}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs text-foreground line-clamp-2 leading-snug">{product.title}{selectedVariantNames ? ` (${selectedVariantNames})` : ""}</p>
+              <div className="mt-2 flex items-center gap-2">
+                <span className="text-base font-extrabold text-marketplace-red">{formatCurrency(Number(product.sale_price))}</span>
+                <span className="text-xs text-muted-foreground line-through">{formatCurrency(Number(product.original_price))}</span>
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center justify-between mt-3">
+            <button className="text-muted-foreground"><X className="w-4 h-4" /></button>
+            <div className="flex items-center gap-3 bg-muted rounded-full px-1 py-1">
+              <button
+                className="w-7 h-7 rounded-full bg-card border border-border flex items-center justify-center"
+                onClick={() => setQuantity(Math.max(1, quantity - 1))}
+              >
+                <Minus className="w-3 h-3" />
+              </button>
+              <span className="text-sm font-semibold w-5 text-center">{quantity}</span>
+              <button
+                className="w-7 h-7 rounded-full bg-card border border-border flex items-center justify-center"
+                onClick={() => setQuantity(quantity + 1)}
+              >
+                <Plus className="w-3 h-3" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {discount > 0 && (
+          <div className="mx-3 my-3 bg-marketplace-green/10 rounded-lg px-3 py-2.5 flex items-center gap-2">
+            <ZapIcon className="w-4 h-4 text-marketplace-green flex-shrink-0 fill-marketplace-green" />
+            <div>
+              <p className="text-[11px] text-foreground">Você está economizando</p>
+              <p className="text-sm font-extrabold text-marketplace-green">{formatCurrency(discount)}</p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Consumer protection card */}
+      <div className="mx-4 mt-3 bg-card rounded-xl border border-border p-4">
+        <div className="flex items-center gap-2 mb-3">
+          <ShieldCheck className="w-4 h-4 text-foreground" />
+          <p className="text-sm font-bold text-foreground">Proteção ao Consumidor</p>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          {[
+            "Devolução grátis em 7 dias",
+            "Reembolso garantido",
+            "Pagamento 100% seguro",
+            "Rastreio em tempo real",
+          ].map((t) => (
+            <div key={t} className="flex items-start gap-1.5 bg-marketplace-green/10 rounded-lg px-2.5 py-2">
+              <ShieldCheck className="w-3 h-3 text-marketplace-green flex-shrink-0 mt-0.5" />
+              <span className="text-[11px] text-foreground leading-tight">{t}</span>
+            </div>
+          ))}
         </div>
       </div>
 
       {/* Shipping options */}
       {shippingOptions && shippingOptions.length > 0 && (
-        <div className="mt-2">
-          <div className="bg-card px-4 py-2.5 border-b border-border">
+        <div className="mx-4 mt-3 bg-card rounded-xl border border-border overflow-hidden">
+          <div className="px-4 py-2.5 border-b border-border">
             <p className="text-sm font-semibold text-foreground">Método de entrega</p>
           </div>
-          {shippingOptions.map((option) => (
+          {shippingOptions.map((option, idx) => (
             <button
               key={option.id}
               onClick={() => setSelectedShipping(option.id)}
-              className={`w-full bg-card px-4 py-3 border-b border-border flex items-center gap-3 transition-colors ${
-                selectedShipping === option.id ? "ring-1 ring-marketplace-red" : ""
+              className={`w-full px-4 py-3 flex items-center gap-3 ${idx < shippingOptions.length - 1 ? "border-b border-border" : ""} ${
+                selectedShipping === option.id ? "bg-marketplace-red/5" : ""
               }`}
             >
-              <div
-                className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                  selectedShipping === option.id
-                    ? "border-marketplace-red"
-                    : "border-muted-foreground/30"
-                }`}
-              >
-                {selectedShipping === option.id && (
-                  <div className="w-2 h-2 rounded-full bg-marketplace-red" />
-                )}
+              <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${selectedShipping === option.id ? "border-marketplace-red" : "border-muted-foreground/30"}`}>
+                {selectedShipping === option.id && <div className="w-2 h-2 rounded-full bg-marketplace-red" />}
               </div>
-              {option.logo_url && (
-                <img src={option.logo_url} alt={option.name} className="w-8 h-8 rounded object-contain" />
-              )}
+              {option.logo_url && <img src={option.logo_url} alt={option.name} className="w-8 h-8 rounded object-contain" />}
               <div className="flex-1 text-left">
                 <p className="text-sm font-medium text-foreground">{option.name}</p>
-                {option.estimated_days && (
-                  <p className="text-[11px] text-muted-foreground">Chega em {option.estimated_days}</p>
-                )}
+                {option.estimated_days && <p className="text-[11px] text-muted-foreground">Chega em {option.estimated_days}</p>}
               </div>
               <span className={`text-sm font-semibold ${option.free ? "text-marketplace-green" : "text-foreground"}`}>
                 {option.free ? "GRÁTIS" : formatCurrency(Number(option.price))}
@@ -1175,95 +1226,99 @@ const CheckoutPage = () => {
 
       {/* Order bumps */}
       {orderBumps && orderBumps.length > 0 && (
-        <div className="mt-2">
-          <div className="bg-marketplace-red/10 px-4 py-2.5 flex items-center gap-2">
-            <span className="text-marketplace-red text-sm">⚡</span>
-            <p className="text-sm font-bold text-marketplace-red uppercase">Ofertas especiais selecionadas</p>
+        <div className="mx-4 mt-3 space-y-2">
+          <div className="bg-marketplace-yellow/15 border border-marketplace-yellow/40 rounded-xl px-3 py-2.5">
+            <div className="flex items-center gap-2">
+              <Flame className="w-4 h-4 text-marketplace-orange fill-marketplace-orange" />
+              <p className="text-sm font-bold text-foreground">Aproveite e leve junto:</p>
+            </div>
+            <p className="text-[11px] text-muted-foreground mt-0.5 ml-6">Ofertas exclusivas com desconto especial. Adicione com 1 clique.</p>
           </div>
-          {orderBumps.map((bump) => (
-            <button
-              key={bump.id}
-              onClick={() => toggleBump(bump.id)}
-              className="w-full bg-card px-4 py-3 border-b border-border flex items-center gap-3"
-            >
-              <div
-                className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                  selectedBumps.includes(bump.id)
-                    ? "border-marketplace-red bg-marketplace-red"
-                    : "border-muted-foreground/30"
+          {orderBumps.map((bump) => {
+            const checked = selectedBumps.includes(bump.id);
+            return (
+              <button
+                key={bump.id}
+                onClick={() => toggleBump(bump.id)}
+                className={`w-full bg-card rounded-xl border-2 border-dashed px-3 py-3 flex items-center gap-3 transition-colors ${
+                  checked ? "border-marketplace-orange bg-marketplace-orange/5" : "border-marketplace-yellow/60"
                 }`}
               >
-                {selectedBumps.includes(bump.id) && <Check className="w-3 h-3 text-white" />}
-              </div>
-              {bump.image_url && (
-                <img src={bump.image_url} alt={bump.title} className="w-12 h-12 rounded object-cover" />
-              )}
-              <div className="flex-1 text-left">
-                <p className="text-xs text-foreground line-clamp-2">{bump.title}</p>
-                <p className="text-sm font-bold text-marketplace-red mt-0.5">Por {formatCurrency(Number(bump.price))}</p>
-              </div>
-            </button>
-          ))}
+                <div className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 ${checked ? "border-marketplace-orange bg-marketplace-orange" : "border-muted-foreground/40"}`}>
+                  {checked && <Check className="w-3 h-3 text-white" />}
+                </div>
+                {bump.image_url && <img src={bump.image_url} alt={bump.title} className="w-12 h-12 rounded object-cover" />}
+                <div className="flex-1 text-left">
+                  <p className="text-xs font-semibold text-foreground line-clamp-2">{bump.title}</p>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <span className="text-xs text-muted-foreground line-through">R$ 89,90</span>
+                    <span className="text-sm font-bold text-marketplace-red">{formatCurrency(Number(bump.price))}</span>
+                    <span className="text-[10px] font-bold text-marketplace-green bg-marketplace-green/10 px-1.5 py-0.5 rounded">-79%</span>
+                  </div>
+                </div>
+              </button>
+            );
+          })}
         </div>
       )}
 
-      {/* Order summary */}
-      <div className="bg-card px-4 py-3 mt-2 space-y-2 border-b border-border">
-        <p className="text-sm font-semibold text-foreground">Resumo do pedido</p>
-        <div className="flex justify-between text-xs text-muted-foreground">
-          <span>Subtotal do produto</span>
-          <span>{formatCurrency(productSubtotal)}</span>
+      {/* Order summary card */}
+      <div className="mx-4 mt-3 bg-card rounded-xl border border-border p-4 space-y-2">
+        <p className="text-sm font-bold text-foreground mb-1">Resumo do pedido</p>
+        <div className="flex justify-between text-sm">
+          <span className="text-muted-foreground">Subtotal</span>
+          <span className="text-foreground">{formatCurrency(productSubtotal)}</span>
         </div>
-        {discount > 0 && (
-          <div className="flex justify-between text-xs text-marketplace-green">
-            <span>Desconto no produto</span>
-            <span>- {formatCurrency(discount)}</span>
+        {shippingCost === 0 && selectedShippingOption ? (
+          <div className="flex justify-between text-sm">
+            <span className="text-marketplace-green font-semibold">Frete</span>
+            <span className="text-marketplace-green font-semibold">Grátis</span>
           </div>
-        )}
-        {shippingCost > 0 && (
-          <div className="flex justify-between text-xs text-muted-foreground">
-            <span>Taxa de envio</span>
-            <span>{formatCurrency(shippingCost)}</span>
+        ) : shippingCost > 0 ? (
+          <div className="flex justify-between text-sm">
+            <span className="text-marketplace-green font-semibold">Frete</span>
+            <span className="text-foreground">{formatCurrency(shippingCost)}</span>
           </div>
-        )}
-        {shippingCost === 0 && selectedShippingOption && (
-          <div className="flex justify-between text-xs text-marketplace-green">
-            <span>Frete</span>
-            <span>Grátis</span>
-          </div>
-        )}
+        ) : null}
         {bumpsTotal > 0 && (
-          <div className="flex justify-between text-xs text-muted-foreground">
-            <span>Ofertas extras</span>
-            <span>{formatCurrency(bumpsTotal)}</span>
+          <div className="flex justify-between text-sm">
+            <span className="text-muted-foreground">Ofertas extras</span>
+            <span className="text-foreground">{formatCurrency(bumpsTotal)}</span>
           </div>
         )}
-        <div className="flex justify-between text-sm font-bold text-foreground pt-2 border-t border-border">
-          <span>Total</span>
-          <span>{formatCurrency(total)}</span>
-        </div>
-        <p className="text-[10px] text-muted-foreground text-right">Impostos inclusos</p>
-      </div>
-
-      {/* Payment method */}
-      <div className="bg-card px-4 py-3 mt-2 border-b border-border">
-        <p className="text-sm font-semibold text-foreground mb-2">Forma de pagamento</p>
-        <div className="flex items-center gap-2 p-3 rounded-lg bg-marketplace-green/10 border border-marketplace-green/30">
-          <div className="w-5 h-5 rounded-full border-2 border-marketplace-green flex items-center justify-center">
-            <div className="w-2.5 h-2.5 rounded-full bg-marketplace-green" />
+        <div className="flex justify-between items-center pt-2 border-t border-border">
+          <span className="text-sm font-bold text-foreground">Total</span>
+          <div className="text-right">
+            <span className="text-lg font-extrabold text-marketplace-red">{formatCurrency(total)}</span>
+            <p className="text-[10px] text-muted-foreground">Impostos inclusos</p>
           </div>
-          <span className="text-sm font-semibold text-foreground">Pix</span>
         </div>
       </div>
 
-      {/* Savings banner */}
-      {discount > 0 && (
-        <div className="bg-card px-4 py-3 mt-2 text-center border-b border-border">
-          <p className="text-xs text-marketplace-green font-medium">
-            😊 Você está economizando {formatCurrency(discount)} nesse pedido.
+      {/* Address summary if filled */}
+      {customerAddress && customerCity && (
+        <div className="mx-4 mt-3 bg-card rounded-xl border border-border p-4">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-marketplace-red" />
+              <p className="text-sm font-bold text-foreground">Endereço de entrega</p>
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            {customerPhone && <>{customerPhone} · {customerEmail}<br /></>}
+            {customerAddress}{customerNumber ? `, ${customerNumber}` : ""}<br />
+            {customerNeighborhood} · {customerCity}, {customerState}<br />
+            {customerCep && `CEP: ${customerCep}`}
           </p>
         </div>
       )}
+
+      {/* Trust strip */}
+      <div className="mx-4 mt-3 mb-2 bg-card rounded-xl border border-border px-4 py-3 flex items-center justify-around text-[11px] text-muted-foreground">
+        <span className="flex items-center gap-1"><Lock className="w-3 h-3" /> SSL Seguro</span>
+        <span className="flex items-center gap-1"><ShieldCheck className="w-3 h-3" /> Compra Protegida</span>
+        <span className="flex items-center gap-1">⭐ 4.8/5</span>
+      </div>
 
       {/* Fixed bottom bar */}
       <div className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border shadow-[0_-4px_12px_rgba(0,0,0,0.1)] pb-2">
