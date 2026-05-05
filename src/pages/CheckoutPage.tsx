@@ -937,6 +937,8 @@ const CheckoutPage = () => {
         </span>
       </div>
 
+      {checkoutStep === "info" && (
+      <>
       {/* Personal info card */}
       <div className="mx-4 mt-3 bg-card rounded-xl border border-border p-4">
         <div className="flex items-center gap-2 mb-3 pb-3 border-b border-border">
