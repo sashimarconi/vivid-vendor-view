@@ -1,4 +1,4 @@
-import { Truck } from "lucide-react";
+import { Truck, ShieldCheck } from "lucide-react";
 
 interface ShippingInfoProps {
   freeShipping: boolean;
@@ -7,26 +7,38 @@ interface ShippingInfoProps {
   shippingLabel?: string;
 }
 
-const ShippingInfo = ({ freeShipping, shippingCost, estimatedDelivery, shippingLabel = "Frete grátis" }: ShippingInfoProps) => {
+const ShippingInfo = ({ freeShipping, shippingCost, estimatedDelivery, shippingLabel = "frete grátis" }: ShippingInfoProps) => {
   return (
-    <div className="bg-card px-4 py-3 mt-2">
+    <div className="bg-card px-4 pt-3 pb-2">
       <div className="flex items-start gap-3">
-        <div className="w-8 h-8 rounded-full bg-marketplace-green-light flex items-center justify-center flex-shrink-0 mt-0.5">
-          <Truck className="w-4 h-4 text-marketplace-green" />
-        </div>
+        <Truck className="w-4 h-4 text-foreground mt-0.5 flex-shrink-0" />
         <div className="flex-1">
-          {freeShipping && (
-            <p className="text-sm font-bold text-marketplace-green">{shippingLabel}</p>
+          <div className="flex items-center gap-2 flex-wrap">
+            {freeShipping && (
+              <span className="text-[11px] font-semibold text-marketplace-green bg-marketplace-green/10 px-2 py-0.5 rounded-full">
+                {shippingLabel}
+              </span>
+            )}
+            <span className="text-sm text-foreground">
+              {estimatedDelivery || "Receba até 10/05"}
+            </span>
+          </div>
+          {freeShipping && shippingCost > 0 && (
+            <p className="text-xs text-muted-foreground mt-1 line-through">
+              Taxa de envio: R$ {shippingCost.toFixed(2).replace('.', ',')}
+            </p>
           )}
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {estimatedDelivery || "Chegará entre 7 e 15 dias úteis"}
-          </p>
-          {shippingCost > 0 && (
+          {!freeShipping && shippingCost > 0 && (
             <p className="text-xs text-muted-foreground mt-1">
               Taxa de envio: <span className="font-medium text-foreground">R$ {shippingCost.toFixed(2).replace('.', ',')}</span>
             </p>
           )}
         </div>
+      </div>
+
+      <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border">
+        <ShieldCheck className="w-4 h-4 text-muted-foreground" />
+        <p className="text-xs text-muted-foreground">Devoluções gratuitas em 30 dias · Cancelamento fácil</p>
       </div>
     </div>
   );
