@@ -1191,38 +1191,20 @@ const CheckoutPage = () => {
         </div>
         <div className="px-4 pb-2">
           <button
-            onClick={() => {
-              if (checkoutStep === "cart") { setCheckoutStep("info"); window.scrollTo({ top: 0, behavior: "smooth" }); return; }
-              if (checkoutStep === "info") {
-                if (!customerName || !customerEmail || !customerPhone || !customerDocument) {
-                  toast.error("Preencha todos os campos obrigatórios");
-                  return;
-                }
-                setCheckoutStep("review");
-                window.scrollTo({ top: 0, behavior: "smooth" });
-                return;
-              }
-              handleSubmitOrder();
-            }}
+            onClick={handleSubmitOrder}
             disabled={submitting}
             className="w-full py-3.5 rounded-full bg-marketplace-red text-white text-sm font-extrabold disabled:opacity-50 flex items-center justify-center gap-2 shadow-md active:scale-[0.99] transition-transform"
           >
             <Lock className="w-4 h-4" />
-            {submitting
-              ? "Processando..."
-              : checkoutStep === "cart"
-                ? "Continuar"
-                : checkoutStep === "info"
-                  ? "Ir para revisão"
-                  : (checkoutSettings?.checkout_button_text || "Pagar com PIX")}
+            {submitting ? "Processando..." : (checkoutSettings?.checkout_button_text || "Pagar com PIX")}
           </button>
         </div>
         <div className="text-center space-y-0.5">
           <p className="text-[11px] text-marketplace-red flex items-center justify-center gap-1">
-            <Clock className="w-3 h-3" /> Cupom expira em 09:35
+            <Clock className="w-3 h-3" /> Cupom expira em {couponMmSs}
           </p>
           <p className="text-[11px] text-marketplace-green flex items-center justify-center gap-1">
-            <Lock className="w-3 h-3" /> Seus dados estão protegidos com criptografia SSL
+            <Lock className="w-3 h-3" /> Pagamento 100% seguro · SSL
           </p>
         </div>
       </div>
