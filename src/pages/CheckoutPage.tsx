@@ -9,7 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { fetchProductBySlug } from "@/lib/supabase-queries";
 import { clearPendingPixOrder, readPendingPixOrder, readStoredThankYouUrl, savePendingPixOrder, saveStoredThankYouUrl } from "@/lib/pending-order";
 import { formatCurrency } from "@/data/mockData";
-import { ArrowLeft, Minus, Plus, Check, ShieldCheck, Clock, X, User, Hash, Mail, Phone, MapPin, Lock, Flame, Users, Zap as ZapIcon } from "lucide-react";
+import { ArrowLeft, Minus, Plus, Check, ShieldCheck, Clock, X, User, Hash, Mail, Phone, MapPin, Lock, Flame, Users, Zap as ZapIcon, QrCode, Smartphone, Copy } from "lucide-react";
 import { toast } from "sonner";
 
 
