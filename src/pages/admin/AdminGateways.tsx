@@ -47,6 +47,12 @@ const GATEWAYS: GatewayConfig[] = [
     description: "Gateway PIX com checkout otimizado para conversão",
     logoUrl: "https://multi.paradisepags.com/assets/images/a.png",
   },
+  {
+    name: "magicpay",
+    label: "Magic Pay",
+    description: "Gateway PIX com API REST simples (Bearer Token)",
+    logoUrl: "https://app.sistema-magicpay.com/favicon.ico",
+  },
 ];
 
 interface GatewayState {

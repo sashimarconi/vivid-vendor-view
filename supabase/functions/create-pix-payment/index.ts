@@ -263,6 +263,7 @@ async function callGateway(name: string, gateway: any, body: any, items: any[], 
     case "duck":        return callDuck(gateway, body, items, webhookUrl);
     case "hisounique":  return callHisoUnique(gateway, body, items, webhookUrl);
     case "paradise":    return callParadise(gateway, body, items, webhookUrl);
+    case "magicpay":    return callMagicPay(gateway, body, items, webhookUrl);
     default: throw new Error(`Gateway desconhecido: ${name}`);
   }
 }
@@ -540,6 +541,92 @@ async function callParadise(gateway: any, body: any, _items: any[], webhookUrl: 
     copyPaste: pickString(data?.qr_code, data?.pix_code),
     qrCodeBase64: pickString(data?.qr_code_base64),
     expiresAt: pickString(data?.expires_at),
+  };
+}
+
+async function callMagicPay(gateway: any, body: any, items: any[], webhookUrl: string) {
+  const reference = `order-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+  const payload = {
+    amount: body.amount, // centavos
+    currency: "BRL",
+    method: "PIX",
+    description: body.productTitle,
+    externalRef: reference,
+    notificationUrl: webhookUrl,
+    payer: {
+      name: body.customerName,
+      taxId: body.customerDocument.replace(/\D/g, ""),
+      email: body.customerEmail,
+      phone: body.customerPhone.replace(/\D/g, ""),
+    },
+    items: items.map((item) => ({
+      quantity: item.quantity,
+      name: item.title,
+      price: item.unitPrice, // centavos
+      type: "PHYSICAL",
+    })),
+  };
+
+  const res = await fetch("https://api.sistema-magicpay.com/v1/payment", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${gateway.secret_key}`,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const rawText = await res.text();
+  let data: any;
+  try {
+    data = JSON.parse(rawText);
+  } catch {
+    console.error("[MagicPay] Non-JSON response:", rawText);
+    throw { status: res.status, data: { error: "Invalid response from MagicPay", raw: rawText } };
+  }
+
+  console.log("[MagicPay] Response status:", res.status);
+  console.log("[MagicPay] Response body:", JSON.stringify(data));
+
+  if (!res.ok) throw { status: res.status, data };
+
+  // Defensive parsing — try common shapes
+  const txn = data?.data ?? data?.payment ?? data?.transaction ?? data;
+  const pix = txn?.pix ?? txn?.qrCode ?? txn?.qr_code ?? txn?.paymentData ?? txn?.payment_data ?? txn;
+
+  const transactionId = pickString(
+    txn?.id, txn?.Id, txn?.transactionId, txn?.transaction_id, txn?.paymentId, txn?.payment_id,
+    txn?.externalRef, data?.id, data?.transactionId, reference,
+  );
+
+  const copyPaste = pickString(
+    pix?.copyPaste, pix?.copy_paste, pix?.pixCopyPaste, pix?.pix_copy_paste,
+    pix?.code, pix?.emv, pix?.payload, pix?.pixCode, pix?.pix_code,
+    pix?.qrCode, pix?.qr_code,
+    txn?.copyPaste, txn?.copy_paste, txn?.pixCode, txn?.pix_code,
+    typeof pix === "string" ? pix : null,
+  );
+
+  const qrCodeBase64 = pickString(
+    pix?.qrCodeBase64, pix?.qr_code_base64, pix?.imageBase64, pix?.image_base64, pix?.base64,
+    txn?.qrCodeBase64, txn?.qr_code_base64,
+  );
+
+  const qrCodeUrl = pickString(
+    pix?.qrCodeUrl, pix?.qr_code_url, pix?.imageUrl, pix?.image_url, pix?.image,
+    txn?.qrCodeUrl, txn?.qr_code_url,
+  );
+
+  return {
+    transactionId,
+    qrCode: qrCodeUrl,
+    copyPaste,
+    qrCodeBase64,
+    expiresAt: pickString(
+      pix?.expiresAt, pix?.expires_at, pix?.expiration_date, pix?.expirationDate,
+      txn?.expiresAt, txn?.expires_at,
+    ),
   };
 }
 
