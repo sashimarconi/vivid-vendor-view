@@ -727,8 +727,36 @@ const CheckoutPage = () => {
 
 
   if (pixData) {
+    const firstName = (customerName || "").trim().split(" ")[0];
+    const handleCopyPix = async () => {
+      try {
+        const pixCode = pixData.copyPaste?.trim();
+        if (!pixCode) {
+          toast.error("Código PIX indisponível no momento");
+          return;
+        }
+        const registerPromise = registerPixCopiedClick(pixData.orderId);
+        const copied = await copyTextToClipboard(pixCode);
+        const registered = await registerPromise;
+        if (!registered) toast.error("Não foi possível registrar o clique do PIX");
+        if (copied) {
+          toast.success("Código PIX copiado! Cole no app do seu banco");
+          setPixJustCopied(true);
+          setTimeout(() => setPixJustCopied(false), 3000);
+        } else {
+          setShowCopyPaste(true);
+          toast.success("Código PIX exibido abaixo");
+        }
+      } catch (e) { console.error("Copy error:", e); }
+    };
+
+    // Timer dinâmico: vermelho só quando <5min, caso contrário neutro
+    const [mm, ss] = pixTimeLeft.split(":");
+    const totalSecondsLeft = (parseInt(mm || "0", 10) * 60) + parseInt(ss || "0", 10);
+    const urgent = totalSecondsLeft > 0 && totalSecondsLeft < 300;
+
     return (
-      <div className="min-h-screen bg-background pb-8">
+      <div className="min-h-screen bg-muted/30 pb-10">
         {/* Header */}
         <header className="sticky top-0 z-40 bg-card border-b border-border">
           <div className="flex items-center h-12 px-4">
@@ -737,138 +765,143 @@ const CheckoutPage = () => {
                 clearPendingPixOrder(slug || "", pixData.orderId);
                 setPixData(null);
               }}
+              aria-label="Voltar"
             >
               <ArrowLeft className="w-5 h-5 text-foreground" />
             </button>
             {checkoutLogoUrl ? (
               <img src={checkoutLogoUrl} alt="Logo" style={{ height: checkoutLogoHeight }} className="object-contain max-w-[180px] mx-auto" />
             ) : (
-              <p className="flex-1 text-center text-sm font-semibold text-foreground">Pagamento</p>
+              <p className="flex-1 text-center text-sm font-semibold text-foreground">Pagamento PIX</p>
             )}
-            <button onClick={() => navigate(-1)}><X className="w-5 h-5 text-foreground" /></button>
+            <button onClick={() => navigate(-1)} aria-label="Fechar"><X className="w-5 h-5 text-foreground" /></button>
           </div>
         </header>
 
-        {/* Stepper */}
-        <div className="bg-card px-6 pt-4 pb-3">
-          <div className="flex items-center justify-center gap-2 max-w-[260px] mx-auto">
-            <div className="flex flex-col items-center gap-1">
-              <div className="w-7 h-7 rounded-full bg-marketplace-red flex items-center justify-center">
-                <Check className="w-4 h-4 text-white" strokeWidth={3} />
-              </div>
-              <span className="text-[10px] font-medium text-foreground">Dados</span>
+        <div className="max-w-lg mx-auto px-4 space-y-3 pt-3">
+          {/* Banner de sucesso/progresso */}
+          <div className="bg-marketplace-green/10 border border-marketplace-green/30 rounded-xl px-4 py-3 flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-marketplace-green flex items-center justify-center flex-shrink-0">
+              <Check className="w-5 h-5 text-white" strokeWidth={3} />
             </div>
-            <div className="flex-1 h-[2px] bg-marketplace-red -mt-4" />
-            <div className="flex flex-col items-center gap-1">
-              <div className="w-7 h-7 rounded-full bg-marketplace-red flex items-center justify-center">
-                <Check className="w-4 h-4 text-white" strokeWidth={3} />
-              </div>
-              <span className="text-[10px] font-medium text-foreground">Pagamento</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-[13px] font-bold text-foreground leading-tight">
+                {firstName ? `Falta só pagar, ${firstName}!` : "Pedido reservado!"}
+              </p>
+              <p className="text-[11px] text-muted-foreground leading-tight">Seu pedido está reservado. Conclua o PIX para garantir.</p>
             </div>
           </div>
-        </div>
 
-        <div className="max-w-lg mx-auto px-4 space-y-3">
-          {/* Valor + Timer (hierarquia principal) */}
-          <div className="bg-card rounded-2xl border border-border p-4 mt-3">
-            <div className="flex items-end justify-between gap-3">
-              <div>
-                <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Valor a pagar</p>
-                <p className="text-3xl font-extrabold text-marketplace-green leading-tight mt-0.5">{formatCurrency(total)}</p>
+          {/* Resumo do pedido (mini) */}
+          <div className="bg-card rounded-xl border border-border p-3">
+            <div className="flex items-center gap-3">
+              <img
+                src={selectedVariantImage || product.product_images?.[0]?.url || "/placeholder.svg"}
+                alt={product.title}
+                className="w-12 h-12 rounded-lg object-cover bg-muted flex-shrink-0"
+              />
+              <div className="flex-1 min-w-0">
+                <p className="text-[12px] text-foreground line-clamp-1 leading-tight">{product.title}</p>
+                <p className="text-[10px] text-muted-foreground">Qtd: {quantity}</p>
               </div>
               <div className="text-right">
-                <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Expira em</p>
-                <div className="flex items-center justify-end gap-1.5 mt-0.5">
-                  <Clock className="w-4 h-4 text-marketplace-red" />
-                  <span className="text-2xl font-extrabold text-marketplace-red tabular-nums">{pixTimeLeft}</span>
-                </div>
+                <p className="text-[10px] text-muted-foreground leading-tight">Total</p>
+                <p className="text-base font-extrabold text-marketplace-green leading-tight">{formatCurrency(total)}</p>
               </div>
             </div>
           </div>
 
-          {/* QR Code */}
-          <div className="bg-card rounded-2xl border border-border p-5 flex flex-col items-center">
-            {pixQrImageSrc ? (
-              <img src={pixQrImageSrc} alt="QR Code PIX" className="w-52 h-52" />
-            ) : (
-              <p className="text-sm text-muted-foreground py-20">QR Code indisponível</p>
+          {/* HERO: Copiar código PIX (ação principal — maior conversão em mobile) */}
+          <div className="bg-card rounded-2xl border-2 border-marketplace-red/20 p-4 shadow-sm">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-marketplace-red">1. Copie o código PIX</p>
+              <div className={`flex items-center gap-1 text-[11px] font-semibold tabular-nums ${urgent ? "text-marketplace-red" : "text-muted-foreground"}`}>
+                <Clock className="w-3 h-3" />
+                <span>{pixTimeLeft || "--:--"}</span>
+              </div>
+            </div>
+
+            {/* Preview do código (sempre visível, build trust) */}
+            <div className="bg-muted/60 rounded-lg p-2.5 mb-3 border border-border/60">
+              <p className="text-[10px] text-foreground/80 break-all font-mono line-clamp-2 leading-relaxed">
+                {pixData.copyPaste?.trim()}
+              </p>
+            </div>
+
+            <button
+              onClick={handleCopyPix}
+              className={`w-full py-4 rounded-xl text-white text-base font-extrabold flex items-center justify-center gap-2 shadow-lg active:scale-[0.99] transition-all ${
+                pixJustCopied ? "bg-marketplace-green" : "bg-marketplace-red hover:bg-marketplace-red/90"
+              }`}
+            >
+              {pixJustCopied ? (
+                <><Check className="w-5 h-5" strokeWidth={3} /> CÓDIGO COPIADO!</>
+              ) : (
+                <>📋 COPIAR CÓDIGO PIX</>
+              )}
+            </button>
+
+            {pixJustCopied && (
+              <p className="text-center text-[12px] text-marketplace-green font-semibold mt-2 flex items-center justify-center gap-1">
+                <Check className="w-3.5 h-3.5" strokeWidth={3} />
+                Agora abra o app do seu banco e cole no PIX
+              </p>
             )}
-            <p className="text-[11px] text-muted-foreground mt-3 text-center">Aponte a câmera do seu app do banco</p>
           </div>
 
-          {/* Copy button */}
-          <button
-            onClick={async () => {
-              try {
-                const pixCode = pixData.copyPaste?.trim();
-                if (!pixCode) {
-                  toast.error("Código PIX indisponível no momento");
-                  return;
-                }
-                const registerPromise = registerPixCopiedClick(pixData.orderId);
-                const copied = await copyTextToClipboard(pixCode);
-                const registered = await registerPromise;
-                if (!registered) toast.error("Não foi possível registrar o clique do PIX");
-                if (copied) {
-                  toast.success("Código PIX copiado!");
-                  setPixJustCopied(true);
-                  setTimeout(() => setPixJustCopied(false), 2500);
-                } else { setShowCopyPaste(true); toast.success("Código PIX exibido abaixo!"); }
-              } catch (e) { console.error("Copy error:", e); }
-            }}
-            className={`w-full py-4 rounded-full text-white text-sm font-extrabold flex items-center justify-center gap-2 shadow-lg active:scale-[0.99] transition-all ${
-              pixJustCopied ? "bg-marketplace-green" : "bg-marketplace-red"
-            }`}
-          >
-            {pixJustCopied ? (
-              <><Check className="w-5 h-5" strokeWidth={3} /> CÓDIGO COPIADO</>
-            ) : (
-              <><span className="text-base">📋</span> COPIAR CÓDIGO PIX</>
-            )}
-          </button>
-
-          {/* Toggle copy paste view */}
-          <button
-            onClick={() => setShowCopyPaste((v) => !v)}
-            className="w-full text-center text-[11px] font-medium text-muted-foreground underline py-1"
-          >
-            {showCopyPaste ? "Ocultar código" : "Ver código PIX copia e cola"}
-          </button>
-
-          {showCopyPaste && (
-            <div className="bg-muted/50 rounded-lg p-3">
-              <p className="text-[10px] text-foreground break-all font-mono">{pixData.copyPaste?.trim()}</p>
-            </div>
-          )}
-
-          {/* Como pagar (3 passos) */}
-          <div className="bg-card rounded-2xl border border-border p-4">
-            <p className="text-sm font-bold text-foreground mb-3">Como pagar com PIX</p>
-            <ol className="space-y-2.5">
+          {/* Como pagar (3 passos curtos) */}
+          <div className="bg-card rounded-xl border border-border p-4">
+            <p className="text-[12px] font-bold text-foreground mb-2.5 uppercase tracking-wide">2. Pague no app do seu banco</p>
+            <ol className="space-y-2">
               {[
                 "Abra o app do seu banco e entre no PIX",
-                "Escolha pagar com QR Code ou Copia e Cola",
-                "Confirme o pagamento — aprovação em segundos",
+                "Escolha PIX Copia e Cola e cole o código",
+                "Confirme o valor e finalize — aprovação em segundos",
               ].map((step, i) => (
                 <li key={i} className="flex items-start gap-2.5">
-                  <span className="w-5 h-5 rounded-full bg-marketplace-red text-white text-[11px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</span>
-                  <span className="text-[13px] text-foreground leading-snug">{step}</span>
+                  <span className="w-5 h-5 rounded-full bg-foreground/10 text-foreground text-[11px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</span>
+                  <span className="text-[12px] text-foreground/90 leading-snug">{step}</span>
                 </li>
               ))}
             </ol>
           </div>
 
-          {/* Awaiting payment */}
-          <div className="flex items-center justify-center gap-2 py-2">
-            <div className="w-3.5 h-3.5 border-2 border-marketplace-red border-t-transparent rounded-full animate-spin" />
-            <span className="text-xs text-muted-foreground">Aguardando confirmação do pagamento...</span>
+          {/* QR Code (alternativa — quem paga em outro dispositivo) */}
+          <details className="bg-card rounded-xl border border-border overflow-hidden group">
+            <summary className="px-4 py-3 cursor-pointer text-[12px] font-semibold text-foreground flex items-center justify-between list-none">
+              <span>Pagar com QR Code (outro celular)</span>
+              <Plus className="w-4 h-4 text-muted-foreground group-open:hidden" />
+              <Minus className="w-4 h-4 text-muted-foreground hidden group-open:block" />
+            </summary>
+            <div className="px-4 pb-4 flex flex-col items-center border-t border-border/60 pt-4">
+              {pixQrImageSrc ? (
+                <img src={pixQrImageSrc} alt="QR Code PIX" className="w-44 h-44" />
+              ) : (
+                <p className="text-sm text-muted-foreground py-12">QR Code indisponível</p>
+              )}
+              <p className="text-[11px] text-muted-foreground mt-2 text-center">Aponte a câmera do app do banco</p>
+            </div>
+          </details>
+
+          {/* Aguardando pagamento — confiante, não ansioso */}
+          <div className="bg-marketplace-green/5 border border-marketplace-green/20 rounded-xl px-4 py-3 flex items-center gap-3">
+            <div className="relative flex-shrink-0">
+              <div className="w-2.5 h-2.5 rounded-full bg-marketplace-green animate-pulse" />
+              <div className="absolute inset-0 w-2.5 h-2.5 rounded-full bg-marketplace-green/40 animate-ping" />
+            </div>
+            <div className="flex-1">
+              <p className="text-[12px] font-semibold text-foreground leading-tight">Aguardando seu pagamento</p>
+              <p className="text-[10px] text-muted-foreground leading-tight">Você será redirecionado automaticamente após a confirmação</p>
+            </div>
           </div>
 
           {/* Trust footer */}
-          <div className="flex items-center justify-center gap-3 text-[11px] text-muted-foreground py-2">
+          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[10px] text-muted-foreground pt-1">
             <span className="flex items-center gap-1"><Lock className="w-3 h-3 text-marketplace-green" /> Pagamento 100% seguro</span>
             <span className="w-1 h-1 rounded-full bg-muted-foreground/40" />
-            <span className="flex items-center gap-1"><ShieldCheck className="w-3 h-3 text-marketplace-green" /> Dados protegidos</span>
+            <span className="flex items-center gap-1"><ShieldCheck className="w-3 h-3 text-marketplace-green" /> Dados criptografados</span>
+            <span className="w-1 h-1 rounded-full bg-muted-foreground/40" />
+            <span className="flex items-center gap-1"><ZapIcon className="w-3 h-3 text-marketplace-green" /> Aprovação imediata</span>
           </div>
         </div>
       </div>
