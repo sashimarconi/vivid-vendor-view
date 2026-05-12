@@ -134,8 +134,9 @@ const AdminLiveView = () => {
     const todayStart = getSaoPauloDayStartIso(now);
     const todayDate = getSaoPauloDateKey(now);
 
-    try {
-      const [liveSessionsRes, liveEventSessionsRes, ordersCountRes, pendingOrdersCountRes, pageViewsCountRes, checkoutViewsCountRes, financialSummaryRes, paidOrdersRows] = await Promise.all([
+    // Tolerante a falhas: se uma query individual der timeout/erro, as demais ainda
+    // atualizam a UI. Antes, Promise.all + throw congelava todos os números.
+    const settled = await Promise.allSettled([
         supabase
           .from("visitor_sessions")
           .select("session_id, page_url, last_seen_at, city, region, country, latitude, longitude")
