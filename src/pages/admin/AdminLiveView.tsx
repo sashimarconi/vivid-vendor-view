@@ -288,6 +288,9 @@ const AdminLiveView = () => {
   }, [fetchAll]);
 
   const fetchSupportingData = useCallback(async () => {
+    if (slowInFlightRef.current) return;
+    slowInFlightRef.current = true;
+
     const requestId = ++slowRequestRef.current;
     const now = new Date();
     const todayStart = getSaoPauloDayStartIso(now);
@@ -319,6 +322,8 @@ const AdminLiveView = () => {
       setTodaySessions(dedupeSessions(todaySessionRows));
     } catch (error) {
       console.error("Erro ao atualizar listas do radar", error);
+    } finally {
+      slowInFlightRef.current = false;
     }
   }, [fetchAll]);
 
