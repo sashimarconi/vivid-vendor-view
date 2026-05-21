@@ -1337,6 +1337,34 @@ const CheckoutPage = () => {
             <div className="w-2 h-2 rounded-full bg-marketplace-red" />
           </div>
         </div>
+
+        {/* Cartão de crédito — desabilitado */}
+        <div className="mt-2 pt-3 border-t border-border opacity-60 cursor-not-allowed">
+          <div className="flex items-center gap-3 py-1">
+            <div className="w-10 h-10 rounded-lg bg-muted/60 border border-border flex items-center justify-center">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <rect x="2" y="5" width="20" height="14" rx="2" stroke="hsl(var(--muted-foreground))" strokeWidth="2"/>
+                <path d="M2 10h20" stroke="hsl(var(--muted-foreground))" strokeWidth="2"/>
+              </svg>
+            </div>
+            <div className="flex-1">
+              <p className="text-[14px] font-semibold text-muted-foreground">Cartão de crédito</p>
+              <div className="flex items-center gap-1 mt-0.5">
+                <span className="text-[9px] font-bold bg-[#ff5f00] text-white px-1 rounded">master</span>
+                <span className="text-[9px] font-bold bg-[#1a1f71] text-white px-1 rounded">VISA</span>
+                <span className="text-[9px] font-bold bg-[#ed1c24] text-white px-1 rounded">elo</span>
+                <span className="text-[9px] font-bold bg-[#006fcf] text-white px-1 rounded">AMEX</span>
+              </div>
+            </div>
+            <div className="w-4 h-4 rounded-full border-2 border-muted-foreground/40" />
+          </div>
+          <div className="mt-2 bg-marketplace-red/5 border border-marketplace-red/20 rounded-md px-2.5 py-1.5 flex items-center gap-1.5">
+            <Flame className="w-3.5 h-3.5 text-marketplace-red fill-marketplace-red flex-shrink-0" />
+            <p className="text-[11px] font-semibold text-marketplace-red leading-tight">
+              Método de pagamento não disponível para o desconto relâmpago
+            </p>
+          </div>
+        </div>
         <p className="text-[11px] text-muted-foreground leading-snug mt-2">
           Ao fazer um pedido, você concorda com os <b>Termos de uso e venda</b> e reconhece que leu e concordou com a <b>Política de privacidade</b>.
         </p>
