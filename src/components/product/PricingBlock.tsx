@@ -1,4 +1,4 @@
-import { Flame, Clock } from "lucide-react";
+import { Flame, Music2 } from "lucide-react";
 import { formatCurrency } from "@/data/mockData";
 import { useState, useEffect } from "react";
 
