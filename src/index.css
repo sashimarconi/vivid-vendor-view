@@ -221,4 +221,37 @@
     filter: drop-shadow(0 0 4px hsl(263 70% 58% / 0.4));
     transition: filter 0.2s ease;
   }
+
+  /* TikTok Shop-style helpers */
+  .tt-shine { position: relative; overflow: hidden; isolation: isolate; }
+  .tt-shine::after {
+    content: "";
+    position: absolute; inset: 0;
+    background: linear-gradient(115deg, transparent 30%, hsl(0 0% 100% / 0.45) 50%, transparent 70%);
+    transform: translateX(-120%);
+    animation: tt-shine-move 2.6s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes tt-shine-move {
+    0% { transform: translateX(-120%); }
+    60%, 100% { transform: translateX(120%); }
+  }
+
+  @keyframes tt-pulse-soft {
+    0%, 100% { box-shadow: 0 8px 24px -8px hsl(348 83% 47% / 0.55), 0 0 0 0 hsl(348 83% 47% / 0.35); }
+    50%      { box-shadow: 0 8px 28px -8px hsl(348 83% 47% / 0.75), 0 0 0 6px hsl(348 83% 47% / 0); }
+  }
+  .tt-pulse-cta { animation: tt-pulse-soft 2.4s ease-in-out infinite; }
+
+  @keyframes tt-bar-flow {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
+  }
+  .tt-bar-flow { background-size: 200% 100%; animation: tt-bar-flow 2.2s linear infinite; }
+
+  .tt-price-gradient {
+    background:
+      radial-gradient(120% 140% at 0% 0%, hsl(340 95% 60% / 0.95) 0%, transparent 55%),
+      linear-gradient(95deg, hsl(348 88% 50%) 0%, hsl(8 92% 54%) 45%, hsl(24 96% 54%) 100%);
+  }
 }
