@@ -1013,7 +1013,7 @@ const CheckoutPage = () => {
       </section>
 
       {/* Shipping row (TikTok style) */}
-      {shippingOptions && shippingOptions.length > 0 && (
+      {customerCep.replace(/\D/g, "").length === 8 && customerAddress && shippingOptions && shippingOptions.length > 0 && (
         <section className="mt-2 bg-card">
           <div className="px-4 py-3 tt-teal-bg flex items-center justify-between">
             <div>
