@@ -254,7 +254,7 @@ const ProductPage = () => {
         storeSlug={productStore.slug}
       />
     ),
-    reviews: isSectionEnabled("reviews") && (
+    reviews: isSectionEnabled("reviews") && reviews.length > 0 && (
       <div ref={reviewsRef}>
         <ReviewsSection reviews={reviews} totalReviews={product.review_count || 0} title={builder.texts.reviews_title} />
       </div>
