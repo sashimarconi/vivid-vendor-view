@@ -254,4 +254,21 @@
       radial-gradient(120% 140% at 0% 0%, hsl(340 95% 60% / 0.95) 0%, transparent 55%),
       linear-gradient(95deg, hsl(348 88% 50%) 0%, hsl(8 92% 54%) 45%, hsl(24 96% 54%) 100%);
   }
+
+  /* TikTok Shop colorful dashed ribbon (red + cyan stripes) */
+  .tt-ribbon {
+    height: 6px;
+    background-image:
+      repeating-linear-gradient(90deg,
+        hsl(348 88% 56%) 0 16px,
+        transparent 16px 24px,
+        hsl(180 70% 48%) 24px 40px,
+        transparent 40px 48px);
+    background-size: 48px 100%;
+    background-repeat: repeat-x;
+  }
+
+  .tt-teal { color: hsl(180 65% 38%); }
+  .tt-teal-bg { background-color: hsl(180 65% 92%); color: hsl(180 65% 32%); }
+  .tt-savings-bg { background-color: hsl(348 88% 96%); color: hsl(348 80% 45%); }
 }
