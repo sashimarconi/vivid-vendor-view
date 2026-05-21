@@ -1192,15 +1192,11 @@ const CheckoutPage = () => {
               </p>
             </div>
             <div className="flex items-center gap-1.5">
-              {selectedShippingOption && !selectedShippingOption.free && Number(selectedShippingOption.price) > 0 && (
-                <span className="text-[12px] text-muted-foreground line-through">
-                  {formatCurrency(Number(selectedShippingOption.price))}
-                </span>
-              )}
               <span className="text-[13px] font-bold tt-teal">
                 {shippingCost === 0 ? "Grátis" : formatCurrency(shippingCost)}
               </span>
             </div>
+
           </div>
 
           {shippingOptions.length > 1 && (
