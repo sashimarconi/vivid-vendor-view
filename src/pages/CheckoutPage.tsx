@@ -902,6 +902,7 @@ const CheckoutPage = () => {
     );
   }
 
+  const mainImage = selectedVariantImage || product.product_images?.[0]?.url || "/placeholder.svg";
   const sellerName = (product as any)?.store_name || (product as any)?.brand || "Loja oficial";
   const hasAddress = !!(customerName && customerCep && customerAddress);
   const maskedPhone = customerPhone
