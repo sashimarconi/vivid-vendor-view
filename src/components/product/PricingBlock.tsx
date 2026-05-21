@@ -39,32 +39,32 @@ const PricingBlock = ({ originalPrice, salePrice, discountPercent, flashSale, fl
   const reais = Math.floor(salePrice).toLocaleString("pt-BR");
 
   return (
-    <div className="relative tt-price-gradient tt-shine px-3.5 py-2 overflow-hidden">
+    <div className="relative tt-price-gradient tt-shine px-4 py-3 overflow-hidden">
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/10 to-transparent" />
 
       <div className="relative flex items-center justify-between gap-2">
         <div className="flex items-baseline gap-1.5 min-w-0">
-          <span className="text-[11px] font-bold text-white/95 leading-none">R$</span>
-          <span className="text-[26px] leading-none font-black text-white tracking-tight inline-flex items-baseline">
+          <span className="text-[13px] font-bold text-white/95 leading-none">R$</span>
+          <span className="text-[32px] leading-none font-black text-white tracking-tight inline-flex items-baseline">
             {reais}
-            <span className="text-[13px] font-extrabold ml-0.5">,{cents}</span>
+            <span className="text-[15px] font-extrabold ml-0.5">,{cents}</span>
           </span>
-          <span className="text-[10px] text-white/70 line-through font-medium truncate">
+          <span className="text-[11px] text-white/70 line-through font-medium truncate">
             {formatCurrency(originalPrice)}
           </span>
         </div>
 
         <div className="flex items-center gap-1.5 shrink-0">
           {flashSale && showFlashSale && (
-            <div className="flex items-center gap-1 bg-black/30 backdrop-blur-sm rounded-full px-1.5 py-0.5">
-              <Flame className="w-2.5 h-2.5 fill-yellow-300 text-yellow-300" />
-              <span className="text-[9.5px] font-mono font-bold text-white tabular-nums">
+            <div className="flex items-center gap-1 bg-black/30 backdrop-blur-sm rounded-full px-2 py-1">
+              <Flame className="w-3 h-3 fill-yellow-300 text-yellow-300" />
+              <span className="text-[11px] font-mono font-bold text-white tabular-nums">
                 {pad(h)}:{pad(m)}:{pad(s)}
               </span>
             </div>
           )}
           {showDiscountBadge && discountPercent > 0 && (
-            <span className="bg-white text-[hsl(348,88%,48%)] text-[11px] font-black px-1.5 py-0.5 rounded shadow-sm">
+            <span className="bg-white text-[hsl(348,88%,48%)] text-[12px] font-black px-2 py-1 rounded shadow-sm">
               -{discountPercent}%
             </span>
           )}
