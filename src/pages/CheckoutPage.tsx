@@ -1326,14 +1326,8 @@ const CheckoutPage = () => {
       <section className="mt-2 bg-card px-4 py-4">
         <p className="text-[15px] font-bold text-foreground mb-3">Forma de pagamento</p>
         <div className="flex items-center gap-3 py-2">
-          <div className="w-10 h-10 rounded-lg bg-white border border-border flex items-center justify-center">
-            <svg width="28" height="28" viewBox="0 0 64 64" aria-label="Pix">
-              <g fill="#32BCAD">
-                <path d="M46.6 41.6c-2.5 0-4.9-1-6.7-2.8l-9.6-9.6c-.7-.7-1.9-.7-2.6 0l-9.6 9.6c-1.8 1.8-4.2 2.8-6.7 2.8H9.5l12.1 12.1c3.8 3.8 10 3.8 13.8 0l12.1-12.1h-.9z"/>
-                <path d="M11.4 22.4c2.5 0 4.9 1 6.7 2.8l9.6 9.6c.7.7 1.9.7 2.6 0l9.6-9.6c1.8-1.8 4.2-2.8 6.7-2.8h1.2L35.7 10.3c-3.8-3.8-10-3.8-13.8 0L9.8 22.4h1.6z"/>
-                <path d="M57.7 25.1l-7.3-7.3c-.2.1-.3.1-.5.1h-3.4c-1.7 0-3.4.7-4.6 1.9l-9.6 9.6c-.9.9-2.1 1.4-3.3 1.4-1.2 0-2.4-.5-3.3-1.4l-9.6-9.6c-1.2-1.2-2.9-1.9-4.6-1.9H7.3c-.2 0-.3 0-.5-.1L.3 25.1c-3.8 3.8-3.8 10 0 13.8l7.3 7.3c.2-.1.3-.1.5-.1h4.2c1.7 0 3.4-.7 4.6-1.9l9.6-9.6c1.8-1.8 4.8-1.8 6.5 0l9.6 9.6c1.2 1.2 2.9 1.9 4.6 1.9h3.4c.2 0 .3 0 .5.1l7.3-7.3c3.8-3.8 3.8-10 0-13.8z" transform="translate(3 0)"/>
-              </g>
-            </svg>
+          <div className="w-12 h-10 rounded-lg bg-white border border-border flex items-center justify-center p-1">
+            <img src="/pix-logo.svg" alt="Pix" className="h-6 w-auto object-contain" />
           </div>
           <p className="flex-1 text-[14px] font-semibold text-foreground">Pix</p>
           <div className="w-4 h-4 rounded-full border-2 border-marketplace-red flex items-center justify-center">
