@@ -1192,15 +1192,11 @@ const CheckoutPage = () => {
               </p>
             </div>
             <div className="flex items-center gap-1.5">
-              {selectedShippingOption && !selectedShippingOption.free && Number(selectedShippingOption.price) > 0 && (
-                <span className="text-[12px] text-muted-foreground line-through">
-                  {formatCurrency(Number(selectedShippingOption.price))}
-                </span>
-              )}
               <span className="text-[13px] font-bold tt-teal">
                 {shippingCost === 0 ? "Grátis" : formatCurrency(shippingCost)}
               </span>
             </div>
+
           </div>
 
           {shippingOptions.length > 1 && (
@@ -1234,34 +1230,65 @@ const CheckoutPage = () => {
 
       {/* Order bumps */}
       {orderBumps && orderBumps.length > 0 && (
-        <section className="mt-2 bg-card px-4 py-4 space-y-2">
+        <section className="mt-2 bg-card px-4 py-4 space-y-3">
           <div className="flex items-center gap-2">
-            <Flame className="w-4 h-4 text-marketplace-orange fill-marketplace-orange" />
-            <p className="text-[14px] font-bold text-foreground">Adicione com 1 clique</p>
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gradient-to-r from-marketplace-orange to-marketplace-red shadow-sm">
+              <Flame className="w-3.5 h-3.5 text-white fill-white" />
+              <p className="text-[11px] font-bold text-white uppercase tracking-wide">Oferta exclusiva</p>
+            </div>
+            <p className="text-[13px] font-bold text-foreground">Adicione com 1 clique</p>
           </div>
-          {orderBumps.map((bump) => {
-            const checked = selectedBumps.includes(bump.id);
-            return (
-              <button
-                key={bump.id}
-                onClick={() => toggleBump(bump.id)}
-                className={`w-full rounded-xl border-2 border-dashed px-3 py-2.5 flex items-center gap-3 transition-colors ${
-                  checked ? "border-marketplace-orange bg-marketplace-orange/5" : "border-marketplace-yellow/60 bg-card"
-                }`}
-              >
-                <div className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 ${checked ? "border-marketplace-orange bg-marketplace-orange" : "border-muted-foreground/40"}`}>
-                  {checked && <Check className="w-3 h-3 text-white" />}
-                </div>
-                {bump.image_url && <img src={bump.image_url} alt={bump.title} className="w-11 h-11 rounded object-cover" />}
-                <div className="flex-1 text-left">
-                  <p className="text-[12px] font-semibold text-foreground line-clamp-2">{bump.title}</p>
-                  <span className="text-[14px] font-bold text-marketplace-red">{formatCurrency(Number(bump.price))}</span>
-                </div>
-              </button>
-            );
-          })}
+          <div className="space-y-2.5">
+            {orderBumps.map((bump) => {
+              const checked = selectedBumps.includes(bump.id);
+              return (
+                <button
+                  key={bump.id}
+                  onClick={() => toggleBump(bump.id)}
+                  className={`group w-full relative rounded-2xl px-3 py-3 flex items-center gap-3 transition-all duration-200 active:scale-[0.99] ${
+                    checked
+                      ? "bg-gradient-to-r from-marketplace-orange/10 via-marketplace-red/5 to-transparent ring-2 ring-marketplace-orange shadow-md"
+                      : "bg-card ring-1 ring-border hover:ring-marketplace-orange/40 shadow-sm"
+                  }`}
+                >
+                  <div
+                    className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-all ${
+                      checked
+                        ? "border-marketplace-orange bg-marketplace-orange scale-110"
+                        : "border-muted-foreground/30 bg-card"
+                    }`}
+                  >
+                    {checked && <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />}
+                  </div>
+                  {bump.image_url && (
+                    <div className="relative flex-shrink-0">
+                      <img
+                        src={bump.image_url}
+                        alt={bump.title}
+                        className="w-14 h-14 rounded-xl object-cover bg-muted"
+                      />
+                    </div>
+                  )}
+                  <div className="flex-1 text-left min-w-0">
+                    <p className="text-[12.5px] font-semibold text-foreground line-clamp-2 leading-tight">
+                      {bump.title}
+                    </p>
+                    <div className="flex items-baseline gap-1.5 mt-1">
+                      <span className="text-[15px] font-extrabold text-marketplace-red leading-none">
+                        {formatCurrency(Number(bump.price))}
+                      </span>
+                      <span className="text-[10px] font-bold text-marketplace-orange uppercase">
+                        + Adicionar
+                      </span>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
         </section>
       )}
+
 
       {/* Order summary — TikTok style */}
       <section className="mt-2 bg-card px-4 py-4">
