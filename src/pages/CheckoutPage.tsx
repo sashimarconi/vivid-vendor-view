@@ -1326,8 +1326,8 @@ const CheckoutPage = () => {
       <section className="mt-2 bg-card px-4 py-4">
         <p className="text-[15px] font-bold text-foreground mb-3">Forma de pagamento</p>
         <div className="flex items-center gap-3 py-2">
-          <div className="w-12 h-10 rounded-lg bg-white border border-border flex items-center justify-center p-1">
-            <img src="/pix-logo.svg" alt="Pix" className="h-6 w-auto object-contain" />
+          <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center">
+            <img src="/pix-logo.png" alt="Pix" className="h-7 w-7 object-contain" />
           </div>
           <p className="flex-1 text-[14px] font-semibold text-foreground">Pix</p>
           <div className="w-4 h-4 rounded-full border-2 border-marketplace-red flex items-center justify-center">
