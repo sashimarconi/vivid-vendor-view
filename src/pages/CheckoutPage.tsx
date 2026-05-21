@@ -902,82 +902,192 @@ const CheckoutPage = () => {
     );
   }
 
-  const mainImage = selectedVariantImage || product.product_images?.[0]?.url || "/placeholder.svg";
+  const sellerName = (product as any)?.store_name || (product as any)?.brand || "Loja oficial";
+  const hasAddress = !!(customerName && customerCep && customerAddress);
+  const maskedPhone = customerPhone
+    ? customerPhone.replace(/(\(\d{2}\)\s?\d)\d{4}(-?\d{2})/, "$1****$2")
+    : "";
 
   return (
-    <div className="min-h-screen bg-muted/30 pb-44">
-      {/* Header */}
-      <header className="sticky top-0 z-40 bg-card border-b border-border">
-        <div className="flex items-center h-12 px-4">
-          <button onClick={() => navigate(-1)}>
-            <ArrowLeft className="w-5 h-5 text-foreground" />
+    <div className="min-h-screen bg-muted/40 pb-44">
+      {/* Header — TikTok Shop style */}
+      <header className="sticky top-0 z-40 bg-card">
+        <div className="relative flex items-center justify-center h-12 px-4">
+          <button onClick={() => navigate(-1)} className="absolute left-3 active:scale-95 transition-transform">
+            <ArrowLeft className="w-6 h-6 text-foreground" strokeWidth={2.2} />
           </button>
-          <div className="flex-1 text-center">
-            {checkoutLogoUrl ? (
-              <img src={checkoutLogoUrl} alt="Logo" style={{ height: checkoutLogoHeight }} className="object-contain max-w-[180px] mx-auto" />
-            ) : (
-              <p className="text-sm font-semibold text-foreground">{checkoutSettings?.checkout_header_text || "Pagamento"}</p>
-            )}
-          </div>
-          <button onClick={() => navigate(-1)}>
-            <X className="w-5 h-5 text-foreground" />
-          </button>
+          <p className="text-[17px] font-bold text-foreground tracking-tight">
+            {checkoutSettings?.checkout_header_text || "Resumo do pedido"}
+          </p>
         </div>
+        <div className="flex items-center justify-center gap-1.5 pb-2 -mt-1">
+          <ShieldCheck className="w-3.5 h-3.5 tt-teal" strokeWidth={2.5} />
+          <p className="text-[12px] tt-teal font-medium">
+            {checkoutSettings?.checkout_security_text || "Seus dados estão seguros conosco"}
+          </p>
+        </div>
+
+        {/* Address row (mostra quando preenchido) */}
+        {hasAddress && (
+          <button className="w-full px-4 pb-3 pt-1 flex items-start gap-2 text-left border-t border-border/60">
+            <MapPin className="w-4 h-4 text-foreground mt-0.5 flex-shrink-0" strokeWidth={2.2} />
+            <div className="flex-1 min-w-0">
+              <p className="text-[14px] font-bold text-foreground truncate">
+                {customerName}{maskedPhone ? `, ${maskedPhone}` : ""}
+              </p>
+              <p className="text-[12px] text-muted-foreground leading-snug">
+                {customerAddress}, {customerNumber}, {customerNeighborhood}, {customerCity}, {customerState}, {customerCep}
+              </p>
+            </div>
+            <ChevronRightIcon />
+          </button>
+        )}
+
+        {/* Colorful dashed ribbon */}
+        <div className="tt-ribbon" />
       </header>
 
-      {/* Cart item card — shows what's being bought up front */}
-      <div className="mx-4 mt-3 bg-card rounded-xl border border-border p-3">
+      {/* Store + product card */}
+      <section className="bg-card px-4 pt-3 pb-4">
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-[15px] font-bold text-foreground">{sellerName}</p>
+          <button className="flex items-center gap-1 text-muted-foreground text-[13px]">
+            Adicionar nota <ChevronRightIcon />
+          </button>
+        </div>
+        <div className="flex items-center gap-1.5 mb-3">
+          <span className="text-[#f5a623] text-[15px] leading-none">★</span>
+          <p className="text-[12px] font-semibold text-[#b88517]">Muito bem avaliado! 4.9/5,0</p>
+        </div>
+
         <div className="flex gap-3">
-          <div className="relative">
-            <img src={mainImage} alt={product.title} className="w-16 h-16 rounded-lg object-cover bg-muted" />
-            {product.discount_percent > 0 && (
-              <span className="absolute -top-1 -left-1 bg-marketplace-red text-white text-[9px] font-bold px-1 py-0.5 rounded">
-                -{product.discount_percent}%
+          <div className="relative flex-shrink-0">
+            <img src={mainImage} alt={product.title} className="w-[88px] h-[88px] rounded-md object-cover bg-muted" />
+            {quantity > 1 && (
+              <span className="absolute top-1 left-1 text-marketplace-red text-[18px] font-extrabold drop-shadow-sm">
+                {quantity}x
               </span>
             )}
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-[13px] text-foreground line-clamp-2 leading-snug">{product.title}{selectedVariantNames ? ` (${selectedVariantNames})` : ""}</p>
-            <div className="mt-1 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-base font-extrabold text-marketplace-red">{formatCurrency(Number(product.sale_price))}</span>
-                {Number(product.original_price) > Number(product.sale_price) && (
-                  <span className="text-[11px] text-muted-foreground line-through">{formatCurrency(Number(product.original_price))}</span>
-                )}
+          <div className="flex-1 min-w-0 flex flex-col">
+            <p className="text-[14px] text-foreground line-clamp-2 leading-snug font-medium">
+              {product.title}{selectedVariantNames ? ` (${selectedVariantNames})` : ""}
+            </p>
+            <div className="mt-1.5">
+              <span className="inline-flex items-center gap-1 bg-orange-50 text-orange-600 text-[11px] font-semibold px-1.5 py-0.5 rounded">
+                <span className="w-3 h-3 rounded-full bg-orange-400 text-white text-[8px] flex items-center justify-center font-bold">↺</span>
+                Devolução gratuita
+              </span>
+            </div>
+            <div className="mt-auto flex items-end justify-between pt-2">
+              <div className="flex flex-col">
+                <span className="text-[18px] font-extrabold text-marketplace-red leading-none">
+                  {formatCurrency(Number(product.sale_price))}
+                </span>
+                <div className="flex items-center gap-1.5 mt-1">
+                  {Number(product.original_price) > Number(product.sale_price) && (
+                    <span className="text-[11px] text-muted-foreground line-through">
+                      {formatCurrency(Number(product.original_price))}
+                    </span>
+                  )}
+                  {product.discount_percent > 0 && (
+                    <span className="bg-marketplace-red/10 text-marketplace-red text-[10px] font-bold px-1 py-0.5 rounded">
+                      -{product.discount_percent}%
+                    </span>
+                  )}
+                </div>
               </div>
-              <div className="flex items-center gap-1.5 bg-muted rounded-full px-1 py-0.5">
-                <button className="w-6 h-6 rounded-full bg-card border border-border flex items-center justify-center" onClick={() => setQuantity(Math.max(1, quantity - 1))}>
-                  <Minus className="w-3 h-3" />
+              <div className="flex items-center bg-muted rounded-full overflow-hidden">
+                <button className="w-7 h-7 flex items-center justify-center text-foreground active:bg-border" onClick={() => setQuantity(Math.max(1, quantity - 1))}>
+                  <Minus className="w-3.5 h-3.5" strokeWidth={2.5} />
                 </button>
-                <span className="text-sm font-semibold w-5 text-center">{quantity}</span>
-                <button className="w-6 h-6 rounded-full bg-card border border-border flex items-center justify-center" onClick={() => setQuantity(quantity + 1)}>
-                  <Plus className="w-3 h-3" />
+                <span className="text-[14px] font-semibold w-7 text-center">{quantity}</span>
+                <button className="w-7 h-7 flex items-center justify-center text-foreground active:bg-border" onClick={() => setQuantity(quantity + 1)}>
+                  <Plus className="w-3.5 h-3.5" strokeWidth={2.5} />
                 </button>
               </div>
             </div>
           </div>
         </div>
-        {discount > 0 && (
-          <div className="mt-2 bg-marketplace-green/10 rounded-md px-2 py-1.5 flex items-center gap-1.5">
-            <ZapIcon className="w-3 h-3 text-marketplace-green flex-shrink-0 fill-marketplace-green" />
-            <p className="text-[11px] text-foreground">
-              Economia de <strong className="text-marketplace-green">{formatCurrency(discount)}</strong>
-            </p>
-          </div>
-        )}
-      </div>
+      </section>
 
-      {/* Personal info card */}
-      <div className="mx-4 mt-3 bg-card rounded-xl border border-border p-4">
+      {/* Shipping row (TikTok style) */}
+      {shippingOptions && shippingOptions.length > 0 && (
+        <section className="mt-2 bg-card">
+          <div className="px-4 py-3 tt-teal-bg flex items-center justify-between">
+            <div>
+              <p className="text-[13px] font-semibold text-foreground">
+                Receba até {selectedShippingOption?.estimated_days || "5–9 dias"}
+              </p>
+              <p className="text-[12px] text-muted-foreground">
+                {selectedShippingOption?.name || "Envio padrão"}
+              </p>
+            </div>
+            <div className="flex items-center gap-1.5">
+              {selectedShippingOption && !selectedShippingOption.free && Number(selectedShippingOption.price) > 0 && (
+                <span className="text-[12px] text-muted-foreground line-through">
+                  {formatCurrency(Number(selectedShippingOption.price))}
+                </span>
+              )}
+              <span className="text-[13px] font-bold tt-teal">
+                {shippingCost === 0 ? "Grátis" : formatCurrency(shippingCost)}
+              </span>
+            </div>
+          </div>
+
+          {shippingOptions.length > 1 && (
+            <div className="border-t border-border">
+              {shippingOptions.map((option) => (
+                <button
+                  key={option.id}
+                  onClick={() => setSelectedShipping(option.id)}
+                  className={`w-full px-4 py-2.5 flex items-center gap-3 border-b border-border last:border-b-0 ${
+                    selectedShipping === option.id ? "bg-marketplace-red/5" : ""
+                  }`}
+                >
+                  <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${selectedShipping === option.id ? "border-marketplace-red" : "border-muted-foreground/30"}`}>
+                    {selectedShipping === option.id && <div className="w-2 h-2 rounded-full bg-marketplace-red" />}
+                  </div>
+                  <div className="flex-1 text-left">
+                    <p className="text-[13px] font-medium text-foreground">{option.name}</p>
+                    {option.estimated_days && <p className="text-[11px] text-muted-foreground">Chega em {option.estimated_days}</p>}
+                  </div>
+                  <span className={`text-[13px] font-semibold ${option.free ? "tt-teal" : "text-foreground"}`}>
+                    {option.free ? "GRÁTIS" : formatCurrency(Number(option.price))}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* Coupon row */}
+      <section className="mt-2 bg-card px-4 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-marketplace-red">
+            <path d="M3 9a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4V9z" stroke="currentColor" strokeWidth="2"/>
+            <path d="M9 9v6M15 9v6" stroke="currentColor" strokeWidth="2" strokeDasharray="2 2"/>
+          </svg>
+          <p className="text-[14px] font-semibold text-foreground">Desconto do TikTok Shop</p>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="tt-teal-bg text-[11px] font-semibold px-2 py-1 rounded">Frete grátis</span>
+          <ChevronRightIcon />
+        </div>
+      </section>
+
+      {/* Personal info form */}
+      <section className="mt-2 bg-card px-4 py-4">
         <div className="flex items-center gap-2 mb-3">
           <User className="w-4 h-4 text-foreground" />
-          <p className="text-sm font-semibold text-foreground">Seus dados</p>
+          <p className="text-[14px] font-bold text-foreground">Seus dados</p>
         </div>
         <div className="space-y-2.5">
           <div className="relative">
             <User className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
             <input
-              className="w-full bg-muted/40 border border-border rounded-lg pl-9 pr-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-marketplace-red focus:ring-1 focus:ring-marketplace-red/30"
+              className="w-full bg-muted/50 border border-border rounded-lg pl-9 pr-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-marketplace-red focus:ring-1 focus:ring-marketplace-red/30"
               placeholder="Nome completo"
               value={customerName}
               onChange={(e) => setCustomerName(e.target.value)}
@@ -988,7 +1098,7 @@ const CheckoutPage = () => {
             <div className="relative">
               <Hash className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
               <input
-                className="w-full bg-muted/40 border border-border rounded-lg pl-9 pr-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-marketplace-red focus:ring-1 focus:ring-marketplace-red/30"
+                className="w-full bg-muted/50 border border-border rounded-lg pl-9 pr-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-marketplace-red focus:ring-1 focus:ring-marketplace-red/30"
                 placeholder="CPF"
                 value={customerDocument}
                 onChange={(e) => setCustomerDocument(formatCpf(e.target.value))}
@@ -999,7 +1109,7 @@ const CheckoutPage = () => {
             <div className="relative">
               <Phone className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
               <input
-                className="w-full bg-muted/40 border border-border rounded-lg pl-9 pr-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-marketplace-red focus:ring-1 focus:ring-marketplace-red/30"
+                className="w-full bg-muted/50 border border-border rounded-lg pl-9 pr-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-marketplace-red focus:ring-1 focus:ring-marketplace-red/30"
                 placeholder="Telefone"
                 value={customerPhone}
                 onChange={(e) => setCustomerPhone(formatPhone(e.target.value))}
@@ -1012,7 +1122,7 @@ const CheckoutPage = () => {
           <div className="relative">
             <Mail className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
             <input
-              className="w-full bg-muted/40 border border-border rounded-lg pl-9 pr-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-marketplace-red focus:ring-1 focus:ring-marketplace-red/30"
+              className="w-full bg-muted/50 border border-border rounded-lg pl-9 pr-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-marketplace-red focus:ring-1 focus:ring-marketplace-red/30"
               placeholder="E-mail"
               type="email"
               value={customerEmail}
@@ -1044,19 +1154,19 @@ const CheckoutPage = () => {
             )}
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Address card — minimal: CEP autofills the rest */}
-      <div className="mx-4 mt-3 bg-card rounded-xl border border-border p-4">
+      {/* Address form */}
+      <section className="mt-2 bg-card px-4 py-4">
         <div className="flex items-center gap-2 mb-3">
           <MapPin className="w-4 h-4 text-marketplace-red" />
-          <p className="text-sm font-semibold text-foreground">Endereço de entrega</p>
+          <p className="text-[14px] font-bold text-foreground">Endereço de entrega</p>
         </div>
         <div className="space-y-2.5">
           <div className="grid grid-cols-[1fr_90px] gap-2.5">
             <div className="relative">
               <input
-                className="w-full bg-muted/40 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-marketplace-red focus:ring-1 focus:ring-marketplace-red/30"
+                className="w-full bg-muted/50 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-marketplace-red focus:ring-1 focus:ring-marketplace-red/30"
                 placeholder="CEP"
                 maxLength={9}
                 value={customerCep}
@@ -1069,7 +1179,7 @@ const CheckoutPage = () => {
               )}
             </div>
             <input
-              className="w-full bg-muted/40 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-marketplace-red focus:ring-1 focus:ring-marketplace-red/30"
+              className="w-full bg-muted/50 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-marketplace-red focus:ring-1 focus:ring-marketplace-red/30"
               placeholder="Número"
               value={customerNumber}
               onChange={(e) => setCustomerNumber(e.target.value)}
@@ -1078,7 +1188,7 @@ const CheckoutPage = () => {
           {customerAddress && (
             <>
               <input
-                className="w-full bg-muted/40 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-marketplace-red focus:ring-1 focus:ring-marketplace-red/30"
+                className="w-full bg-muted/50 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-marketplace-red focus:ring-1 focus:ring-marketplace-red/30"
                 placeholder="Rua"
                 value={customerAddress}
                 onChange={(e) => setCustomerAddress(e.target.value)}
@@ -1086,13 +1196,13 @@ const CheckoutPage = () => {
               />
               <div className="grid grid-cols-2 gap-2.5">
                 <input
-                  className="w-full bg-muted/40 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-marketplace-red focus:ring-1 focus:ring-marketplace-red/30"
+                  className="w-full bg-muted/50 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-marketplace-red focus:ring-1 focus:ring-marketplace-red/30"
                   placeholder="Bairro"
                   value={customerNeighborhood}
                   onChange={(e) => setCustomerNeighborhood(e.target.value)}
                 />
                 <input
-                  className="w-full bg-muted/40 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-marketplace-red focus:ring-1 focus:ring-marketplace-red/30"
+                  className="w-full bg-muted/50 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-marketplace-red focus:ring-1 focus:ring-marketplace-red/30"
                   placeholder="Complemento"
                   value={customerComplement}
                   onChange={(e) => setCustomerComplement(e.target.value)}
@@ -1100,13 +1210,13 @@ const CheckoutPage = () => {
               </div>
               <div className="grid grid-cols-[1fr_70px] gap-2.5">
                 <input
-                  className="w-full bg-muted/40 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-marketplace-red focus:ring-1 focus:ring-marketplace-red/30"
+                  className="w-full bg-muted/50 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-marketplace-red focus:ring-1 focus:ring-marketplace-red/30"
                   placeholder="Cidade"
                   value={customerCity}
                   onChange={(e) => setCustomerCity(e.target.value)}
                 />
                 <input
-                  className="w-full bg-muted/40 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-marketplace-red focus:ring-1 focus:ring-marketplace-red/30"
+                  className="w-full bg-muted/50 border border-border rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-marketplace-red focus:ring-1 focus:ring-marketplace-red/30"
                   placeholder="UF"
                   maxLength={2}
                   value={customerState}
@@ -1116,44 +1226,14 @@ const CheckoutPage = () => {
             </>
           )}
         </div>
-      </div>
-
-      {/* Shipping options */}
-      {shippingOptions && shippingOptions.length > 0 && (
-        <div className="mx-4 mt-3 bg-card rounded-xl border border-border overflow-hidden">
-          <div className="px-4 py-2.5 border-b border-border">
-            <p className="text-sm font-semibold text-foreground">Entrega</p>
-          </div>
-          {shippingOptions.map((option, idx) => (
-            <button
-              key={option.id}
-              onClick={() => setSelectedShipping(option.id)}
-              className={`w-full px-4 py-3 flex items-center gap-3 ${idx < shippingOptions.length - 1 ? "border-b border-border" : ""} ${
-                selectedShipping === option.id ? "bg-marketplace-red/5" : ""
-              }`}
-            >
-              <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${selectedShipping === option.id ? "border-marketplace-red" : "border-muted-foreground/30"}`}>
-                {selectedShipping === option.id && <div className="w-2 h-2 rounded-full bg-marketplace-red" />}
-              </div>
-              {option.logo_url && <img src={option.logo_url} alt={option.name} className="w-7 h-7 rounded object-contain" />}
-              <div className="flex-1 text-left">
-                <p className="text-sm font-medium text-foreground">{option.name}</p>
-                {option.estimated_days && <p className="text-[11px] text-muted-foreground">Chega em {option.estimated_days}</p>}
-              </div>
-              <span className={`text-sm font-semibold ${option.free ? "text-marketplace-green" : "text-foreground"}`}>
-                {option.free ? "GRÁTIS" : formatCurrency(Number(option.price))}
-              </span>
-            </button>
-          ))}
-        </div>
-      )}
+      </section>
 
       {/* Order bumps */}
       {orderBumps && orderBumps.length > 0 && (
-        <div className="mx-4 mt-3 space-y-2">
-          <div className="flex items-center gap-2 px-1">
+        <section className="mt-2 bg-card px-4 py-4 space-y-2">
+          <div className="flex items-center gap-2">
             <Flame className="w-4 h-4 text-marketplace-orange fill-marketplace-orange" />
-            <p className="text-sm font-bold text-foreground">Adicione com 1 clique</p>
+            <p className="text-[14px] font-bold text-foreground">Adicione com 1 clique</p>
           </div>
           {orderBumps.map((bump) => {
             const checked = selectedBumps.includes(bump.id);
@@ -1161,8 +1241,8 @@ const CheckoutPage = () => {
               <button
                 key={bump.id}
                 onClick={() => toggleBump(bump.id)}
-                className={`w-full bg-card rounded-xl border-2 border-dashed px-3 py-2.5 flex items-center gap-3 transition-colors ${
-                  checked ? "border-marketplace-orange bg-marketplace-orange/5" : "border-marketplace-yellow/60"
+                className={`w-full rounded-xl border-2 border-dashed px-3 py-2.5 flex items-center gap-3 transition-colors ${
+                  checked ? "border-marketplace-orange bg-marketplace-orange/5" : "border-marketplace-yellow/60 bg-card"
                 }`}
               >
                 <div className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 ${checked ? "border-marketplace-orange bg-marketplace-orange" : "border-muted-foreground/40"}`}>
@@ -1170,77 +1250,135 @@ const CheckoutPage = () => {
                 </div>
                 {bump.image_url && <img src={bump.image_url} alt={bump.title} className="w-11 h-11 rounded object-cover" />}
                 <div className="flex-1 text-left">
-                  <p className="text-xs font-semibold text-foreground line-clamp-2">{bump.title}</p>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <span className="text-sm font-bold text-marketplace-red">{formatCurrency(Number(bump.price))}</span>
-                  </div>
+                  <p className="text-[12px] font-semibold text-foreground line-clamp-2">{bump.title}</p>
+                  <span className="text-[14px] font-bold text-marketplace-red">{formatCurrency(Number(bump.price))}</span>
                 </div>
               </button>
             );
           })}
+        </section>
+      )}
+
+      {/* Order summary — TikTok style */}
+      <section className="mt-2 bg-card px-4 py-4">
+        <p className="text-[15px] font-bold text-foreground mb-3">Resumo do pedido</p>
+        <div className="space-y-2">
+          <div className="flex justify-between text-[13px]">
+            <span className="text-foreground font-semibold">Subtotal do produto</span>
+            <span className="text-foreground font-semibold">{formatCurrency(productSubtotal)}</span>
+          </div>
+          {originalSubtotal > productSubtotal && (
+            <>
+              <div className="flex justify-between text-[12px] pl-3">
+                <span className="text-muted-foreground">Preço original</span>
+                <span className="text-muted-foreground">{formatCurrency(originalSubtotal)}</span>
+              </div>
+              <div className="flex justify-between text-[12px] pl-3">
+                <span className="text-muted-foreground">Desconto no produto</span>
+                <span className="text-marketplace-red">- {formatCurrency(discount)}</span>
+              </div>
+            </>
+          )}
+          {selectedShippingOption && (
+            <>
+              <div className="flex justify-between text-[13px] pt-1">
+                <span className="text-foreground font-semibold">Subtotal do envio</span>
+                <span className="text-foreground font-semibold">{formatCurrency(shippingCost)}</span>
+              </div>
+              {!selectedShippingOption.free && Number(selectedShippingOption.price) > 0 && (
+                <div className="flex justify-between text-[12px] pl-3">
+                  <span className="text-muted-foreground">Taxa de envio</span>
+                  <span className="text-muted-foreground">{formatCurrency(Number(selectedShippingOption.price))}</span>
+                </div>
+              )}
+              {selectedShippingOption.free && Number(selectedShippingOption.price) > 0 && (
+                <>
+                  <div className="flex justify-between text-[12px] pl-3">
+                    <span className="text-muted-foreground">Taxa de envio</span>
+                    <span className="text-muted-foreground">{formatCurrency(Number(selectedShippingOption.price))}</span>
+                  </div>
+                  <div className="flex justify-between text-[12px] pl-3">
+                    <span className="text-muted-foreground">Desconto de envio</span>
+                    <span className="text-marketplace-red">- {formatCurrency(Number(selectedShippingOption.price))}</span>
+                  </div>
+                </>
+              )}
+            </>
+          )}
+          {bumpsTotal > 0 && (
+            <div className="flex justify-between text-[13px]">
+              <span className="text-foreground font-semibold">Ofertas extras</span>
+              <span className="text-foreground font-semibold">{formatCurrency(bumpsTotal)}</span>
+            </div>
+          )}
+          <div className="flex justify-between items-end pt-3 border-t border-border">
+            <span className="text-[15px] font-bold text-foreground">Total</span>
+            <div className="text-right">
+              <p className="text-[18px] font-extrabold text-foreground leading-none">{formatCurrency(total)}</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5">Impostos inclusos</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Payment method preview */}
+      <section className="mt-2 bg-card px-4 py-4">
+        <p className="text-[15px] font-bold text-foreground mb-3">Forma de pagamento</p>
+        <div className="flex items-center gap-3 py-2">
+          <div className="w-9 h-9 rounded-lg bg-[hsl(180,65%,92%)] flex items-center justify-center">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2 L22 12 L12 22 L2 12 Z" fill="hsl(180 65% 38%)" />
+              <path d="M12 7 L17 12 L12 17 L7 12 Z" fill="white" />
+            </svg>
+          </div>
+          <p className="flex-1 text-[14px] font-semibold text-foreground">Pix</p>
+          <div className="w-4 h-4 rounded-full border-2 border-marketplace-red flex items-center justify-center">
+            <div className="w-2 h-2 rounded-full bg-marketplace-red" />
+          </div>
+        </div>
+        <p className="text-[11px] text-muted-foreground leading-snug mt-2">
+          Ao fazer um pedido, você concorda com os <b>Termos de uso e venda</b> e reconhece que leu e concordou com a <b>Política de privacidade</b>.
+        </p>
+      </section>
+
+      {/* Savings banner */}
+      {discount > 0 && (
+        <div className="mt-2 tt-savings-bg px-4 py-2.5 flex items-center gap-2">
+          <span className="text-base">😄</span>
+          <p className="text-[12px] font-semibold">
+            Você está economizando {formatCurrency(discount + (selectedShippingOption?.free ? Number(selectedShippingOption.price || 0) : 0))} nesse pedido.
+          </p>
         </div>
       )}
 
-      {/* Order summary */}
-      <div className="mx-4 mt-3 bg-card rounded-xl border border-border p-3 space-y-1.5">
-        <div className="flex justify-between text-[13px]">
-          <span className="text-muted-foreground">Subtotal</span>
-          <span className="text-foreground">{formatCurrency(productSubtotal)}</span>
-        </div>
-        {selectedShippingOption && (
-          <div className="flex justify-between text-[13px]">
-            <span className="text-muted-foreground">Frete</span>
-            <span className={shippingCost === 0 ? "text-marketplace-green font-semibold" : "text-foreground"}>
-              {shippingCost === 0 ? "Grátis" : formatCurrency(shippingCost)}
-            </span>
-          </div>
-        )}
-        {bumpsTotal > 0 && (
-          <div className="flex justify-between text-[13px]">
-            <span className="text-muted-foreground">Ofertas extras</span>
-            <span className="text-foreground">{formatCurrency(bumpsTotal)}</span>
-          </div>
-        )}
-        <div className="flex justify-between items-center pt-2 border-t border-border">
-          <span className="text-sm font-bold text-foreground">Total</span>
-          <span className="text-lg font-extrabold text-marketplace-red">{formatCurrency(total)}</span>
-        </div>
-      </div>
-
-      {/* Trust strip */}
-      <div className="mx-4 mt-3 mb-2 bg-card rounded-xl border border-border px-4 py-3 flex items-center justify-around text-[11px] text-muted-foreground">
-        <span className="flex items-center gap-1"><Lock className="w-3 h-3" /> SSL Seguro</span>
-        <span className="flex items-center gap-1"><ShieldCheck className="w-3 h-3" /> Compra Protegida</span>
-        <span className="flex items-center gap-1">⭐ 4.8/5</span>
-      </div>
-
       {/* Fixed bottom bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border shadow-[0_-4px_12px_rgba(0,0,0,0.1)] pb-2">
-        <div className="max-w-screen-lg mx-auto px-4 pt-3 pb-1 flex items-center justify-between">
-          <p className="text-sm text-foreground">Total ({quantity} {quantity === 1 ? "item" : "itens"}):</p>
-          <p className="text-xl font-extrabold text-marketplace-red">{formatCurrency(total)}</p>
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border shadow-[0_-4px_12px_rgba(0,0,0,0.08)]">
+        <div className="max-w-screen-lg mx-auto px-4 pt-2.5 pb-1 flex items-center justify-between">
+          <p className="text-[14px] text-foreground">Total ({quantity} {quantity === 1 ? "item" : "itens"})</p>
+          <p className="text-[18px] font-extrabold text-marketplace-red">{formatCurrency(total)}</p>
         </div>
-        <div className="px-4 pb-2">
+        <div className="px-4 pb-2 pt-1">
           <button
             onClick={handleSubmitOrder}
             disabled={submitting}
-            className="w-full py-3.5 rounded-full bg-marketplace-red text-white text-sm font-extrabold disabled:opacity-50 flex items-center justify-center gap-2 shadow-md active:scale-[0.99] transition-transform"
+            className="w-full py-3.5 rounded-full bg-marketplace-red text-white text-[15px] font-extrabold disabled:opacity-50 flex flex-col items-center justify-center shadow-md active:scale-[0.99] transition-transform"
           >
-            <Lock className="w-4 h-4" />
-            {submitting ? "Processando..." : (checkoutSettings?.checkout_button_text || "Pagar com PIX")}
+            <span>{submitting ? "Processando..." : (checkoutSettings?.checkout_button_text || "Fazer pedido")}</span>
+            <span className="text-[10px] font-medium opacity-90 mt-0.5">
+              O cupom expira em {couponMmSs}{selectedShippingOption?.free ? " | Frete grátis" : ""}
+            </span>
           </button>
-        </div>
-        <div className="text-center space-y-0.5">
-          <p className="text-[11px] text-marketplace-red flex items-center justify-center gap-1">
-            <Clock className="w-3 h-3" /> Cupom expira em {couponMmSs}
-          </p>
-          <p className="text-[11px] text-marketplace-green flex items-center justify-center gap-1">
-            <Lock className="w-3 h-3" /> Pagamento 100% seguro · SSL
-          </p>
         </div>
       </div>
     </div>
   );
 };
+
+// Small chevron helper used inline
+const ChevronRightIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-muted-foreground flex-shrink-0">
+    <path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
 
 export default CheckoutPage;
