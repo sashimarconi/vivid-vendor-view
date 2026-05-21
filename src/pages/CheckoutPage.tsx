@@ -1326,11 +1326,8 @@ const CheckoutPage = () => {
       <section className="mt-2 bg-card px-4 py-4">
         <p className="text-[15px] font-bold text-foreground mb-3">Forma de pagamento</p>
         <div className="flex items-center gap-3 py-2">
-          <div className="w-10 h-10 rounded-lg bg-white border border-border flex items-center justify-center">
-            <svg width="26" height="26" viewBox="0 0 512 512" fill="none" aria-label="Pix">
-              <path fill="#32BCAD" d="M384.6 350.7c-17.5 0-33.9-6.8-46.3-19.2l-66.8-66.8c-4.7-4.7-13-4.7-17.7 0l-67 67c-12.4 12.4-28.8 19.2-46.3 19.2H127l84.7 84.7c26.5 26.5 69.4 26.5 95.9 0l84.9-84.9h-7.9zM140.5 161.2c17.5 0 33.9 6.8 46.3 19.2l67 67c4.9 4.9 12.8 4.9 17.7 0l66.8-66.8c12.4-12.4 28.8-19.2 46.3-19.2h7.9l-84.9-84.9c-26.5-26.5-69.4-26.5-95.9 0L127 161.2h13.5z"/>
-              <path fill="#32BCAD" d="M463.4 208.3l-51.3-51.3c-1.1.5-2.4.8-3.6.8h-23.8c-12.1 0-23.9 4.9-32.4 13.4l-66.8 66.8c-6.3 6.3-14.7 9.5-23 9.5s-16.6-3.2-23-9.5l-67-67c-8.5-8.5-20.4-13.4-32.4-13.4h-29.3c-1.2 0-2.3-.3-3.4-.7L77.4 208.3c-26.5 26.5-26.5 69.4 0 95.9l51.1 51.1c1.1-.4 2.2-.7 3.4-.7h29.3c12.1 0 23.9-4.9 32.4-13.4l67-67c12.3-12.3 33.8-12.3 46 0l66.8 66.8c8.5 8.5 20.4 13.4 32.4 13.4h23.8c1.3 0 2.5.3 3.6.8l51.3-51.3c26.4-26.5 26.4-69.5-.1-95.6z"/>
-            </svg>
+          <div className="w-12 h-10 rounded-lg bg-white border border-border flex items-center justify-center p-1">
+            <img src="/pix-logo.svg" alt="Pix" className="h-6 w-auto object-contain" />
           </div>
           <p className="flex-1 text-[14px] font-semibold text-foreground">Pix</p>
           <div className="w-4 h-4 rounded-full border-2 border-marketplace-red flex items-center justify-center">
