@@ -110,35 +110,44 @@ const ProductInfo = ({ title, promoTag, rating, reviewCount, soldCount, variants
   };
 
   return (
-    <div className="bg-card px-4 pt-3 pb-3">
+    <div className="bg-card px-4 pt-3.5 pb-4">
       {promoTag && (
-        <span className="inline-block bg-marketplace-red text-white text-[10px] font-extrabold px-2 py-0.5 rounded mb-1.5 uppercase tracking-wide">
+        <span className="inline-flex items-center gap-1 bg-gradient-to-r from-[hsl(348,88%,50%)] to-[hsl(8,92%,54%)] text-white text-[10px] font-extrabold px-2 py-[3px] rounded-md mb-2 uppercase tracking-wide shadow-sm">
+          <span className="w-1 h-1 rounded-full bg-white animate-pulse" />
           {promoTag}
         </span>
       )}
-      <h1 className="text-[15px] font-bold text-foreground leading-snug">{title}</h1>
+      <h1 className="text-[16px] font-bold text-foreground leading-snug tracking-tight">{title}</h1>
 
-      <div className="flex items-center gap-2 mt-2">
-        <div className="flex items-center gap-1 bg-marketplace-yellow/15 px-1.5 py-0.5 rounded">
+      <div className="flex items-center gap-2 mt-2.5">
+        <div className="flex items-center gap-1 bg-marketplace-yellow/15 px-1.5 py-0.5 rounded-md">
           <Star className="w-3 h-3 fill-marketplace-yellow text-marketplace-yellow" />
-          <span className="text-[11px] font-bold text-foreground">{rating}</span>
+          <span className="text-[11px] font-bold text-foreground tabular-nums">{rating}</span>
         </div>
         <span className="text-[11px] text-muted-foreground">({formatCount(reviewCount)})</span>
         {showSoldCount && (
           <>
-            <span className="text-muted-foreground">·</span>
-            <span className="text-[11px] text-muted-foreground"><span className="font-semibold text-foreground">{formatCount(soldCount)}</span> vendidos</span>
+            <span className="text-muted-foreground/60">·</span>
+            <span className="text-[11px] text-muted-foreground">
+              <span className="font-semibold text-foreground">{formatCount(soldCount)}</span> vendidos
+            </span>
           </>
         )}
       </div>
 
       {showUnitsAvailable && (
-        <div className="mt-2 flex items-center gap-2">
-          <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
-            <div className="h-full w-[35%] bg-gradient-to-r from-marketplace-orange to-marketplace-red" />
+        <div className="mt-3 flex items-center gap-2 bg-marketplace-red/5 border border-marketplace-red/15 rounded-lg px-2.5 py-2">
+          <div className="flex-1 h-2 bg-marketplace-red/10 rounded-full overflow-hidden">
+            <div
+              className="h-full w-[35%] rounded-full tt-bar-flow"
+              style={{
+                background:
+                  "linear-gradient(90deg, hsl(24 96% 54%) 0%, hsl(8 92% 54%) 50%, hsl(348 88% 50%) 100%, hsl(24 96% 54%) 100%)",
+              }}
+            />
           </div>
-          <span className="text-[10px] font-bold text-marketplace-red whitespace-nowrap">
-            {unitsAvailableText}
+          <span className="text-[10.5px] font-extrabold text-marketplace-red whitespace-nowrap uppercase tracking-wide">
+            🔥 {unitsAvailableText}
           </span>
         </div>
       )}
@@ -156,3 +165,4 @@ const ProductInfo = ({ title, promoTag, rating, reviewCount, soldCount, variants
 };
 
 export default ProductInfo;
+
