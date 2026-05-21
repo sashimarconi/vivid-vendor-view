@@ -1012,56 +1012,6 @@ const CheckoutPage = () => {
         </div>
       </section>
 
-      {/* Shipping row (TikTok style) */}
-      {customerCep.replace(/\D/g, "").length === 8 && customerAddress && shippingOptions && shippingOptions.length > 0 && (
-        <section className="mt-2 bg-card">
-          <div className="px-4 py-3 tt-teal-bg flex items-center justify-between">
-            <div>
-              <p className="text-[13px] font-semibold text-foreground">
-                Receba até {selectedShippingOption?.estimated_days || "5–9 dias"}
-              </p>
-              <p className="text-[12px] text-muted-foreground">
-                {selectedShippingOption?.name || "Envio padrão"}
-              </p>
-            </div>
-            <div className="flex items-center gap-1.5">
-              {selectedShippingOption && !selectedShippingOption.free && Number(selectedShippingOption.price) > 0 && (
-                <span className="text-[12px] text-muted-foreground line-through">
-                  {formatCurrency(Number(selectedShippingOption.price))}
-                </span>
-              )}
-              <span className="text-[13px] font-bold tt-teal">
-                {shippingCost === 0 ? "Grátis" : formatCurrency(shippingCost)}
-              </span>
-            </div>
-          </div>
-
-          {shippingOptions.length > 1 && (
-            <div className="border-t border-border">
-              {shippingOptions.map((option) => (
-                <button
-                  key={option.id}
-                  onClick={() => setSelectedShipping(option.id)}
-                  className={`w-full px-4 py-2.5 flex items-center gap-3 border-b border-border last:border-b-0 ${
-                    selectedShipping === option.id ? "bg-marketplace-red/5" : ""
-                  }`}
-                >
-                  <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${selectedShipping === option.id ? "border-marketplace-red" : "border-muted-foreground/30"}`}>
-                    {selectedShipping === option.id && <div className="w-2 h-2 rounded-full bg-marketplace-red" />}
-                  </div>
-                  <div className="flex-1 text-left">
-                    <p className="text-[13px] font-medium text-foreground">{option.name}</p>
-                    {option.estimated_days && <p className="text-[11px] text-muted-foreground">Chega em {option.estimated_days}</p>}
-                  </div>
-                  <span className={`text-[13px] font-semibold ${option.free ? "tt-teal" : "text-foreground"}`}>
-                    {option.free ? "GRÁTIS" : formatCurrency(Number(option.price))}
-                  </span>
-                </button>
-              ))}
-            </div>
-          )}
-        </section>
-      )}
 
       {/* Coupon row */}
       <section className="mt-2 bg-card px-4 py-3 flex items-center justify-between">
@@ -1228,6 +1178,59 @@ const CheckoutPage = () => {
           )}
         </div>
       </section>
+
+      {/* Shipping row (TikTok style) — aparece depois do endereço */}
+      {customerCep.replace(/\D/g, "").length === 8 && customerAddress && shippingOptions && shippingOptions.length > 0 && (
+        <section className="mt-2 bg-card">
+          <div className="px-4 py-3 tt-teal-bg flex items-center justify-between">
+            <div>
+              <p className="text-[13px] font-semibold text-foreground">
+                Receba até {selectedShippingOption?.estimated_days || "5–9 dias"}
+              </p>
+              <p className="text-[12px] text-muted-foreground">
+                {selectedShippingOption?.name || "Envio padrão"}
+              </p>
+            </div>
+            <div className="flex items-center gap-1.5">
+              {selectedShippingOption && !selectedShippingOption.free && Number(selectedShippingOption.price) > 0 && (
+                <span className="text-[12px] text-muted-foreground line-through">
+                  {formatCurrency(Number(selectedShippingOption.price))}
+                </span>
+              )}
+              <span className="text-[13px] font-bold tt-teal">
+                {shippingCost === 0 ? "Grátis" : formatCurrency(shippingCost)}
+              </span>
+            </div>
+          </div>
+
+          {shippingOptions.length > 1 && (
+            <div className="border-t border-border">
+              {shippingOptions.map((option) => (
+                <button
+                  key={option.id}
+                  onClick={() => setSelectedShipping(option.id)}
+                  className={`w-full px-4 py-2.5 flex items-center gap-3 border-b border-border last:border-b-0 ${
+                    selectedShipping === option.id ? "bg-marketplace-red/5" : ""
+                  }`}
+                >
+                  <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${selectedShipping === option.id ? "border-marketplace-red" : "border-muted-foreground/30"}`}>
+                    {selectedShipping === option.id && <div className="w-2 h-2 rounded-full bg-marketplace-red" />}
+                  </div>
+                  <div className="flex-1 text-left">
+                    <p className="text-[13px] font-medium text-foreground">{option.name}</p>
+                    {option.estimated_days && <p className="text-[11px] text-muted-foreground">Chega em {option.estimated_days}</p>}
+                  </div>
+                  <span className={`text-[13px] font-semibold ${option.free ? "tt-teal" : "text-foreground"}`}>
+                    {option.free ? "GRÁTIS" : formatCurrency(Number(option.price))}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
+
+
 
       {/* Order bumps */}
       {orderBumps && orderBumps.length > 0 && (
