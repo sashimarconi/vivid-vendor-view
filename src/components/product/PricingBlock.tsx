@@ -79,14 +79,6 @@ const PricingBlock = ({ originalPrice, salePrice, discountPercent, flashSale, fl
         </div>
       </div>
 
-      {flashSale && showFlashSale && (
-        <div className="relative mt-2 flex items-center gap-1 bg-black/30 backdrop-blur-sm rounded-full px-2 py-1 w-fit">
-          <Flame className="w-3 h-3 fill-yellow-300 text-yellow-300" />
-          <span className="text-[11px] font-mono font-bold text-white tabular-nums">
-            {pad(h)}:{pad(m)}:{pad(s)}
-          </span>
-        </div>
-      )}
     </div>
   );
 };
