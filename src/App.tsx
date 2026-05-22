@@ -109,6 +109,7 @@ const AppRoutes = () => {
         <Route path="plans" element={<AdminPlans />} />
         <Route path="domains" element={<AdminDomains />} />
         <Route path="security" element={<AdminSecurity />} />
+        <Route path="blocked-ips" element={<AdminBlockedIPs />} />
         <Route path="profile" element={<AdminProfile />} />
       </Route>
       <Route path="*" element={<NotFound />} />
