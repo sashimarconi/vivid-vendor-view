@@ -724,6 +724,8 @@ const CheckoutPage = () => {
     );
   }
 
+  if (ipBlocked) return <BlockedScreen />;
+
 
 
   if (pixData) {
