@@ -671,6 +671,23 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Bloqueio de IPs: checa se o IP do cliente está na blocklist do dono do produto
+    if (customerIp && product?.user_id) {
+      const { data: blocked } = await supabase
+        .from("blocked_ips")
+        .select("id")
+        .eq("user_id", product.user_id)
+        .eq("ip", customerIp)
+        .maybeSingle();
+      if (blocked) {
+        console.log(`[BlockedIP] Pedido bloqueado para IP ${customerIp} (user ${product.user_id})`);
+        return new Response(
+          JSON.stringify({ error: "Não foi possível processar seu pedido. Entre em contato com o suporte." }),
+          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+
     // Build items
     const items = [
       {

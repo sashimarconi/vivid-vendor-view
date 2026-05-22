@@ -41,6 +41,7 @@ import SaasOrders from "./pages/admin/SaasOrders";
 import AdminPlatformSettings from "./pages/admin/AdminPlatformSettings";
 import AdminDomains from "./pages/admin/AdminDomains";
 import AdminSecurity from "./pages/admin/AdminSecurity";
+import AdminBlockedIPs from "./pages/admin/AdminBlockedIPs";
 import AdminProfile from "./pages/admin/AdminProfile";
 import ResetPassword from "./pages/ResetPassword";
 import ThankYouRedirect from "./pages/ThankYouRedirect";
@@ -108,6 +109,7 @@ const AppRoutes = () => {
         <Route path="plans" element={<AdminPlans />} />
         <Route path="domains" element={<AdminDomains />} />
         <Route path="security" element={<AdminSecurity />} />
+        <Route path="blocked-ips" element={<AdminBlockedIPs />} />
         <Route path="profile" element={<AdminProfile />} />
       </Route>
       <Route path="*" element={<NotFound />} />

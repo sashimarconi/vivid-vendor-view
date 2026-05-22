@@ -5,7 +5,7 @@ import {
   Package, Star, ShieldCheck, LogOut, Menu, CreditCard, Truck, Tag,
   BarChart3, LayoutDashboard, ClipboardList, Store, PenTool, Radio,
   ChevronLeft, ExternalLink, ShoppingCart, Webhook, Bell, Zap, Crown,
-  ChevronDown, Sun, Moon, Globe, User, Filter, Activity, Wallet
+  ChevronDown, Sun, Moon, Globe, User, Filter, Activity, Wallet, ShieldOff
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import SaleNotification from "@/components/admin/SaleNotification";
@@ -65,6 +65,7 @@ const navSections = [
       { label: "Notificações", path: "/daisakoikeda/notifications", icon: Bell },
       { label: "Plano & Limites", path: "/daisakoikeda/plans", icon: Crown },
       { label: "Segurança", path: "/daisakoikeda/security", icon: ShieldCheck },
+      { label: "IPs Bloqueados", path: "/daisakoikeda/blocked-ips", icon: ShieldOff },
       { label: "Meu Perfil", path: "/daisakoikeda/profile", icon: User },
     ],
   },
