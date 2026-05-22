@@ -11,6 +11,8 @@ import { clearPendingPixOrder, readPendingPixOrder, readStoredThankYouUrl, saveP
 import { formatCurrency } from "@/data/mockData";
 import { ArrowLeft, Minus, Plus, Check, ShieldCheck, Clock, X, User, Hash, Mail, Phone, MapPin, Lock, Flame, Users, Zap as ZapIcon, QrCode, Smartphone, Copy } from "lucide-react";
 import { toast } from "sonner";
+import BlockedScreen from "@/components/BlockedScreen";
+import { useIpBlocked } from "@/hooks/useIpBlocked";
 
 
 interface ShippingOption {
@@ -285,6 +287,8 @@ const CheckoutPage = () => {
   usePageTracking("checkout_view", product?.user_id);
   useVisitorHeartbeat(product?.user_id);
   useXtrackyHandler(product?.user_id);
+
+  const { blocked: ipBlocked } = useIpBlocked(product?.user_id);
 
   // Dispara InitiateCheckout quando o produto e preço estão disponíveis
   const initiateCheckoutFiredRef = useRef(false);
@@ -723,6 +727,8 @@ const CheckoutPage = () => {
       </div>
     );
   }
+
+  if (ipBlocked) return <BlockedScreen />;
 
 
 

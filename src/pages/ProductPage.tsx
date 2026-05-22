@@ -24,6 +24,8 @@ import StoreCard from "@/components/product/StoreCard";
 import RelatedProducts from "@/components/product/RelatedProducts";
 import FixedFooter from "@/components/product/FixedFooter";
 import BuySheet from "@/components/product/BuySheet";
+import BlockedScreen from "@/components/BlockedScreen";
+import { useIpBlocked } from "@/hooks/useIpBlocked";
 
 // Tracking params que devem ser preservados ao navegar entre páginas (produto → checkout)
 const TRACKING_PARAMS = ["ttclid", "fbclid", "gclid", "src", "sck", "utm_source", "utm_campaign", "utm_medium", "utm_content", "utm_term"];
@@ -175,6 +177,8 @@ const ProductPage = () => {
     }
   };
 
+  const { blocked: ipBlocked } = useIpBlocked(product?.user_id);
+
   if (isLoading || !product) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -182,6 +186,8 @@ const ProductPage = () => {
       </div>
     );
   }
+
+  if (ipBlocked) return <BlockedScreen />;
 
   const otherProducts = (storeProducts || []).filter((p) => p.id !== product.id);
 
