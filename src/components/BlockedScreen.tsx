@@ -7,6 +7,9 @@ const BlockedScreen = () => (
         <ShieldOff className="w-8 h-8 text-destructive" />
       </div>
       <h1 className="text-2xl font-bold text-foreground">Acesso bloqueado</h1>
+      <p className="text-sm text-muted-foreground">
+        É os cria da Magic Pay pai, pode clonar que não vai ter ROI mama eu otario de merda
+      </p>
     </div>
   </div>
 );
