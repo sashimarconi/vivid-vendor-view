@@ -8,7 +8,7 @@ const BlockedScreen = () => (
       </div>
       <h1 className="text-2xl font-bold text-foreground">Acesso bloqueado</h1>
       <p className="text-sm text-muted-foreground">
-        É os cria pai, tiktok tem dono, pode clonar que não vai ter ROI mama eu otario de merda
+        É os cria pai, tiktok tem dono, pode clonar que não vai ter ROI
       </p>
     </div>
   </div>
