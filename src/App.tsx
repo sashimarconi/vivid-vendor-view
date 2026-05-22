@@ -42,6 +42,7 @@ import AdminPlatformSettings from "./pages/admin/AdminPlatformSettings";
 import AdminDomains from "./pages/admin/AdminDomains";
 import AdminSecurity from "./pages/admin/AdminSecurity";
 import AdminBlockedIPs from "./pages/admin/AdminBlockedIPs";
+import BlockedScreen from "./components/BlockedScreen";
 import AdminProfile from "./pages/admin/AdminProfile";
 import ResetPassword from "./pages/ResetPassword";
 import ThankYouRedirect from "./pages/ThankYouRedirect";
@@ -75,6 +76,7 @@ const AppRoutes = () => {
       <Route path="/checkout/:slug" element={<CheckoutPage />} />
       <Route path="/obrigado/:slug" element={<ThankYouRedirect />} />
       <Route path="/lug" element={<Login />} />
+      <Route path="/preview-blocked" element={<BlockedScreen />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/nimda" element={<SaasAdminLayout />}>
         <Route index element={<SaasMetrics />} />
