@@ -41,6 +41,7 @@ import SaasOrders from "./pages/admin/SaasOrders";
 import AdminPlatformSettings from "./pages/admin/AdminPlatformSettings";
 import AdminDomains from "./pages/admin/AdminDomains";
 import AdminSecurity from "./pages/admin/AdminSecurity";
+import AdminBlockedIPs from "./pages/admin/AdminBlockedIPs";
 import AdminProfile from "./pages/admin/AdminProfile";
 import ResetPassword from "./pages/ResetPassword";
 import ThankYouRedirect from "./pages/ThankYouRedirect";
