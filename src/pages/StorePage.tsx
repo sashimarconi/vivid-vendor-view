@@ -6,6 +6,8 @@ import { useXtrackyHandler } from "@/hooks/useXtrackyHandler";
 import { fetchStoreBySlug, fetchStoreProducts } from "@/lib/supabase-queries";
 import { formatCurrency } from "@/data/mockData";
 import ProductHeader from "@/components/product/ProductHeader";
+import BlockedScreen from "@/components/BlockedScreen";
+import { useIpBlocked } from "@/hooks/useIpBlocked";
 
 const StorePage = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -27,6 +29,8 @@ const StorePage = () => {
     enabled: !!store?.id,
   });
 
+  const { blocked: ipBlocked } = useIpBlocked(store?.user_id);
+
   if (storeLoading || !store) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -34,6 +38,8 @@ const StorePage = () => {
       </div>
     );
   }
+
+  if (ipBlocked) return <BlockedScreen />;
 
   return (
     <div className="min-h-screen bg-background">

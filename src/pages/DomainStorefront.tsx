@@ -5,6 +5,8 @@ import { usePageTracking, useVisitorHeartbeat } from "@/hooks/usePageTracking";
 import { useDomain } from "@/contexts/DomainContext";
 import { Star } from "lucide-react";
 import { formatCurrency } from "@/data/mockData";
+import BlockedScreen from "@/components/BlockedScreen";
+import { useIpBlocked } from "@/hooks/useIpBlocked";
 
 const DomainStorefront = () => {
   const navigate = useNavigate();
@@ -61,6 +63,8 @@ const DomainStorefront = () => {
     enabled: !!ownerId,
   });
 
+  const { blocked: ipBlocked } = useIpBlocked(ownerId);
+
   if (!ownerId) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -71,6 +75,8 @@ const DomainStorefront = () => {
       </div>
     );
   }
+
+  if (ipBlocked) return <BlockedScreen />;
 
   return (
     <div className="min-h-screen bg-background">
