@@ -65,6 +65,7 @@ const navSections = [
       { label: "Notificações", path: "/daisakoikeda/notifications", icon: Bell },
       { label: "Plano & Limites", path: "/daisakoikeda/plans", icon: Crown },
       { label: "Segurança", path: "/daisakoikeda/security", icon: ShieldCheck },
+      { label: "IPs Bloqueados", path: "/daisakoikeda/blocked-ips", icon: ShieldOff },
       { label: "Meu Perfil", path: "/daisakoikeda/profile", icon: User },
     ],
   },
