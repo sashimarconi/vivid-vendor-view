@@ -7,9 +7,6 @@ const BlockedScreen = () => (
         <ShieldOff className="w-8 h-8 text-destructive" />
       </div>
       <h1 className="text-2xl font-bold text-foreground">Acesso bloqueado</h1>
-      <p className="text-sm text-muted-foreground">
-        Seu acesso a esta página foi bloqueado pelo lojista. Se você acredita que isso é um engano, entre em contato com o suporte da loja.
-      </p>
     </div>
   </div>
 );
