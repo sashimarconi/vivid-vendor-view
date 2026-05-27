@@ -17,7 +17,8 @@ interface SummaryRow {
 
 interface DailyRow {
   gateway_name: string;
-  day: string;
+  bucket: string;
+  unit: "hour" | "day";
   pix_generated: number;
   paid: number;
   conversion_pct: number | null;
@@ -25,9 +26,10 @@ interface DailyRow {
 }
 
 const PERIODS = [
-  { label: "7 dias", days: 7 },
-  { label: "14 dias", days: 14 },
-  { label: "30 dias", days: 30 },
+  { label: "1h", hours: 1 },
+  { label: "24h", hours: 24 },
+  { label: "7 dias", hours: 168 },
+  { label: "30 dias", hours: 720 },
 ];
 
 const formatCurrency = (v: number) => `R$ ${Number(v).toFixed(2).replace(".", ",")}`;
