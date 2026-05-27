@@ -1852,18 +1852,19 @@ export type Database = {
         }[]
       }
       user_gateway_conversion: {
-        Args: { _days?: number }
+        Args: { _hours?: number }
         Returns: {
+          bucket: string
           conversion_pct: number
-          day: string
           gateway_name: string
           paid: number
           pix_generated: number
           revenue: number
+          unit: string
         }[]
       }
       user_gateway_conversion_summary: {
-        Args: { _days?: number }
+        Args: { _hours?: number }
         Returns: {
           avg_ticket: number
           conversion_pct: number

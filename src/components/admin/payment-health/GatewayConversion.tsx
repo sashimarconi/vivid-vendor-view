@@ -17,7 +17,8 @@ interface SummaryRow {
 
 interface DailyRow {
   gateway_name: string;
-  day: string;
+  bucket: string;
+  unit: "hour" | "day";
   pix_generated: number;
   paid: number;
   conversion_pct: number | null;
@@ -25,15 +26,16 @@ interface DailyRow {
 }
 
 const PERIODS = [
-  { label: "7 dias", days: 7 },
-  { label: "14 dias", days: 14 },
-  { label: "30 dias", days: 30 },
+  { label: "1h", hours: 1 },
+  { label: "24h", hours: 24 },
+  { label: "7 dias", hours: 168 },
+  { label: "30 dias", hours: 720 },
 ];
 
 const formatCurrency = (v: number) => `R$ ${Number(v).toFixed(2).replace(".", ",")}`;
 
 const GatewayConversion = () => {
-  const [days, setDays] = useState(7);
+  const [hours, setHours] = useState(24);
   const [summary, setSummary] = useState<SummaryRow[]>([]);
   const [daily, setDaily] = useState<DailyRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,14 +44,14 @@ const GatewayConversion = () => {
     setLoading(true);
     const [s, d] = await Promise.all([
       (supabase as unknown as { rpc: (n: string, p: Record<string, unknown>) => Promise<{ data: SummaryRow[] | null }> })
-        .rpc("user_gateway_conversion_summary", { _days: days }),
+        .rpc("user_gateway_conversion_summary", { _hours: hours }),
       (supabase as unknown as { rpc: (n: string, p: Record<string, unknown>) => Promise<{ data: DailyRow[] | null }> })
-        .rpc("user_gateway_conversion", { _days: days }),
+        .rpc("user_gateway_conversion", { _hours: hours }),
     ]);
     setSummary(s.data || []);
     setDaily(d.data || []);
     setLoading(false);
-  }, [days]);
+  }, [hours]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -58,17 +60,26 @@ const GatewayConversion = () => {
     return summary.reduce((a, b) => (Number(a.conversion_pct ?? 0) >= Number(b.conversion_pct ?? 0) ? a : b));
   }, [summary]);
 
-  // Pivot: dias × gateways
+  const isHourly = hours <= 48;
+
+  // Pivot: buckets × gateways
   const { dayList, gatewayList, matrix } = useMemo(() => {
-    const days = Array.from(new Set(daily.map(r => r.day))).sort((a, b) => b.localeCompare(a));
+    const buckets = Array.from(new Set(daily.map(r => r.bucket))).sort((a, b) => b.localeCompare(a));
     const gateways = Array.from(new Set(daily.map(r => r.gateway_name))).sort();
     const m: Record<string, Record<string, DailyRow>> = {};
     daily.forEach(r => {
-      if (!m[r.day]) m[r.day] = {};
-      m[r.day][r.gateway_name] = r;
+      if (!m[r.bucket]) m[r.bucket] = {};
+      m[r.bucket][r.gateway_name] = r;
     });
-    return { dayList: days, gatewayList: gateways, matrix: m };
+    return { dayList: buckets, gatewayList: gateways, matrix: m };
   }, [daily]);
+
+  const formatBucket = (b: string) => {
+    const d = new Date(b);
+    return isHourly
+      ? d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", day: "2-digit", month: "short" })
+      : d.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" });
+  };
 
   const convColor = (pct: number | null) => {
     const v = Number(pct ?? 0);
@@ -85,13 +96,13 @@ const GatewayConversion = () => {
           <TrendingUp className="w-4 h-4 text-primary" />
           <h3 className="text-sm font-semibold text-foreground">Conversão por Gateway</h3>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           {PERIODS.map(p => (
             <Button
-              key={p.days}
+              key={p.hours}
               size="sm"
-              variant={days === p.days ? "default" : "outline"}
-              onClick={() => setDays(p.days)}
+              variant={hours === p.hours ? "default" : "outline"}
+              onClick={() => setHours(p.hours)}
             >
               {p.label}
             </Button>
@@ -157,29 +168,29 @@ const GatewayConversion = () => {
             })}
           </div>
 
-          {/* Tabela diária */}
+          {/* Tabela por bucket */}
           {dayList.length > 0 && (
             <Card>
               <CardContent className="p-4">
-                <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Conversão diária</p>
+                <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3">
+                  Conversão por {isHourly ? "hora" : "dia"}
+                </p>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="text-left text-xs text-muted-foreground border-b border-border/60">
-                        <th className="py-2 pr-4 font-medium">Dia</th>
+                        <th className="py-2 pr-4 font-medium">{isHourly ? "Hora" : "Dia"}</th>
                         {gatewayList.map(g => (
                           <th key={g} className="py-2 px-3 font-medium capitalize text-center">{g}</th>
                         ))}
                       </tr>
                     </thead>
                     <tbody>
-                      {dayList.map(day => (
-                        <tr key={day} className="border-b border-border/30 last:border-0">
-                          <td className="py-2 pr-4 text-muted-foreground tabular-nums">
-                            {new Date(day + "T12:00:00").toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })}
-                          </td>
+                      {dayList.map(b => (
+                        <tr key={b} className="border-b border-border/30 last:border-0">
+                          <td className="py-2 pr-4 text-muted-foreground tabular-nums">{formatBucket(b)}</td>
                           {gatewayList.map(g => {
-                            const cell = matrix[day]?.[g];
+                            const cell = matrix[b]?.[g];
                             if (!cell) return <td key={g} className="py-2 px-3 text-center text-muted-foreground/50">—</td>;
                             return (
                               <td key={g} className="py-2 px-3 text-center">
