@@ -168,29 +168,29 @@ const GatewayConversion = () => {
             })}
           </div>
 
-          {/* Tabela diária */}
+          {/* Tabela por bucket */}
           {dayList.length > 0 && (
             <Card>
               <CardContent className="p-4">
-                <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Conversão diária</p>
+                <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3">
+                  Conversão por {isHourly ? "hora" : "dia"}
+                </p>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="text-left text-xs text-muted-foreground border-b border-border/60">
-                        <th className="py-2 pr-4 font-medium">Dia</th>
+                        <th className="py-2 pr-4 font-medium">{isHourly ? "Hora" : "Dia"}</th>
                         {gatewayList.map(g => (
                           <th key={g} className="py-2 px-3 font-medium capitalize text-center">{g}</th>
                         ))}
                       </tr>
                     </thead>
                     <tbody>
-                      {dayList.map(day => (
-                        <tr key={day} className="border-b border-border/30 last:border-0">
-                          <td className="py-2 pr-4 text-muted-foreground tabular-nums">
-                            {new Date(day + "T12:00:00").toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })}
-                          </td>
+                      {dayList.map(b => (
+                        <tr key={b} className="border-b border-border/30 last:border-0">
+                          <td className="py-2 pr-4 text-muted-foreground tabular-nums">{formatBucket(b)}</td>
                           {gatewayList.map(g => {
-                            const cell = matrix[day]?.[g];
+                            const cell = matrix[b]?.[g];
                             if (!cell) return <td key={g} className="py-2 px-3 text-center text-muted-foreground/50">—</td>;
                             return (
                               <td key={g} className="py-2 px-3 text-center">
