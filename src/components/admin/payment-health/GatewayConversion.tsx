@@ -35,7 +35,7 @@ const PERIODS = [
 const formatCurrency = (v: number) => `R$ ${Number(v).toFixed(2).replace(".", ",")}`;
 
 const GatewayConversion = () => {
-  const [days, setDays] = useState(7);
+  const [hours, setHours] = useState(24);
   const [summary, setSummary] = useState<SummaryRow[]>([]);
   const [daily, setDaily] = useState<DailyRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -44,14 +44,14 @@ const GatewayConversion = () => {
     setLoading(true);
     const [s, d] = await Promise.all([
       (supabase as unknown as { rpc: (n: string, p: Record<string, unknown>) => Promise<{ data: SummaryRow[] | null }> })
-        .rpc("user_gateway_conversion_summary", { _days: days }),
+        .rpc("user_gateway_conversion_summary", { _hours: hours }),
       (supabase as unknown as { rpc: (n: string, p: Record<string, unknown>) => Promise<{ data: DailyRow[] | null }> })
-        .rpc("user_gateway_conversion", { _days: days }),
+        .rpc("user_gateway_conversion", { _hours: hours }),
     ]);
     setSummary(s.data || []);
     setDaily(d.data || []);
     setLoading(false);
-  }, [days]);
+  }, [hours]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -60,17 +60,26 @@ const GatewayConversion = () => {
     return summary.reduce((a, b) => (Number(a.conversion_pct ?? 0) >= Number(b.conversion_pct ?? 0) ? a : b));
   }, [summary]);
 
-  // Pivot: dias × gateways
+  const isHourly = hours <= 48;
+
+  // Pivot: buckets × gateways
   const { dayList, gatewayList, matrix } = useMemo(() => {
-    const days = Array.from(new Set(daily.map(r => r.day))).sort((a, b) => b.localeCompare(a));
+    const buckets = Array.from(new Set(daily.map(r => r.bucket))).sort((a, b) => b.localeCompare(a));
     const gateways = Array.from(new Set(daily.map(r => r.gateway_name))).sort();
     const m: Record<string, Record<string, DailyRow>> = {};
     daily.forEach(r => {
-      if (!m[r.day]) m[r.day] = {};
-      m[r.day][r.gateway_name] = r;
+      if (!m[r.bucket]) m[r.bucket] = {};
+      m[r.bucket][r.gateway_name] = r;
     });
-    return { dayList: days, gatewayList: gateways, matrix: m };
+    return { dayList: buckets, gatewayList: gateways, matrix: m };
   }, [daily]);
+
+  const formatBucket = (b: string) => {
+    const d = new Date(b);
+    return isHourly
+      ? d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", day: "2-digit", month: "short" })
+      : d.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" });
+  };
 
   const convColor = (pct: number | null) => {
     const v = Number(pct ?? 0);
@@ -87,13 +96,13 @@ const GatewayConversion = () => {
           <TrendingUp className="w-4 h-4 text-primary" />
           <h3 className="text-sm font-semibold text-foreground">Conversão por Gateway</h3>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           {PERIODS.map(p => (
             <Button
-              key={p.days}
+              key={p.hours}
               size="sm"
-              variant={days === p.days ? "default" : "outline"}
-              onClick={() => setDays(p.days)}
+              variant={hours === p.hours ? "default" : "outline"}
+              onClick={() => setHours(p.hours)}
             >
               {p.label}
             </Button>
