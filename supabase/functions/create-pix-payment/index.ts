@@ -829,6 +829,28 @@ Deno.serve(async (req) => {
       console.error("Order save error:", orderError);
     }
 
+    // Liga o log de sucesso do gateway ao pedido recém-criado (alimenta conversão por gateway)
+    if (orderData?.id && usedGateway?.gateway_name) {
+      try {
+        const { data: lastLog } = await supabase
+          .from("gateway_health_logs")
+          .select("id")
+          .eq("user_id", product.user_id)
+          .eq("gateway_name", usedGateway.gateway_name)
+          .eq("success", true)
+          .is("order_id", null)
+          .gte("created_at", new Date(Date.now() - 5 * 60 * 1000).toISOString())
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (lastLog?.id) {
+          await supabase.from("gateway_health_logs").update({ order_id: orderData.id }).eq("id", lastLog.id);
+        }
+      } catch (e) {
+        console.error("[health log] backfill order_id error:", e);
+      }
+    }
+
     // Fire TikTok CompletePayment via Server-to-Server quando o PIX é gerado.
     // Bypassa ad-blockers do navegador do visitante (que comumente bloqueiam
     // analytics.tiktok.com). Roda em paralelo, sem await, pra não atrasar a resposta.
