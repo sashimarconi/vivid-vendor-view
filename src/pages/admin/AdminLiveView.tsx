@@ -361,141 +361,198 @@ const AdminLiveView = () => {
     { label: "Vendas (hoje)", value: formatCurrency(stats.revenue), icon: DollarSign, colSpan: "col-span-2", highlight: true },
   ];
 
+  const headingFont = { fontFamily: "'Space Grotesk', system-ui, sans-serif" };
+  const bodyFont = { fontFamily: "'DM Sans', system-ui, sans-serif" };
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-foreground via-foreground to-primary bg-clip-text text-transparent">
-              Radar de Vendas
-            </h1>
-            <span className="flex items-center gap-1.5 bg-marketplace-green/10 text-marketplace-green text-xs font-medium px-2.5 py-1 rounded-full border border-marketplace-green/20">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-marketplace-green opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-marketplace-green" />
+    <div className="relative space-y-6" style={bodyFont}>
+      {/* Ambient background */}
+      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+        <div className="absolute -top-40 -left-40 h-[480px] w-[480px] rounded-full bg-[#2dd4a8]/10 blur-[140px]" />
+        <div className="absolute top-1/3 -right-32 h-[420px] w-[420px] rounded-full bg-[#73ffb8]/8 blur-[160px]" />
+        <div className="absolute inset-0 opacity-[0.035] [background-image:linear-gradient(to_right,#73ffb8_1px,transparent_1px),linear-gradient(to_bottom,#73ffb8_1px,transparent_1px)] [background-size:48px_48px]" />
+      </div>
+
+      {/* Header */}
+      <div className="relative overflow-hidden rounded-2xl border border-[#2dd4a8]/15 bg-gradient-to-br from-[#0d1b2a]/80 via-[#0d1b2a]/40 to-[#1b4332]/30 backdrop-blur-xl p-6">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,#2dd4a8_0%,transparent_55%)] opacity-[0.08] pointer-events-none" />
+        <div className="relative flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-3">
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-[#2dd4a8]/15 border border-[#2dd4a8]/30">
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#73ffb8] opacity-75" />
+                  <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[#2dd4a8]" />
+                </span>
               </span>
-              ao vivo
-            </span>
+              <h1
+                className="text-3xl md:text-4xl font-bold tracking-tight bg-gradient-to-r from-white via-[#73ffb8] to-[#2dd4a8] bg-clip-text text-transparent"
+                style={headingFont}
+              >
+                Radar de Vendas
+              </h1>
+              <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-[#2dd4a8]/30 bg-[#2dd4a8]/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-[#73ffb8]">
+                ao vivo
+              </span>
+            </div>
+            <p className="mt-2 text-sm text-muted-foreground" style={bodyFont}>
+              Monitoramento em tempo real • atualização contínua a cada 2s
+            </p>
           </div>
-          <p className="text-sm text-muted-foreground mt-1">Monitoramento em tempo real</p>
+          <div className="flex items-center gap-3">
+            <div className="rounded-xl border border-[#2dd4a8]/20 bg-black/20 px-4 py-2.5 backdrop-blur">
+              <p className="text-[10px] uppercase tracking-widest text-muted-foreground" style={headingFont}>Vendas hoje</p>
+              <p className="text-xl font-bold text-[#73ffb8] tabular-nums" style={headingFont}>{formatCurrency(stats.revenue)}</p>
+            </div>
+            <div className="rounded-xl border border-[#2dd4a8]/20 bg-black/20 px-4 py-2.5 backdrop-blur">
+              <p className="text-[10px] uppercase tracking-widest text-muted-foreground" style={headingFont}>Visitantes</p>
+              <p className="text-xl font-bold text-white tabular-nums" style={headingFont}>{formatCompact(stats.visitors)}</p>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left column */}
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-3">
-            {kpiCards.map((card) => {
-              const isHighlight = "highlight" in card && card.highlight;
-              const valueClass = "valueClass" in card && card.valueClass ? card.valueClass : "text-foreground";
-              return (
-                <Card
-                  key={card.label}
-                  className={`relative overflow-hidden border-border/60 bg-card/40 backdrop-blur transition-all hover:border-primary/40 ${card.colSpan} ${
-                    isHighlight ? "shadow-[0_0_32px_-12px_hsl(var(--primary)/0.5)] border-primary/30" : ""
-                  }`}
-                >
-                  {isHighlight && (
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent pointer-events-none" />
-                  )}
-                  <CardContent className="relative p-4">
-                    <span className="text-[11px] uppercase tracking-wider text-muted-foreground/80 flex items-center gap-1.5 font-medium">
-                      <card.icon className="w-3.5 h-3.5 text-muted-foreground" /> {card.label}
-                    </span>
-                    <p className={`text-2xl font-bold mt-1.5 tabular-nums ${isHighlight ? "text-3xl text-foreground" : valueClass}`}>
-                      {card.value}
-                    </p>
-                  </CardContent>
-                </Card>
-              );
-            })}
+      {/* KPI Bento */}
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+        {kpiCards.map((card) => {
+          const isHighlight = "highlight" in card && card.highlight;
+          const valueClass = "valueClass" in card && card.valueClass ? card.valueClass : "text-white";
+          return (
+            <div
+              key={card.label}
+              className={`group relative overflow-hidden rounded-2xl border bg-gradient-to-br from-[#0d1b2a]/60 to-[#0d1b2a]/30 backdrop-blur-xl p-4 transition-all duration-300 hover:-translate-y-0.5 ${
+                isHighlight
+                  ? "col-span-2 md:col-span-4 lg:col-span-6 border-[#2dd4a8]/40 shadow-[0_0_40px_-10px_rgba(45,212,168,0.4)]"
+                  : "border-white/5 hover:border-[#2dd4a8]/30"
+              }`}
+            >
+              {isHighlight && (
+                <>
+                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,#2dd4a8_0%,transparent_50%)] opacity-[0.12] pointer-events-none" />
+                  <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-[#73ffb8]/10 blur-3xl" />
+                </>
+              )}
+              <div className="relative flex items-center justify-between">
+                <span className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground" style={headingFont}>
+                  <card.icon className="h-3 w-3" /> {card.label}
+                </span>
+                <span className="h-1.5 w-1.5 rounded-full bg-[#2dd4a8] opacity-60 group-hover:opacity-100 transition" />
+              </div>
+              <p
+                className={`relative mt-2 tabular-nums font-bold ${isHighlight ? "text-4xl md:text-5xl bg-gradient-to-r from-white via-[#73ffb8] to-[#2dd4a8] bg-clip-text text-transparent" : `text-2xl ${valueClass}`}`}
+                style={headingFont}
+              >
+                {card.value}
+              </p>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Main grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {/* Globe — large featured tile */}
+        <div className="lg:col-span-2 relative overflow-hidden rounded-2xl border border-[#2dd4a8]/15 bg-gradient-to-br from-[#0d1b2a]/80 to-[#1b4332]/40 backdrop-blur-xl" style={{ height: 460 }}>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_30%,#0d1b2a_85%)] pointer-events-none z-[1]" />
+
+          <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#2dd4a8]/30 bg-black/40 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-[#73ffb8] backdrop-blur" style={headingFont}>
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#73ffb8] opacity-75" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#2dd4a8]" />
+              </span>
+              Global Live Feed
+            </span>
           </div>
 
+          <div className="absolute top-4 right-4 z-10 rounded-xl border border-white/10 bg-black/40 backdrop-blur px-3 py-2.5 space-y-1.5">
+            <div className="flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-[#73ffb8] shadow-[0_0_8px_#73ffb8]" />
+              <span className="text-[11px] text-muted-foreground" style={bodyFont}>Visitantes ativos</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-[#2dd4a8]" />
+              <span className="text-[11px] text-muted-foreground" style={bodyFont}>Servidor</span>
+            </div>
+          </div>
+
+          <div className="absolute bottom-5 left-5 z-10">
+            <p className="text-5xl font-bold text-white tabular-nums leading-none" style={headingFont}>{formatCompact(stats.visitors)}</p>
+            <p className="mt-1 text-xs uppercase tracking-widest text-[#73ffb8]/80" style={headingFont}>visitantes ativos agora</p>
+          </div>
+
+          <Suspense fallback={<div className="w-full h-full flex items-center justify-center text-muted-foreground">Carregando globo...</div>}>
+            <LiveGlobe
+              visitors={sessions.map(s => ({ session_id: s.session_id, latitude: s.latitude, longitude: s.longitude }))}
+              className="w-full h-full"
+            />
+          </Suspense>
+        </div>
+
+        {/* Behavior tile */}
+        <div className="rounded-2xl border border-white/5 bg-gradient-to-br from-[#0d1b2a]/70 to-[#0d1b2a]/30 backdrop-blur-xl p-4">
           <ClientBehavior
             activeCarts={behavior.activeCarts}
             inCheckout={behavior.inCheckout}
             purchased={behavior.purchased}
           />
-
-          <Card className="border-border/60 bg-card/60 backdrop-blur">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-foreground">Histórico de Vendas</span>
-                <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Hoje</span>
-              </div>
-              <div className="h-[180px] mt-3">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={hourlyData}>
-                    <defs>
-                      <linearGradient id="liveRevenueGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="hsl(263, 80%, 60%)" stopOpacity={0.5} />
-                        <stop offset="100%" stopColor="hsl(263, 80%, 60%)" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-                    <XAxis dataKey="hour" tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }} axisLine={false} tickLine={false} />
-                    <YAxis tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }} axisLine={false} tickLine={false} />
-                    <Tooltip
-                      contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, color: "hsl(var(--foreground))" }}
-                      formatter={(value: number) => [formatCurrency(value), "Receita"]}
-                    />
-                    <Area type="monotone" dataKey="value" stroke="hsl(263, 80%, 65%)" strokeWidth={2.5} fill="url(#liveRevenueGrad)" dot={false} />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-border/60 bg-card/60 backdrop-blur">
-            <CardContent className="p-5">
-              <AnimatedFunnel data={funnelData} />
-            </CardContent>
-          </Card>
-
-          <LiveSessionsDebug />
         </div>
 
-        {/* Right column */}
-        <div className="space-y-4">
-          {/* Interactive Globe */}
-          <Card className="border-border relative overflow-hidden" style={{ height: 420 }}>
-            <CardContent className="p-0 h-full relative">
-              <div className="absolute top-4 right-4 z-10 rounded-xl p-3 border border-border bg-card/90 backdrop-blur">
-                <div className="flex items-center gap-2 mb-1.5">
-                  <span className="w-2 h-2 rounded-full bg-marketplace-green" />
-                  <span className="text-xs text-muted-foreground">Visitantes Ativos</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-primary" />
-                  <span className="text-xs text-muted-foreground">Servidor</span>
-                </div>
-              </div>
-
-              <div className="absolute bottom-4 left-4 z-10">
-                <p className="text-4xl font-bold text-foreground">{formatCompact(stats.visitors)}</p>
-                <p className="text-sm text-muted-foreground">visitantes ativos</p>
-              </div>
-
-              <Suspense fallback={<div className="w-full h-full flex items-center justify-center text-muted-foreground">Carregando globo...</div>}>
-                <LiveGlobe
-                  visitors={sessions.map(s => ({ session_id: s.session_id, latitude: s.latitude, longitude: s.longitude }))}
-                  className="w-full h-full"
+        {/* Sales history chart */}
+        <div className="lg:col-span-2 rounded-2xl border border-white/5 bg-gradient-to-br from-[#0d1b2a]/70 to-[#0d1b2a]/30 backdrop-blur-xl p-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-semibold text-white" style={headingFont}>Histórico de Vendas</p>
+              <p className="text-[11px] text-muted-foreground" style={bodyFont}>Receita acumulada por hora • hoje</p>
+            </div>
+            <span className="rounded-full border border-[#2dd4a8]/25 bg-[#2dd4a8]/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-[#73ffb8]" style={headingFont}>Hoje</span>
+          </div>
+          <div className="h-[200px] mt-4">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={hourlyData}>
+                <defs>
+                  <linearGradient id="liveRevenueGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#2dd4a8" stopOpacity={0.55} />
+                    <stop offset="100%" stopColor="#2dd4a8" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#2dd4a8" opacity={0.08} />
+                <XAxis dataKey="hour" tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }} axisLine={false} tickLine={false} />
+                <Tooltip
+                  contentStyle={{ background: "rgba(13,27,42,0.95)", border: "1px solid rgba(45,212,168,0.3)", borderRadius: 12, color: "#fff" }}
+                  formatter={(value: number) => [formatCurrency(value), "Receita"]}
                 />
-              </Suspense>
-            </CardContent>
-          </Card>
+                <Area type="monotone" dataKey="value" stroke="#73ffb8" strokeWidth={2.5} fill="url(#liveRevenueGrad)" dot={false} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
 
-          {/* Pages Visited */}
+        {/* Pages visited */}
+        <div className="rounded-2xl border border-white/5 bg-gradient-to-br from-[#0d1b2a]/70 to-[#0d1b2a]/30 backdrop-blur-xl p-4">
           <PagesVisited
             todayEvents={todayEvents}
             liveSessions={sessions.map(s => ({ page_url: s.page_url }))}
           />
+        </div>
 
-          {/* Sessions by Location */}
+        {/* Funnel */}
+        <div className="lg:col-span-2 rounded-2xl border border-white/5 bg-gradient-to-br from-[#0d1b2a]/70 to-[#0d1b2a]/30 backdrop-blur-xl p-5">
+          <AnimatedFunnel data={funnelData} />
+        </div>
+
+        {/* Sessions by location */}
+        <div className="rounded-2xl border border-white/5 bg-gradient-to-br from-[#0d1b2a]/70 to-[#0d1b2a]/30 backdrop-blur-xl p-4">
           <SessionsByLocation
             liveSessions={sessions.map(s => ({ session_id: s.session_id, city: s.city, region: s.region, country: s.country }))}
             todaySessions={todaySessions}
           />
+        </div>
+
+        {/* Debug — full width */}
+        <div className="lg:col-span-3 rounded-2xl border border-dashed border-[#2dd4a8]/20 bg-[#0d1b2a]/40 backdrop-blur-xl p-4">
+          <LiveSessionsDebug />
         </div>
       </div>
     </div>
