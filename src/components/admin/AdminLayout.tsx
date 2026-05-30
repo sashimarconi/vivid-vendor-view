@@ -459,9 +459,7 @@ const AdminLayout = () => {
               {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
 
-            <div className="h-8 w-8 inline-flex items-center justify-center rounded-lg text-muted-foreground hover:text-[hsl(152_100%_73%)] hover:bg-[hsl(165_65%_51%/0.10)] border border-transparent hover:border-[hsl(165_65%_51%/0.25)] transition-all">
-              <PushNotificationToggle />
-            </div>
+            <PushNotificationToggle />
 
             <div className="mx-1 h-6 w-px bg-[hsl(165_30%_18%)]" />
 
