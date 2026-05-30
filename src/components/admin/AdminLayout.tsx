@@ -327,16 +327,24 @@ const AdminLayout = () => {
   );
 
   return (
-    <div className={cn("min-h-screen flex", theme === "dark" ? "void-gradient-bg" : "bg-background")}>
+    <div className={cn("min-h-screen flex w-full", theme === "dark" ? "void-gradient-bg" : "bg-background")}>
       {/* Desktop sidebar */}
       <aside
         className={cn(
-          "hidden md:flex flex-col fixed top-0 left-0 h-screen border-r border-border/60 z-50 transition-all duration-200",
-          sidebarOpen ? "w-[220px]" : "w-[84px]"
+          "hidden md:flex flex-col fixed top-0 left-0 h-screen z-50 transition-all duration-200",
+          sidebarOpen ? "w-[230px]" : "w-[76px]"
         )}
         style={{
-          background: theme === "dark" ? 'hsl(240 6% 7% / 0.95)' : 'hsl(0 0% 100% / 0.95)',
-          backdropFilter: 'blur(20px)'
+          background: theme === "dark"
+            ? 'linear-gradient(180deg, hsl(200 45% 7% / 0.96) 0%, hsl(200 40% 6% / 0.96) 100%)'
+            : 'hsl(0 0% 100% / 0.95)',
+          backdropFilter: 'blur(24px)',
+          borderRight: theme === "dark"
+            ? '1px solid hsl(165 30% 16% / 0.8)'
+            : '1px solid hsl(214 32% 91%)',
+          boxShadow: theme === "dark"
+            ? 'inset -1px 0 0 hsl(152 100% 73% / 0.04), 4px 0 24px -12px hsl(165 65% 51% / 0.15)'
+            : undefined,
         }}
       >
         <SidebarNav />
@@ -344,40 +352,85 @@ const AdminLayout = () => {
 
       {/* Mobile overlay */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden" onClick={() => setMobileMenuOpen(false)} />
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 md:hidden" onClick={() => setMobileMenuOpen(false)} />
       )}
 
       {/* Mobile sidebar */}
       <aside
         className={cn(
-          "fixed top-0 left-0 h-screen w-[220px] bg-card border-r border-border/60 z-50 transition-transform duration-200 md:hidden",
+          "fixed top-0 left-0 h-screen w-[230px] z-50 transition-transform duration-200 md:hidden",
           mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
         )}
+        style={{
+          background: theme === "dark" ? 'hsl(200 45% 7% / 0.98)' : 'hsl(0 0% 100%)',
+          backdropFilter: 'blur(24px)',
+          borderRight: theme === "dark" ? '1px solid hsl(165 30% 16%)' : '1px solid hsl(214 32% 91%)',
+        }}
       >
         <SidebarNav />
       </aside>
 
       {/* Main content */}
-      <div className={cn("flex-1 transition-all duration-200", sidebarOpen ? "md:ml-[220px]" : "md:ml-[84px]")}>
-        <header className="sticky top-0 z-30 h-14 border-b border-border/60 flex items-center px-5 gap-3" style={{ background: theme === "dark" ? 'hsl(240 6% 7% / 0.8)' : 'hsl(0 0% 100% / 0.8)', backdropFilter: 'blur(20px)' }}>
-          <button className="md:hidden text-muted-foreground hover:text-foreground transition-colors" onClick={() => setMobileMenuOpen(true)}>
+      <div className={cn("flex-1 min-w-0 transition-all duration-200", sidebarOpen ? "md:ml-[230px]" : "md:ml-[76px]")}>
+        <header
+          className="sticky top-0 z-30 h-14 flex items-center px-5 gap-3"
+          style={{
+            background: theme === "dark"
+              ? 'linear-gradient(180deg, hsl(200 45% 7% / 0.92) 0%, hsl(200 45% 7% / 0.78) 100%)'
+              : 'hsl(0 0% 100% / 0.85)',
+            backdropFilter: 'blur(24px)',
+            borderBottom: theme === "dark"
+              ? '1px solid hsl(165 30% 16% / 0.7)'
+              : '1px solid hsl(214 32% 91%)',
+            boxShadow: theme === "dark"
+              ? '0 1px 0 hsl(152 100% 73% / 0.04), 0 8px 24px -16px hsl(0 0% 0% / 0.5)'
+              : undefined,
+          }}
+        >
+          <button
+            className="md:hidden p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-[hsl(165_65%_51%/0.08)] transition-colors"
+            onClick={() => setMobileMenuOpen(true)}
+          >
             <Menu className="w-5 h-5" />
           </button>
+
+          {/* Live status pill */}
+          <div className="hidden sm:flex items-center gap-2 rounded-full border border-[hsl(165_65%_51%/0.25)] bg-[hsl(165_65%_51%/0.08)] px-3 py-1">
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[hsl(152_100%_73%)] opacity-75" />
+              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[hsl(165_65%_51%)]" />
+            </span>
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-[hsl(152_100%_73%)]">
+              Sistema Online
+            </span>
+          </div>
+
           <div className="flex-1" />
-          <div className="flex items-center gap-3">
+
+          <div className="flex items-center gap-1.5">
             <button
               onClick={toggleTheme}
-              className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+              className="h-8 w-8 inline-flex items-center justify-center rounded-lg text-muted-foreground hover:text-[hsl(152_100%_73%)] hover:bg-[hsl(165_65%_51%/0.10)] border border-transparent hover:border-[hsl(165_65%_51%/0.25)] transition-all"
               title={theme === "dark" ? "Modo claro" : "Modo escuro"}
             >
               {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
-            <PushNotificationToggle />
+
+            <div className="h-8 w-8 inline-flex items-center justify-center rounded-lg text-muted-foreground hover:text-[hsl(152_100%_73%)] hover:bg-[hsl(165_65%_51%/0.10)] border border-transparent hover:border-[hsl(165_65%_51%/0.25)] transition-all">
+              <PushNotificationToggle />
+            </div>
+
+            <div className="mx-1 h-6 w-px bg-[hsl(165_30%_18%)]" />
+
             <Link
               to="/daisakoikeda/profile"
-              className="h-7 w-7 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center hover:ring-2 hover:ring-primary/40 transition-all"
+              className="relative h-8 w-8 rounded-full flex items-center justify-center transition-all hover:scale-105"
+              style={{
+                background: 'linear-gradient(135deg, hsl(165 65% 51%), hsl(152 100% 73%))',
+                boxShadow: '0 0 0 1px hsl(200 45% 7%), 0 0 12px hsl(165 65% 51% / 0.4)',
+              }}
             >
-              <span className="text-white text-[10px] font-bold">VT</span>
+              <span className="text-[10px] font-bold text-[hsl(200_45%_7%)]">VT</span>
             </Link>
           </div>
         </header>
