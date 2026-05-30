@@ -242,28 +242,64 @@ const AdminLayout = () => {
       {/* Nav items */}
       <div className="flex-1 overflow-hidden px-3 py-4">
         <ScrollArea className="h-full" type="auto">
-          <nav className="space-y-2 pr-2">
+          <nav className={cn("pr-2", sidebarOpen ? "space-y-2" : "space-y-1")}>
             {navSections.map((section, sIdx) => {
               const isExpanded = expandedSections.has(sIdx);
               const hasActive = section.items.some(i => isActive(i.path));
 
+              // Collapsed sidebar: render icons only, with a thin divider between groups
+              if (!sidebarOpen) {
+                return (
+                  <div key={section.title} className="space-y-1">
+                    {sIdx > 0 && (
+                      <div className="mx-auto my-1 h-px w-8 bg-[hsl(165_30%_18%/0.6)]" />
+                    )}
+                    {section.items.map((item) => {
+                      const active = isActive(item.path);
+                      return (
+                        <Link
+                          key={item.path}
+                          to={item.path}
+                          onClick={() => setMobileMenuOpen(false)}
+                          title={item.label}
+                          className={cn(
+                            "group relative flex items-center justify-center h-10 w-10 mx-auto rounded-xl transition-all duration-200",
+                            active
+                              ? "text-[hsl(152_100%_73%)] bg-[hsl(165_65%_51%/0.12)] border border-[hsl(165_65%_51%/0.30)]"
+                              : "text-muted-foreground hover:text-[hsl(152_100%_73%)] hover:bg-[hsl(165_65%_51%/0.08)] border border-transparent"
+                          )}
+                          style={active ? { boxShadow: '0 0 14px -4px hsl(165 65% 51% / 0.4)' } : undefined}
+                        >
+                          <item.icon className="w-[18px] h-[18px]" />
+                          {item.label === "Live View" && (
+                            <span className="absolute top-1 right-1 flex h-1.5 w-1.5">
+                              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[hsl(152_100%_73%)] opacity-75" />
+                              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[hsl(165_65%_51%)]" />
+                            </span>
+                          )}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                );
+              }
+
+              // Expanded sidebar: collapsible groups
               return (
                 <Collapsible key={section.title} open={isExpanded} onOpenChange={() => toggleSection(sIdx)}>
-                  {sidebarOpen ? (
-                    <CollapsibleTrigger className="w-full flex items-center justify-between px-2 py-1.5 rounded-md hover:bg-[hsl(165_65%_51%/0.06)] transition-colors group">
-                      <span className={cn(
-                        "text-[10px] font-bold uppercase tracking-[0.14em] transition-colors",
-                        hasActive ? "text-[hsl(152_100%_73%)]" : "text-muted-foreground/50 group-hover:text-muted-foreground/80"
-                      )}>
-                        {section.title}
-                      </span>
-                      <ChevronDown className={cn(
-                        "w-3 h-3 transition-all duration-200",
-                        hasActive ? "text-[hsl(152_100%_73%)]" : "text-muted-foreground/40",
-                        !isExpanded && "-rotate-90"
-                      )} />
-                    </CollapsibleTrigger>
-                  ) : null}
+                  <CollapsibleTrigger className="w-full flex items-center justify-between px-2 py-1.5 rounded-md hover:bg-[hsl(165_65%_51%/0.06)] transition-colors group">
+                    <span className={cn(
+                      "text-[10px] font-bold uppercase tracking-[0.14em] transition-colors",
+                      hasActive ? "text-[hsl(152_100%_73%)]" : "text-muted-foreground/50 group-hover:text-muted-foreground/80"
+                    )}>
+                      {section.title}
+                    </span>
+                    <ChevronDown className={cn(
+                      "w-3 h-3 transition-all duration-200",
+                      hasActive ? "text-[hsl(152_100%_73%)]" : "text-muted-foreground/40",
+                      !isExpanded && "-rotate-90"
+                    )} />
+                  </CollapsibleTrigger>
 
                   <CollapsibleContent className="space-y-0.5 mt-1">
                     {section.items.map((item) => {
@@ -295,8 +331,8 @@ const AdminLayout = () => {
                           )}>
                             <item.icon className="w-[15px] h-[15px] shrink-0" />
                           </div>
-                          {sidebarOpen && <span className="truncate">{item.label}</span>}
-                          {item.label === "Live View" && sidebarOpen && (
+                          <span className="truncate">{item.label}</span>
+                          {item.label === "Live View" && (
                             <span className="ml-auto flex h-1.5 w-1.5 relative">
                               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[hsl(152_100%_73%)] opacity-75" />
                               <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[hsl(165_65%_51%)]" style={{ boxShadow: '0 0 6px hsl(152 100% 73%)' }} />
@@ -306,28 +342,6 @@ const AdminLayout = () => {
                       );
                     })}
                   </CollapsibleContent>
-
-                  {/* Collapsed mode: icons only */}
-                  {!sidebarOpen && section.items.map((item) => {
-                    const active = isActive(item.path);
-                    return (
-                      <Link
-                        key={item.path}
-                        to={item.path}
-                        onClick={() => setMobileMenuOpen(false)}
-                        title={item.label}
-                        className={cn(
-                          "group relative flex items-center justify-center h-11 mx-auto w-11 rounded-xl transition-all duration-200",
-                          active
-                            ? "text-[hsl(152_100%_73%)] bg-[hsl(165_65%_51%/0.12)] border border-[hsl(165_65%_51%/0.30)]"
-                            : "text-muted-foreground hover:text-[hsl(152_100%_73%)] hover:bg-[hsl(165_65%_51%/0.08)]"
-                        )}
-                        style={active ? { boxShadow: '0 0 14px -4px hsl(165 65% 51% / 0.4)' } : undefined}
-                      >
-                        <item.icon className="w-[20px] h-[20px]" />
-                      </Link>
-                    );
-                  })}
                 </Collapsible>
               );
             })}
@@ -445,9 +459,7 @@ const AdminLayout = () => {
               {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
 
-            <div className="h-8 w-8 inline-flex items-center justify-center rounded-lg text-muted-foreground hover:text-[hsl(152_100%_73%)] hover:bg-[hsl(165_65%_51%/0.10)] border border-transparent hover:border-[hsl(165_65%_51%/0.25)] transition-all">
-              <PushNotificationToggle />
-            </div>
+            <PushNotificationToggle />
 
             <div className="mx-1 h-6 w-px bg-[hsl(165_30%_18%)]" />
 
