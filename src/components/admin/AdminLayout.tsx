@@ -371,10 +371,10 @@ const AdminLayout = () => {
 
   return (
     <div className={cn("min-h-screen flex w-full", theme === "dark" ? "void-gradient-bg" : "bg-background")}>
-      {/* Desktop sidebar */}
+      {/* Desktop sidebar — sticky, in-flow so no gap appears */}
       <aside
         className={cn(
-          "hidden md:flex flex-col fixed top-0 left-0 h-screen z-50 transition-all duration-200",
+          "hidden md:flex flex-col sticky top-0 h-screen z-50 shrink-0 transition-[width] duration-200",
           sidebarOpen ? "w-[230px]" : "w-[76px]"
         )}
         style={{
@@ -398,7 +398,7 @@ const AdminLayout = () => {
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 md:hidden" onClick={() => setMobileMenuOpen(false)} />
       )}
 
-      {/* Mobile sidebar */}
+      {/* Mobile sidebar — kept fixed for slide-in */}
       <aside
         className={cn(
           "fixed top-0 left-0 h-screen w-[230px] z-50 transition-transform duration-200 md:hidden",
@@ -414,7 +414,8 @@ const AdminLayout = () => {
       </aside>
 
       {/* Main content */}
-      <div className={cn("flex-1 min-w-0 transition-all duration-200", sidebarOpen ? "md:ml-[230px]" : "md:ml-[76px]")}>
+      <div className="flex-1 min-w-0">
+
         <header
           className="sticky top-0 z-30 h-14 flex items-center px-5 gap-3"
           style={{
