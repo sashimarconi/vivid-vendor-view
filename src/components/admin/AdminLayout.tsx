@@ -177,10 +177,13 @@ const AdminLayout = () => {
     : platformSettings?.sidebar_logo_collapsed;
 
   const SidebarNav = () => (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full relative">
+      {/* Subtle mint accent edge */}
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-px bg-gradient-to-b from-transparent via-[hsl(165_65%_51%/0.25)] to-transparent" />
+
       {/* Logo */}
       <div className={cn(
-        "border-b border-border/60 flex items-center",
+        "border-b border-[hsl(165_30%_16%/0.7)] flex items-center",
         sidebarOpen ? "h-14 px-4 justify-between" : "relative h-[76px] px-2 justify-center"
       )}>
         <Link
@@ -195,11 +198,17 @@ const AdminLayout = () => {
               <img src={logoOpen} alt="Logo" className="h-9 max-w-[160px] object-contain" />
             ) : (
               <>
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                  <span className="text-white font-bold text-xs">V</span>
+                <div
+                  className="w-8 h-8 rounded-lg flex items-center justify-center"
+                  style={{
+                    background: 'linear-gradient(135deg, hsl(165 65% 51%), hsl(152 100% 73%))',
+                    boxShadow: '0 0 16px hsl(165 65% 51% / 0.4)',
+                  }}
+                >
+                  <span className="text-[hsl(200_45%_7%)] font-bold text-xs">V</span>
                 </div>
                 <span className="font-bold text-[15px] tracking-tight text-foreground">
-                  Void<span className="text-accent">Tok</span>
+                  Void<span className="text-[hsl(152_100%_73%)]">Tok</span>
                 </span>
               </>
             )
@@ -207,8 +216,14 @@ const AdminLayout = () => {
             logoClosed ? (
               <img src={logoClosed} alt="Logo" className="w-16 h-16 object-contain" />
             ) : (
-              <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                <span className="text-white font-bold text-sm">V</span>
+              <div
+                className="w-12 h-12 rounded-xl flex items-center justify-center"
+                style={{
+                  background: 'linear-gradient(135deg, hsl(165 65% 51%), hsl(152 100% 73%))',
+                  boxShadow: '0 0 20px hsl(165 65% 51% / 0.4)',
+                }}
+              >
+                <span className="text-[hsl(200_45%_7%)] font-bold text-sm">V</span>
               </div>
             )
           )}
@@ -216,7 +231,7 @@ const AdminLayout = () => {
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
           className={cn(
-            "hidden md:flex text-muted-foreground hover:text-foreground transition-colors p-1 rounded-md hover:bg-muted",
+            "hidden md:flex items-center justify-center w-6 h-6 rounded-md text-muted-foreground hover:text-[hsl(152_100%_73%)] hover:bg-[hsl(165_65%_51%/0.10)] border border-transparent hover:border-[hsl(165_65%_51%/0.25)] transition-all",
             sidebarOpen ? "" : "absolute right-1 top-2"
           )}
         >
@@ -225,9 +240,9 @@ const AdminLayout = () => {
       </div>
 
       {/* Nav items */}
-      <div className="flex-1 overflow-hidden px-3 py-3">
+      <div className="flex-1 overflow-hidden px-3 py-4">
         <ScrollArea className="h-full" type="auto">
-          <nav className="space-y-1 pr-2">
+          <nav className="space-y-2 pr-2">
             {navSections.map((section, sIdx) => {
               const isExpanded = expandedSections.has(sIdx);
               const hasActive = section.items.some(i => isActive(i.path));
@@ -235,70 +250,84 @@ const AdminLayout = () => {
               return (
                 <Collapsible key={section.title} open={isExpanded} onOpenChange={() => toggleSection(sIdx)}>
                   {sidebarOpen ? (
-                    <CollapsibleTrigger className="w-full flex items-center justify-between px-2 py-1.5 rounded-md hover:bg-muted/40 transition-colors group">
+                    <CollapsibleTrigger className="w-full flex items-center justify-between px-2 py-1.5 rounded-md hover:bg-[hsl(165_65%_51%/0.06)] transition-colors group">
                       <span className={cn(
-                        "text-[11px] font-semibold uppercase tracking-[0.12em]",
-                        hasActive ? "text-primary" : "text-muted-foreground/60"
+                        "text-[10px] font-bold uppercase tracking-[0.14em] transition-colors",
+                        hasActive ? "text-[hsl(152_100%_73%)]" : "text-muted-foreground/50 group-hover:text-muted-foreground/80"
                       )}>
                         {section.title}
                       </span>
                       <ChevronDown className={cn(
-                        "w-3 h-3 text-muted-foreground/50 transition-transform duration-200",
+                        "w-3 h-3 transition-all duration-200",
+                        hasActive ? "text-[hsl(152_100%_73%)]" : "text-muted-foreground/40",
                         !isExpanded && "-rotate-90"
                       )} />
                     </CollapsibleTrigger>
                   ) : null}
 
-                  <CollapsibleContent className="space-y-0.5 mt-0.5">
-                    {section.items.map((item) => (
+                  <CollapsibleContent className="space-y-0.5 mt-1">
+                    {section.items.map((item) => {
+                      const active = isActive(item.path);
+                      return (
+                        <Link
+                          key={item.path}
+                          to={item.path}
+                          onClick={() => setMobileMenuOpen(false)}
+                          className={cn(
+                            "group relative flex items-center gap-3 px-2.5 py-2 rounded-lg text-[13.5px] font-medium transition-all duration-200",
+                            active
+                              ? "text-foreground bg-[hsl(165_65%_51%/0.12)] border border-[hsl(165_65%_51%/0.25)]"
+                              : "text-muted-foreground hover:text-foreground hover:bg-[hsl(165_65%_51%/0.06)] border border-transparent"
+                          )}
+                          style={active ? {
+                            boxShadow: '0 0 14px -4px hsl(165 65% 51% / 0.35), inset 0 1px 0 hsl(152 100% 73% / 0.06)',
+                          } : undefined}
+                        >
+                          {active && (
+                            <span
+                              className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-r-full"
+                              style={{ background: 'linear-gradient(180deg, hsl(152 100% 73%), hsl(165 65% 51%))', boxShadow: '0 0 8px hsl(152 100% 73% / 0.6)' }}
+                            />
+                          )}
+                          <div className={cn(
+                            "flex items-center justify-center w-5 h-5 transition-colors",
+                            active ? "text-[hsl(152_100%_73%)]" : "group-hover:text-[hsl(152_100%_73%)]"
+                          )}>
+                            <item.icon className="w-[15px] h-[15px] shrink-0" />
+                          </div>
+                          {sidebarOpen && <span className="truncate">{item.label}</span>}
+                          {item.label === "Live View" && sidebarOpen && (
+                            <span className="ml-auto flex h-1.5 w-1.5 relative">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[hsl(152_100%_73%)] opacity-75" />
+                              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[hsl(165_65%_51%)]" style={{ boxShadow: '0 0 6px hsl(152 100% 73%)' }} />
+                            </span>
+                          )}
+                        </Link>
+                      );
+                    })}
+                  </CollapsibleContent>
+
+                  {/* Collapsed mode: icons only */}
+                  {!sidebarOpen && section.items.map((item) => {
+                    const active = isActive(item.path);
+                    return (
                       <Link
                         key={item.path}
                         to={item.path}
                         onClick={() => setMobileMenuOpen(false)}
+                        title={item.label}
                         className={cn(
-                          "group flex items-center gap-3 px-2.5 py-[7px] rounded-lg text-[14px] font-medium transition-all duration-150",
-                          isActive(item.path)
-                            ? "bg-primary/10 text-foreground"
-                            : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                          "group relative flex items-center justify-center h-11 mx-auto w-11 rounded-xl transition-all duration-200",
+                          active
+                            ? "text-[hsl(152_100%_73%)] bg-[hsl(165_65%_51%/0.12)] border border-[hsl(165_65%_51%/0.30)]"
+                            : "text-muted-foreground hover:text-[hsl(152_100%_73%)] hover:bg-[hsl(165_65%_51%/0.08)]"
                         )}
+                        style={active ? { boxShadow: '0 0 14px -4px hsl(165 65% 51% / 0.4)' } : undefined}
                       >
-                        <div className={cn(
-                          "flex items-center justify-center w-5 h-5",
-                          isActive(item.path) && "text-primary"
-                        )}>
-                          <item.icon className={cn(
-                            "w-[15px] h-[15px] shrink-0 transition-colors duration-150",
-                            isActive(item.path) ? "text-primary" : "group-hover:text-foreground"
-                          )} />
-                        </div>
-                        {sidebarOpen && <span>{item.label}</span>}
-                        {item.label === "Live View" && sidebarOpen && (
-                          <span className="ml-auto flex h-1.5 w-1.5 relative">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-void-success opacity-60" />
-                            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-void-success" />
-                          </span>
-                        )}
+                        <item.icon className="w-[20px] h-[20px]" />
                       </Link>
-                    ))}
-                  </CollapsibleContent>
-
-                  {/* When sidebar collapsed, show items without section headers */}
-                  {!sidebarOpen && section.items.map((item) => (
-                    <Link
-                      key={item.path}
-                      to={item.path}
-                      onClick={() => setMobileMenuOpen(false)}
-                      title={item.label}
-                      className={cn(
-                        "group flex items-center justify-center h-11 rounded-xl transition-all duration-150",
-                        isActive(item.path)
-                          ? "bg-primary/10 text-primary"
-                          : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                      )}
-                    >
-                      <item.icon className="w-[22px] h-[22px]" />
-                    </Link>
-                  ))}
+                    );
+                  })}
                 </Collapsible>
               );
             })}
@@ -307,19 +336,19 @@ const AdminLayout = () => {
       </div>
 
       {/* Footer */}
-      <div className="p-3 border-t border-border/60 space-y-0.5">
+      <div className="p-3 border-t border-[hsl(165_30%_16%/0.7)] space-y-0.5">
         <Link
           to="/"
-          className="flex items-center gap-3 px-2.5 py-[7px] rounded-lg text-[13px] text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors group"
+          className="flex items-center gap-3 px-2.5 py-2 rounded-lg text-[13px] text-muted-foreground hover:text-[hsl(152_100%_73%)] hover:bg-[hsl(165_65%_51%/0.06)] transition-colors group"
         >
-          <ExternalLink className={cn("shrink-0", sidebarOpen ? "w-[15px] h-[15px]" : "w-5 h-5")} />
+          <ExternalLink className={cn("shrink-0", sidebarOpen ? "w-[15px] h-[15px]" : "w-5 h-5 mx-auto")} />
           {sidebarOpen && <span>Ver Loja</span>}
         </Link>
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-2.5 py-[7px] rounded-lg text-[13px] text-muted-foreground hover:text-destructive hover:bg-destructive/8 transition-colors"
+          className="w-full flex items-center gap-3 px-2.5 py-2 rounded-lg text-[13px] text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
         >
-          <LogOut className={cn("shrink-0", sidebarOpen ? "w-[15px] h-[15px]" : "w-5 h-5")} />
+          <LogOut className={cn("shrink-0", sidebarOpen ? "w-[15px] h-[15px]" : "w-5 h-5 mx-auto")} />
           {sidebarOpen && <span>Sair</span>}
         </button>
       </div>
@@ -327,16 +356,24 @@ const AdminLayout = () => {
   );
 
   return (
-    <div className={cn("min-h-screen flex", theme === "dark" ? "void-gradient-bg" : "bg-background")}>
+    <div className={cn("min-h-screen flex w-full", theme === "dark" ? "void-gradient-bg" : "bg-background")}>
       {/* Desktop sidebar */}
       <aside
         className={cn(
-          "hidden md:flex flex-col fixed top-0 left-0 h-screen border-r border-border/60 z-50 transition-all duration-200",
-          sidebarOpen ? "w-[220px]" : "w-[84px]"
+          "hidden md:flex flex-col fixed top-0 left-0 h-screen z-50 transition-all duration-200",
+          sidebarOpen ? "w-[230px]" : "w-[76px]"
         )}
         style={{
-          background: theme === "dark" ? 'hsl(240 6% 7% / 0.95)' : 'hsl(0 0% 100% / 0.95)',
-          backdropFilter: 'blur(20px)'
+          background: theme === "dark"
+            ? 'linear-gradient(180deg, hsl(200 45% 7% / 0.96) 0%, hsl(200 40% 6% / 0.96) 100%)'
+            : 'hsl(0 0% 100% / 0.95)',
+          backdropFilter: 'blur(24px)',
+          borderRight: theme === "dark"
+            ? '1px solid hsl(165 30% 16% / 0.8)'
+            : '1px solid hsl(214 32% 91%)',
+          boxShadow: theme === "dark"
+            ? 'inset -1px 0 0 hsl(152 100% 73% / 0.04), 4px 0 24px -12px hsl(165 65% 51% / 0.15)'
+            : undefined,
         }}
       >
         <SidebarNav />
@@ -344,40 +381,85 @@ const AdminLayout = () => {
 
       {/* Mobile overlay */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden" onClick={() => setMobileMenuOpen(false)} />
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 md:hidden" onClick={() => setMobileMenuOpen(false)} />
       )}
 
       {/* Mobile sidebar */}
       <aside
         className={cn(
-          "fixed top-0 left-0 h-screen w-[220px] bg-card border-r border-border/60 z-50 transition-transform duration-200 md:hidden",
+          "fixed top-0 left-0 h-screen w-[230px] z-50 transition-transform duration-200 md:hidden",
           mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
         )}
+        style={{
+          background: theme === "dark" ? 'hsl(200 45% 7% / 0.98)' : 'hsl(0 0% 100%)',
+          backdropFilter: 'blur(24px)',
+          borderRight: theme === "dark" ? '1px solid hsl(165 30% 16%)' : '1px solid hsl(214 32% 91%)',
+        }}
       >
         <SidebarNav />
       </aside>
 
       {/* Main content */}
-      <div className={cn("flex-1 transition-all duration-200", sidebarOpen ? "md:ml-[220px]" : "md:ml-[84px]")}>
-        <header className="sticky top-0 z-30 h-14 border-b border-border/60 flex items-center px-5 gap-3" style={{ background: theme === "dark" ? 'hsl(240 6% 7% / 0.8)' : 'hsl(0 0% 100% / 0.8)', backdropFilter: 'blur(20px)' }}>
-          <button className="md:hidden text-muted-foreground hover:text-foreground transition-colors" onClick={() => setMobileMenuOpen(true)}>
+      <div className={cn("flex-1 min-w-0 transition-all duration-200", sidebarOpen ? "md:ml-[230px]" : "md:ml-[76px]")}>
+        <header
+          className="sticky top-0 z-30 h-14 flex items-center px-5 gap-3"
+          style={{
+            background: theme === "dark"
+              ? 'linear-gradient(180deg, hsl(200 45% 7% / 0.92) 0%, hsl(200 45% 7% / 0.78) 100%)'
+              : 'hsl(0 0% 100% / 0.85)',
+            backdropFilter: 'blur(24px)',
+            borderBottom: theme === "dark"
+              ? '1px solid hsl(165 30% 16% / 0.7)'
+              : '1px solid hsl(214 32% 91%)',
+            boxShadow: theme === "dark"
+              ? '0 1px 0 hsl(152 100% 73% / 0.04), 0 8px 24px -16px hsl(0 0% 0% / 0.5)'
+              : undefined,
+          }}
+        >
+          <button
+            className="md:hidden p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-[hsl(165_65%_51%/0.08)] transition-colors"
+            onClick={() => setMobileMenuOpen(true)}
+          >
             <Menu className="w-5 h-5" />
           </button>
+
+          {/* Live status pill */}
+          <div className="hidden sm:flex items-center gap-2 rounded-full border border-[hsl(165_65%_51%/0.25)] bg-[hsl(165_65%_51%/0.08)] px-3 py-1">
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[hsl(152_100%_73%)] opacity-75" />
+              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[hsl(165_65%_51%)]" />
+            </span>
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-[hsl(152_100%_73%)]">
+              Sistema Online
+            </span>
+          </div>
+
           <div className="flex-1" />
-          <div className="flex items-center gap-3">
+
+          <div className="flex items-center gap-1.5">
             <button
               onClick={toggleTheme}
-              className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+              className="h-8 w-8 inline-flex items-center justify-center rounded-lg text-muted-foreground hover:text-[hsl(152_100%_73%)] hover:bg-[hsl(165_65%_51%/0.10)] border border-transparent hover:border-[hsl(165_65%_51%/0.25)] transition-all"
               title={theme === "dark" ? "Modo claro" : "Modo escuro"}
             >
               {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
-            <PushNotificationToggle />
+
+            <div className="h-8 w-8 inline-flex items-center justify-center rounded-lg text-muted-foreground hover:text-[hsl(152_100%_73%)] hover:bg-[hsl(165_65%_51%/0.10)] border border-transparent hover:border-[hsl(165_65%_51%/0.25)] transition-all">
+              <PushNotificationToggle />
+            </div>
+
+            <div className="mx-1 h-6 w-px bg-[hsl(165_30%_18%)]" />
+
             <Link
               to="/daisakoikeda/profile"
-              className="h-7 w-7 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center hover:ring-2 hover:ring-primary/40 transition-all"
+              className="relative h-8 w-8 rounded-full flex items-center justify-center transition-all hover:scale-105"
+              style={{
+                background: 'linear-gradient(135deg, hsl(165 65% 51%), hsl(152 100% 73%))',
+                boxShadow: '0 0 0 1px hsl(200 45% 7%), 0 0 12px hsl(165 65% 51% / 0.4)',
+              }}
             >
-              <span className="text-white text-[10px] font-bold">VT</span>
+              <span className="text-[10px] font-bold text-[hsl(200_45%_7%)]">VT</span>
             </Link>
           </div>
         </header>
