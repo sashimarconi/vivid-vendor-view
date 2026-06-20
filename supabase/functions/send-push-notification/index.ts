@@ -129,6 +129,17 @@ Deno.serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+    // Require service-role bearer (called only from other backend functions)
+    const authHeader = req.headers.get("authorization") || "";
+    const token = authHeader.replace(/^Bearer\s+/i, "").trim();
+    if (!token || token !== serviceRoleKey) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const vapidPublicKey = normalizeBase64Url(Deno.env.get("VAPID_PUBLIC_KEY") || "");
     const vapidPrivateKey = normalizeBase64Url(Deno.env.get("VAPID_PRIVATE_KEY") || "");
     const supabase = createClient(supabaseUrl, serviceRoleKey);
