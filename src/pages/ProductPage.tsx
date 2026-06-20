@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import DOMPurify from "dompurify";
 import { usePageTracking, useVisitorHeartbeat, trackEvent } from "@/hooks/usePageTracking";
 import { useTikTokPixel, trackTikTokViewContent } from "@/hooks/useTikTokPixel";
 import { useXtrackyHandler } from "@/hooks/useXtrackyHandler";
@@ -274,7 +275,16 @@ const ProductPage = () => {
           </div>
         )}
         {product.description && product.description.includes("<") ? (
-          <div className="text-xs text-muted-foreground leading-relaxed prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: product.description }} />
+          <div
+            className="text-xs text-muted-foreground leading-relaxed prose prose-sm max-w-none"
+            dangerouslySetInnerHTML={{
+              __html: DOMPurify.sanitize(product.description, {
+                ALLOWED_TAGS: ['b','i','u','strong','em','p','br','ul','ol','li','h1','h2','h3','h4','h5','h6','span','div','a','img','blockquote','code','pre','hr'],
+                ALLOWED_ATTR: ['href','target','rel','src','alt','title','class','style'],
+                ALLOWED_URI_REGEXP: /^(?:(?:https?|mailto|tel):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i,
+              }),
+            }}
+          />
         ) : (
           <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{product.description}</p>
         )}

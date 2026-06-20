@@ -129,6 +129,16 @@ Deno.serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+    const authHeader = req.headers.get("authorization") || "";
+    const token = authHeader.replace(/^Bearer\s+/i, "").trim();
+    if (!token) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const vapidPublicKey = normalizeBase64Url(Deno.env.get("VAPID_PUBLIC_KEY") || "");
     const vapidPrivateKey = normalizeBase64Url(Deno.env.get("VAPID_PRIVATE_KEY") || "");
     const supabase = createClient(supabaseUrl, serviceRoleKey);
@@ -136,26 +146,41 @@ Deno.serve(async (req) => {
     if (!vapidPublicKey || !vapidPrivateKey) {
       throw new Error("Missing VAPID keys");
     }
-
     if (decodedByteLength(vapidPublicKey) !== 65) {
-      throw new Error(`Invalid VAPID public key length after normalization: ${decodedByteLength(vapidPublicKey)} bytes`);
+      throw new Error(`Invalid VAPID public key length`);
     }
 
     const requestBody = await req.json();
     const { event_type, user_id, owner_user_id } = requestBody;
-
-    // owner_user_id = dono do pedido (deve receber a notificação).
-    // Fallback para user_id por compatibilidade.
     const targetUserId = owner_user_id || user_id || null;
 
-    // Get push subscriptions APENAS do dono do pedido
-    let query = supabase
-      .from("push_subscriptions")
-      .select("endpoint, p256dh, auth, user_id");
-    if (targetUserId) {
-      query = query.eq("user_id", targetUserId);
+    if (!targetUserId) {
+      return new Response(JSON.stringify({ error: "owner_user_id required" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
-    const { data: subscriptions, error } = await query;
+
+    // Allow service-role calls OR authenticated user pushing only to themselves
+    const isServiceRole = token === serviceRoleKey;
+    if (!isServiceRole) {
+      const userClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY") || serviceRoleKey, {
+        global: { headers: { Authorization: `Bearer ${token}` } },
+      });
+      const { data: userResp } = await userClient.auth.getUser();
+      const callerId = userResp?.user?.id;
+      if (!callerId || callerId !== targetUserId) {
+        return new Response(JSON.stringify({ error: "Forbidden" }), {
+          status: 403,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
+    const { data: subscriptions, error } = await supabase
+      .from("push_subscriptions")
+      .select("endpoint, p256dh, auth, user_id")
+      .eq("user_id", targetUserId);
 
     if (error) {
       console.error("Error fetching subscriptions:", error);
@@ -240,9 +265,7 @@ Deno.serve(async (req) => {
     });
   } catch (err) {
     console.error("Push notification error:", err);
-    const message = err instanceof Error ? err.message : String(err);
-    const stack = err instanceof Error ? err.stack : undefined;
-    return new Response(JSON.stringify({ error: "Internal server error", message, stack }), {
+    return new Response(JSON.stringify({ error: "Internal server error" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

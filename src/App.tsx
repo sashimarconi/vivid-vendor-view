@@ -46,6 +46,7 @@ import BlockedScreen from "./components/BlockedScreen";
 import AdminProfile from "./pages/admin/AdminProfile";
 import ResetPassword from "./pages/ResetPassword";
 import ThankYouRedirect from "./pages/ThankYouRedirect";
+import Trust from "./pages/Trust";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -78,6 +79,8 @@ const AppRoutes = () => {
       <Route path="/lug" element={<Login />} />
       <Route path="/preview-blocked" element={<BlockedScreen />} />
       <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/trust" element={<Trust />} />
+      <Route path="/seguranca" element={<Trust />} />
       <Route path="/nimda" element={<SaasAdminLayout />}>
         <Route index element={<SaasMetrics />} />
         <Route path="analytics" element={<SaasAnalytics />} />

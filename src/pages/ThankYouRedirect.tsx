@@ -7,19 +7,7 @@ import { trackEvent } from "@/hooks/usePageTracking";
 const ThankYouRedirect = () => {
   const { slug } = useParams<{ slug: string }>();
   const [searchParams] = useSearchParams();
-  const target = searchParams.get("to");
   const orderId = searchParams.get("order");
-
-  const targetUrl = useMemo(() => {
-    if (!target?.trim()) return null;
-
-    try {
-      const resolved = new URL(target.trim(), window.location.origin);
-      return /^https?:$/i.test(resolved.protocol) ? resolved.toString() : null;
-    } catch {
-      return null;
-    }
-  }, [target]);
 
   const { data: product, isFetched } = useQuery({
     queryKey: ["thank-you-product", slug],
@@ -27,6 +15,20 @@ const ThankYouRedirect = () => {
     enabled: !!slug,
     staleTime: 60_000,
   });
+
+  // Only redirect to the URL configured by the merchant on the product itself.
+  // The legacy `?to=` query param is ignored to prevent open-redirect phishing.
+  const targetUrl = useMemo(() => {
+    const configured = product?.thank_you_url?.trim();
+    if (!configured) return null;
+    try {
+      const resolved = new URL(configured, window.location.origin);
+      return /^https?:$/i.test(resolved.protocol) ? resolved.toString() : null;
+    } catch {
+      return null;
+    }
+  }, [product?.thank_you_url]);
+
 
   useEffect(() => {
     if (!targetUrl) return;
