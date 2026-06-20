@@ -1786,6 +1786,10 @@ export type Database = {
           total_revenue: number
         }[]
       }
+      expire_visitor_session: {
+        Args: { _session_id: string }
+        Returns: undefined
+      }
       get_user_plan: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["plan_type"]
@@ -1801,6 +1805,19 @@ export type Database = {
       mark_pix_copied: { Args: { _order_id: string }; Returns: undefined }
       materialize_recurring_expenses: {
         Args: { _end: string; _start: string; _user_id: string }
+        Returns: undefined
+      }
+      upsert_visitor_session: {
+        Args: {
+          _city?: string
+          _country?: string
+          _latitude?: number
+          _longitude?: number
+          _page_url?: string
+          _region?: string
+          _session_id: string
+          _user_id: string
+        }
         Returns: undefined
       }
       user_financial_daily: {
