@@ -154,27 +154,16 @@ export function useVisitorHeartbeat(userId?: string | null) {
     const sessionId = getSessionId();
 
     const beat = () => {
-      supabase.from("visitor_sessions").upsert(
-        { session_id: sessionId, last_seen_at: new Date().toISOString(), page_url: window.location.pathname, user_id: userId },
-        { onConflict: "session_id" }
-      ).then();
+      supabase.rpc("upsert_visitor_session" as any, {
+        _session_id: sessionId,
+        _user_id: userId,
+        _page_url: window.location.pathname,
+      }).then();
     };
 
-    // Marca sessão como expirada imediatamente quando o usuário sai
-    // (seta last_seen_at para 1min atrás, fora da janela "ao vivo")
     const expire = () => {
-      const expiredAt = new Date(Date.now() - 60_000).toISOString();
-      const url = `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/visitor_sessions?session_id=eq.${encodeURIComponent(sessionId)}`;
-      const body = JSON.stringify({ last_seen_at: expiredAt });
-      const headers = {
-        "Content-Type": "application/json",
-        apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-        Prefer: "return=minimal",
-      };
       try {
-        // sendBeacon não suporta PATCH; usamos fetch com keepalive para garantir envio na saída
-        fetch(url, { method: "PATCH", headers, body, keepalive: true }).catch(() => {});
+        supabase.rpc("expire_visitor_session" as any, { _session_id: sessionId }).then();
       } catch {
         // ignore
       }
