@@ -155,18 +155,18 @@ Deno.serve(async (req) => {
     const requestBody = await req.json();
     const { event_type, user_id, owner_user_id } = requestBody;
 
-    // owner_user_id = dono do pedido (deve receber a notificação).
-    // Fallback para user_id por compatibilidade.
     const targetUserId = owner_user_id || user_id || null;
-
-    // Get push subscriptions APENAS do dono do pedido
-    let query = supabase
-      .from("push_subscriptions")
-      .select("endpoint, p256dh, auth, user_id");
-    if (targetUserId) {
-      query = query.eq("user_id", targetUserId);
+    if (!targetUserId) {
+      return new Response(JSON.stringify({ error: "owner_user_id required" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
-    const { data: subscriptions, error } = await query;
+
+    const { data: subscriptions, error } = await supabase
+      .from("push_subscriptions")
+      .select("endpoint, p256dh, auth, user_id")
+      .eq("user_id", targetUserId);
 
     if (error) {
       console.error("Error fetching subscriptions:", error);
