@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import DOMPurify from "dompurify";
 import { usePageTracking, useVisitorHeartbeat, trackEvent } from "@/hooks/usePageTracking";
 import { useTikTokPixel, trackTikTokViewContent } from "@/hooks/useTikTokPixel";
 import { useXtrackyHandler } from "@/hooks/useXtrackyHandler";
