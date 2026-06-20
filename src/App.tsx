@@ -46,6 +46,7 @@ import BlockedScreen from "./components/BlockedScreen";
 import AdminProfile from "./pages/admin/AdminProfile";
 import ResetPassword from "./pages/ResetPassword";
 import ThankYouRedirect from "./pages/ThankYouRedirect";
+import Trust from "./pages/Trust";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
