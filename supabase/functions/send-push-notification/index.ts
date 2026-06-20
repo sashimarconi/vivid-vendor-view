@@ -130,10 +130,9 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-    // Require service-role bearer (called only from other backend functions)
     const authHeader = req.headers.get("authorization") || "";
     const token = authHeader.replace(/^Bearer\s+/i, "").trim();
-    if (!token || token !== serviceRoleKey) {
+    if (!token) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -147,20 +146,35 @@ Deno.serve(async (req) => {
     if (!vapidPublicKey || !vapidPrivateKey) {
       throw new Error("Missing VAPID keys");
     }
-
     if (decodedByteLength(vapidPublicKey) !== 65) {
-      throw new Error(`Invalid VAPID public key length after normalization: ${decodedByteLength(vapidPublicKey)} bytes`);
+      throw new Error(`Invalid VAPID public key length`);
     }
 
     const requestBody = await req.json();
     const { event_type, user_id, owner_user_id } = requestBody;
-
     const targetUserId = owner_user_id || user_id || null;
+
     if (!targetUserId) {
       return new Response(JSON.stringify({ error: "owner_user_id required" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
+    }
+
+    // Allow service-role calls OR authenticated user pushing only to themselves
+    const isServiceRole = token === serviceRoleKey;
+    if (!isServiceRole) {
+      const userClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY") || serviceRoleKey, {
+        global: { headers: { Authorization: `Bearer ${token}` } },
+      });
+      const { data: userResp } = await userClient.auth.getUser();
+      const callerId = userResp?.user?.id;
+      if (!callerId || callerId !== targetUserId) {
+        return new Response(JSON.stringify({ error: "Forbidden" }), {
+          status: 403,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
     }
 
     const { data: subscriptions, error } = await supabase
