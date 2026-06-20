@@ -108,32 +108,29 @@ export function usePageTracking(eventType: string = "page_view", userId?: string
       if (error) console.error("[Tracking] page_events insert error:", error.message);
     });
 
-    // 2) Marca presença IMEDIATAMENTE (sem esperar geo) para o Radar contar o visitante já
-    supabase.from("visitor_sessions").upsert(
-      { session_id: sessionId, last_seen_at: new Date().toISOString(), page_url: pageUrl, user_id: userId },
-      { onConflict: "session_id" }
-    ).then(({ error }) => {
-      if (error) console.error("[Tracking] visitor_sessions presence upsert error:", error.message);
+    // 2) Marca presença IMEDIATAMENTE via RPC segura
+    supabase.rpc("upsert_visitor_session" as any, {
+      _session_id: sessionId,
+      _user_id: userId,
+      _page_url: pageUrl,
+    }).then(({ error }) => {
+      if (error) console.error("[Tracking] visitor presence rpc error:", error.message);
     });
 
-    // 3) Em paralelo, busca geo e enriquece o registro quando disponível
+    // 3) Em paralelo, busca geo e enriquece o registro
     fetchGeoOnce().then(geo => {
       if (!geo) return;
-      supabase.from("visitor_sessions").upsert(
-        {
-          session_id: sessionId,
-          last_seen_at: new Date().toISOString(),
-          page_url: pageUrl,
-          user_id: userId,
-          city: geo.city,
-          region: geo.region,
-          country: geo.country,
-          latitude: geo.latitude,
-          longitude: geo.longitude,
-        },
-        { onConflict: "session_id" }
-      ).then(({ error }) => {
-        if (error) console.error("[Tracking] visitor_sessions geo upsert error:", error.message);
+      supabase.rpc("upsert_visitor_session" as any, {
+        _session_id: sessionId,
+        _user_id: userId,
+        _page_url: pageUrl,
+        _city: geo.city,
+        _region: geo.region,
+        _country: geo.country,
+        _latitude: geo.latitude,
+        _longitude: geo.longitude,
+      }).then(({ error }) => {
+        if (error) console.error("[Tracking] visitor geo rpc error:", error.message);
       });
     });
   }, [eventType, userId, metadata]);
