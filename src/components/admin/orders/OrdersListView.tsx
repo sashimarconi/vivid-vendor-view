@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { CheckCircle2, Clock3, CopyCheck, Eye, Filter, Package2, RefreshCw, Search, Wallet, X } from "lucide-react";
 import { OrderStatusBadge } from "./OrderStatusBadge";
 import { formatCurrency, formatDateTime, getDisplayVariantLabel, getShortOrderId, orderDateOptions, orderStatusOptions } from "./order-utils";
+import { ExportOrdersButton } from "./ExportOrdersButton";
 import type { AdminOrderRecord, DateFilter, OrderStats, StatusFilter } from "./types";
 
 interface OrdersListViewProps {
@@ -62,10 +63,13 @@ export const OrdersListView = ({
                 <p className="text-sm text-muted-foreground">Gerencie pedidos pagos, pendentes e os cliques no botão de copiar PIX.</p>
               </div>
             </div>
-            <Button variant="outline" size="sm" onClick={onRefresh} className="gap-2 self-start sm:self-auto">
-              <RefreshCw className="h-4 w-4" />
-              Atualizar
-            </Button>
+            <div className="flex items-center gap-2 self-start sm:self-auto">
+              <ExportOrdersButton orders={orders} />
+              <Button variant="outline" size="sm" onClick={onRefresh} className="gap-2">
+                <RefreshCw className="h-4 w-4" />
+                <span className="hidden sm:inline">Atualizar</span>
+              </Button>
+            </div>
           </div>
 
           <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-2 xl:grid-cols-5">
