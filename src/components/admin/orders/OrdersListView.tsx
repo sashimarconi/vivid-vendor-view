@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { CheckCircle2, Clock3, CopyCheck, Eye, Filter, Package2, RefreshCw, Search, Wallet, X } from "lucide-react";
 import { OrderStatusBadge } from "./OrderStatusBadge";
 import { formatCurrency, formatDateTime, getDisplayVariantLabel, getShortOrderId, orderDateOptions, orderStatusOptions } from "./order-utils";
+import { ExportOrdersButton } from "./ExportOrdersButton";
 import type { AdminOrderRecord, DateFilter, OrderStats, StatusFilter } from "./types";
 
 interface OrdersListViewProps {
