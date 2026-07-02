@@ -45,6 +45,7 @@ const PERIOD_PRESETS = [
   { value: "30d", label: "Últimos 30 dias" },
   { value: "month", label: "Este mês" },
   { value: "lastmonth", label: "Mês passado" },
+  { value: "custom", label: "Personalizado" },
 ];
 
 // Format Date as YYYY-MM-DD using LOCAL timezone (avoids UTC shift bug)
@@ -91,8 +92,13 @@ const fmtPct = (v: number) => `${(v || 0).toFixed(1)}%`;
 export default function AdminFinancial() {
   const [preset, setPreset] = useState("30d");
   const [tab, setTab] = useState("overview");
+  const [customStart, setCustomStart] = useState(() => getRange("30d").start);
+  const [customEnd, setCustomEnd] = useState(() => getRange("30d").end);
 
-  const range = useMemo(() => getRange(preset), [preset]);
+  const range = useMemo(
+    () => (preset === "custom" ? { start: customStart, end: customEnd } : getRange(preset)),
+    [preset, customStart, customEnd],
+  );
 
   // Summary
   const { data: summary } = useQuery({
@@ -186,7 +192,7 @@ export default function AdminFinancial() {
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Painel Financeiro</h1>
           <p className="text-muted-foreground text-sm mt-1">Acompanhe receita, custos, despesas e lucro líquido</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Calendar className="w-4 h-4 text-muted-foreground" />
           <Select value={preset} onValueChange={setPreset}>
             <SelectTrigger className="w-[180px]"><SelectValue /></SelectTrigger>
@@ -194,6 +200,25 @@ export default function AdminFinancial() {
               {PERIOD_PRESETS.map(p => <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>)}
             </SelectContent>
           </Select>
+          {preset === "custom" && (
+            <>
+              <Input
+                type="date"
+                value={customStart}
+                max={customEnd}
+                onChange={(e) => setCustomStart(e.target.value)}
+                className="w-[160px]"
+              />
+              <span className="text-muted-foreground text-sm">até</span>
+              <Input
+                type="date"
+                value={customEnd}
+                min={customStart}
+                onChange={(e) => setCustomEnd(e.target.value)}
+                className="w-[160px]"
+              />
+            </>
+          )}
         </div>
       </div>
 
