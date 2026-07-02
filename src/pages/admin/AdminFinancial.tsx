@@ -92,8 +92,13 @@ const fmtPct = (v: number) => `${(v || 0).toFixed(1)}%`;
 export default function AdminFinancial() {
   const [preset, setPreset] = useState("30d");
   const [tab, setTab] = useState("overview");
+  const [customStart, setCustomStart] = useState(() => getRange("30d").start);
+  const [customEnd, setCustomEnd] = useState(() => getRange("30d").end);
 
-  const range = useMemo(() => getRange(preset), [preset]);
+  const range = useMemo(
+    () => (preset === "custom" ? { start: customStart, end: customEnd } : getRange(preset)),
+    [preset, customStart, customEnd],
+  );
 
   // Summary
   const { data: summary } = useQuery({
