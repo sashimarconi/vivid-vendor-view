@@ -45,6 +45,7 @@ const PERIOD_PRESETS = [
   { value: "30d", label: "Últimos 30 dias" },
   { value: "month", label: "Este mês" },
   { value: "lastmonth", label: "Mês passado" },
+  { value: "custom", label: "Personalizado" },
 ];
 
 // Format Date as YYYY-MM-DD using LOCAL timezone (avoids UTC shift bug)
